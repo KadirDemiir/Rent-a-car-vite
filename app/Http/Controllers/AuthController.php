@@ -10,6 +10,11 @@ use Inertia\Inertia;
 
 class AuthController extends Controller
 {
+    public function deneme(Request $request)
+    {
+        dd($request->all());
+    }
+
     public function auth(Request $request)
     {
         if($request->has('log_in'))
@@ -31,7 +36,7 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
  
-            return Inertia::render('Home');
+            return redirect('/');
         }
  
         return Inertia::render('auth/Auth', [
@@ -77,12 +82,12 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        Auth::logout();
+            Auth::logout();
  
         $request->session()->invalidate();
  
         $request->session()->regenerateToken();
  
-        return Inertia::render('Home');
+        return redirect('/');
     }
 }

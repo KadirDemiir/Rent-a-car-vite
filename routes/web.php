@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\SignInController;
 use App\Http\Controllers\AuthController;
 
 Route::inertia('/', 'Home')->name('home');
@@ -15,3 +13,6 @@ Route::inertia('/blog', 'Blog')->name('blog');
 Route::inertia('/auth', 'auth/Auth')->name('auth');
 
 Route::post('/auth', [AuthController::class, 'auth'])->name('auth');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::post('/searchReservation', [AuthController::class, 'deneme'])->name('searchReservation');

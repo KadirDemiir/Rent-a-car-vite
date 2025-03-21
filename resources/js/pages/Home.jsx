@@ -1,13 +1,12 @@
 import NavBar from '../components/Navbar';
+import SearchReservation from '../components/SearchReservation';
 
 export default function Home() {
-    return (
+    return(
         <div>
-            < NavBar />
-            <div className="p-4">
-                <h1 className="text-2xl font-bold text-red-900">Home Page</h1>
-                <p>Welcome to the Home page!</p>
-            </div>
+            <NavBar />
+            <SearchReservation />
+
         </div>
-    );
+    )
 }

@@ -1,13 +1,6 @@
-import { Link, usePage } from '@inertiajs/react';
-import {useState} from 'react';
-import ProfileDropDown from './ProfileDropDown';
-
+import { Link } from '@inertiajs/react';
 
 export default function UpSide() {
-    const { auth } = usePage().props;
-    const [isHovered, setIsHovered] = useState(false);
-    
-
     return (
         <div className="h-[20vh] w-full flex items-center justify-center bg-blue-100 p-2">
             <div className="w-[80%] flex items-center justify-between">
@@ -20,24 +13,7 @@ export default function UpSide() {
                             </li>
                             
                             <li>
-                                { auth.user ?
-                                <div 
-                                className="w-[150px] flex flex-col items-center justify-center relative"
-                                onMouseEnter={() => setIsHovered(true)}
-                                onMouseLeave={() => setIsHovered(false)}
-                                >
-                                    <div className="cursor-pointer">
-                                        {auth.user.name}
-                                    </div>
-
-                                    {isHovered &&
-                                        < ProfileDropDown />
-                                    }
-                                </div>
-                                : 
                                 <Link href="/auth">Sign Up</Link>
-                                
-                                }
                             </li>
                         </ul>
                     </nav>
