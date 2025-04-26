@@ -2,9 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CarController;
+use App\Http\Controllers\LocationsController;
 
 Route::inertia('/', 'Home')->name('home');
-Route::inertia('/cars', 'Cars')->name('cars');
+Route::get('/cars', [CarController::class, 'show'])->name('cars');
 Route::inertia('/locations', 'Locations')->name('locations');
 Route::inertia('/campaigns', 'Campaigns')->name('campaigns');
 Route::inertia('/carporateRental', 'CorporateRental')->name('carporateRental');
@@ -16,3 +18,5 @@ Route::post('/auth', [AuthController::class, 'auth'])->name('auth');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::post('/searchReservation', [AuthController::class, 'deneme'])->name('searchReservation');
+
+Route::get('/location', [LocationsController::class, 'index']);

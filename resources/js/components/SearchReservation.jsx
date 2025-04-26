@@ -4,6 +4,17 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import ClockSelector from './clockSelector/ClockSelector';
 import LocationSelector from './locationSelector/LocationSelector';
+import { forwardRef } from 'react';
+
+const CustomInput = forwardRef(({ value, onClick }, ref) => (
+  <input
+    className="w-52 h-12 text-center rounded-md outline-none cursor-pointer"
+    onClick={onClick}
+    value={value}
+    ref={ref}
+    readOnly
+  />
+));
 
 export default function SearchReservation() {
 
@@ -55,7 +66,7 @@ export default function SearchReservation() {
     return (
         <div className="p-4">
             <form onSubmit={submitHandler} action="" className="flex items-center justify-center  gap-4">
-                <div className="relative w-80" onBlur={() => setIsPUOpen(false)} tabIndex={-1}>
+                <div className="relative w-80" tabIndex={-1}>
                     <div className="w-full">
                         <div className="flex items-center justify-center mb-2">Pick Up Location</div>
                         <LocationSelector 
@@ -68,7 +79,7 @@ export default function SearchReservation() {
                     </div>
                 </div>
 
-                <div className="relative w-80"   onBlur={() => setIsROpen(false)} tabIndex={-1}>
+                <div className="relative w-80" tabIndex={-1}>
                 <div className="w-full">
                     <div className="flex items-center justify-center mb-2">Return Location</div>
                         <LocationSelector 
@@ -91,6 +102,7 @@ export default function SearchReservation() {
                             onChange={(date) => setStartDate(date)}
                             dateFormat="MMMM d, yyyy"
                             className="w-52 h-12 text-center rounded-md outline-none"
+                            customInput={<CustomInput />}
                             />
 
                            <ClockSelector
@@ -108,7 +120,7 @@ export default function SearchReservation() {
                             selected={finishDate}
                             onChange={(date) => setFinishDate(date)}
                             dateFormat="MMMM d, yyyy"
-                            className="w-52 h-12 text-center rounded-md outline-none"
+                            customInput={<CustomInput />}
                             />
 
                             <ClockSelector

@@ -1,12 +1,18 @@
 import Navbar from '../components/Navbar';
-export default function About() {
+import CarCard from '../components/carCards/carCard';
+import { usePage } from '@inertiajs/react';
+
+export default function Car() {
+    const { cars } = usePage().props;
+
     return (
         <div>
             < Navbar />
-            <div className="p-4">
-                <h1 className="text-2xl font-bold">Cars Page</h1>
-                <p>Learn more about our cars!</p>
+            <div className="mt-8 w-full flex flex-cols-3 justify-center gap-6">
+                {cars.map((car) => (
+                    < CarCard key={car.id} car={car} />
+                ))}
             </div>
         </div>
-    );
+    ); 
 }
