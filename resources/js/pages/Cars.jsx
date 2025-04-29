@@ -1,6 +1,7 @@
 import Navbar from '../components/Navbar';
-import CarCard from '../components/carCards/carCard';
+import CarCard from '../components/carCards/CarCard';
 import { usePage } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 
 export default function Car() {
     const { cars } = usePage().props;
@@ -10,7 +11,9 @@ export default function Car() {
             < Navbar />
             <div className="mt-8 w-full grid grid-cols-3 justify-items-center gap-6">
                 {cars.map((car) => (
-                    < CarCard key={car.id} car={car} />
+                    <Link href={`/cars/${car.id}`}>
+                        < CarCard key={car.id} car={car} />
+                    </Link>
                 ))}
             </div>
         </div>

@@ -6,10 +6,16 @@ import { InertiaProgress } from '@inertiajs/progress';
 InertiaProgress.init();
 
 createInertiaApp({
-    resolve: async name => {
-        const module = await import(`./pages/${name}`);
-        return module.default;
-      },
+    resolve: name => {
+        const pages = import.meta.glob('./pages/**/*.jsx'); 
+        const importPage = pages[`./pages/${name}.jsx`]; 
+
+        if (!importPage) {
+            throw new Error(`Sayfa bulunamadı: ${name}`);
+        }
+
+        return importPage().then(module => module.default);
+    },
     setup({ el, App, props }) {
         createRoot(el).render(<App {...props} />);
     },

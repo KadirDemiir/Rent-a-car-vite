@@ -6,7 +6,8 @@ use App\Http\Controllers\CarController;
 use App\Http\Controllers\LocationsController;
 
 Route::inertia('/', 'Home')->name('home');
-Route::get('/cars', [CarController::class, 'show'])->name('cars');
+Route::get('/cars', [CarController::class, 'showAllCars'])->name('cars');
+Route::get('/cars/{id}', [CarController::class, 'showCar'])->name('car');
 Route::inertia('/locations', 'Locations')->name('locations');
 Route::inertia('/campaigns', 'Campaigns')->name('campaigns');
 Route::inertia('/carporateRental', 'CorporateRental')->name('carporateRental');

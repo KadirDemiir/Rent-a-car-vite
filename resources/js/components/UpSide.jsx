@@ -2,7 +2,7 @@ import { Link } from '@inertiajs/react';
 
 export default function UpSide() {
     return (
-        <div className="h-[20vh] w-full flex items-center justify-center bg-blue-100 p-2">
+        <div className="h-[20vh] w-full flex items-center justify-center bg-gray-100 p-2">
             <div className="w-[80%] flex items-center justify-between">
                 <div><h1>LOGO</h1></div>
                 <div className="flex h-full min-w-[50%]">

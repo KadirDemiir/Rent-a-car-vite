@@ -2,7 +2,7 @@ import { Link } from '@inertiajs/react';
 
 export default function DownSide() {
     return (
-        <nav className="bg-blue-600 h-20 flex items-center justify-center">
+        <nav className="bg-blue-800 h-20 flex items-center justify-center">
         <ul className="flex items-center justify-center gap-4 h-full w-[80%]">
             <li className="h-full hover:bg-blue-700 flex flex-1 items-center justify-center rounded-md">
                 <Link href="/cars" className="h-full w-full text-white flex items-center justify-center">Cars</Link>

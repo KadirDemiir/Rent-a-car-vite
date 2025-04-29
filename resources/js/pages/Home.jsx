@@ -3,7 +3,7 @@ import SearchReservation from '../components/SearchReservation';
 
 export default function Home() {
     return(
-        <div>
+        <div className="">
             <NavBar />
             <SearchReservation />
 

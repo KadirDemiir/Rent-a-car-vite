@@ -64,11 +64,11 @@ export default function SearchReservation() {
 
 
     return (
-        <div className="p-4">
+        <div className="p-4 h-[200px] bg-white border-1 border-blue-800 rounded-2xl m-2 flex items-center justify-center">
             <form onSubmit={submitHandler} action="" className="flex items-center justify-center  gap-4">
                 <div className="relative w-80" tabIndex={-1}>
                     <div className="w-full">
-                        <div className="flex items-center justify-center mb-2">Pick Up Location</div>
+                        <div className="flex items-center justify-center mb-2 font-semibold text-gray-700">Pick Up Location</div>
                         <LocationSelector 
                         selectedLocation={selectedPULocation} 
                         isOpen={isPUOpen}
@@ -81,7 +81,7 @@ export default function SearchReservation() {
 
                 <div className="relative w-80" tabIndex={-1}>
                 <div className="w-full">
-                    <div className="flex items-center justify-center mb-2">Return Location</div>
+                    <div className="flex items-center justify-center mb-2 font-semibold text-gray-700">Return Location</div>
                         <LocationSelector 
                         selectedLocation={selectedRLocation} 
                         isOpen={isROpen}
@@ -94,7 +94,7 @@ export default function SearchReservation() {
 
                 <div className="flex gap-4">
                     <div>
-                        <div className="flex items-center justify-center mb-2">Pickup Date & Time</div>
+                        <div className="flex items-center justify-center mb-2 font-semibold text-gray-700">Pickup Date & Time</div>
                         <div className="h-12 w-72 border rounded-md flex">
                             <DatePicker
                             minDate={new Date()}
@@ -113,7 +113,7 @@ export default function SearchReservation() {
                     </div>
 
                     <div>
-                        <div className="flex items-center justify-center mb-2">Return Date & Time</div>
+                        <div className="flex items-center justify-center mb-2 font-semibold text-gray-700">Return Date & Time</div>
                         <div className="h-12 w-72 border rounded-md flex">
                             <DatePicker
                             minDate={minFinish()}
