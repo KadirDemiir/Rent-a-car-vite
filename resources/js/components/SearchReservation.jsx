@@ -64,78 +64,82 @@ export default function SearchReservation() {
 
 
     return (
-        <div className="p-4 h-[200px] bg-white border-1 border-blue-800 rounded-2xl m-2 flex items-center justify-center">
-            <form onSubmit={submitHandler} action="" className="flex items-center justify-center  gap-4">
-                <div className="relative w-80" tabIndex={-1}>
-                    <div className="w-full">
-                        <div className="flex items-center justify-center mb-2 font-semibold text-gray-700">Pick Up Location</div>
-                        <LocationSelector 
-                        selectedLocation={selectedPULocation} 
-                        isOpen={isPUOpen}
-                        locations={locations}
-                        setSelectedLocation={setSelectedPULocation}
-                        setIsOpen={setIsPUOpen}
-                        />
-                    </div>
-                </div>
+<div className="p-6 bg-gradient-to-br from-blue-50 to-white rounded-2xl shadow-xl m-4">
+  <form
+    onSubmit={submitHandler}
+    className="flex flex-wrap gap-6 items-end justify-center"
+  >
+    <div className="w-72">
+      <label className="block mb-1 text-sm font-semibold text-blue-800">
+        Pick Up Location
+      </label>
+      <LocationSelector
+        selectedLocation={selectedPULocation}
+        isOpen={isPUOpen}
+        locations={locations}
+        setSelectedLocation={setSelectedPULocation}
+        setIsOpen={setIsPUOpen}
+      />
+    </div>
 
-                <div className="relative w-80" tabIndex={-1}>
-                <div className="w-full">
-                    <div className="flex items-center justify-center mb-2 font-semibold text-gray-700">Return Location</div>
-                        <LocationSelector 
-                        selectedLocation={selectedRLocation} 
-                        isOpen={isROpen}
-                        locations={locations}
-                        setSelectedLocation={setSelectedRLocation}
-                        setIsOpen={setIsROpen}
-                        />
-                    </div>
-                </div>
+    <div className="w-72">
+      <label className="block mb-1 text-sm font-semibold text-blue-800">
+        Return Location
+      </label>
+      <LocationSelector
+        selectedLocation={selectedRLocation}
+        isOpen={isROpen}
+        locations={locations}
+        setSelectedLocation={setSelectedRLocation}
+        setIsOpen={setIsROpen}
+      />
+    </div>
 
-                <div className="flex gap-4">
-                    <div>
-                        <div className="flex items-center justify-center mb-2 font-semibold text-gray-700">Pickup Date & Time</div>
-                        <div className="h-12 w-72 border rounded-md flex">
-                            <DatePicker
-                            minDate={new Date()}
-                            selected={startDate}
-                            onChange={(date) => setStartDate(date)}
-                            dateFormat="MMMM d, yyyy"
-                            className="w-52 h-12 text-center rounded-md outline-none"
-                            customInput={<CustomInput />}
-                            />
+    <div className="w-72">
+      <label className="block mb-1 text-sm font-semibold text-blue-800">
+        Pickup Date & Time
+      </label>
+      <div className="flex border rounded-md overflow-hidden shadow-sm">
+        <DatePicker
+          minDate={new Date()}
+          selected={startDate}
+          onChange={(date) => setStartDate(date)}
+          dateFormat="MMMM d, yyyy"
+          customInput={<CustomInput />}
+        />
+        <ClockSelector onClockChange={setStartClock} startClock={startClock} />
+      </div>
+    </div>
 
-                           <ClockSelector
-                           onClockChange={setStartClock}
-                           startClock={startClock}
-                           />
-                        </div>
-                    </div>
+    <div className="w-72">
+      <label className="block mb-1 text-sm font-semibold text-blue-800">
+        Return Date & Time
+      </label>
+      <div className="flex border rounded-md overflow-hidden shadow-sm">
+        <DatePicker
+          minDate={minFinish()}
+          selected={finishDate}
+          onChange={(date) => setFinishDate(date)}
+          dateFormat="MMMM d, yyyy"
+          customInput={<CustomInput />}
+        />
+        <ClockSelector
+          onClockChange={setFinishClock}
+          startClock={finishClock}
+        />
+      </div>
+    </div>
 
-                    <div>
-                        <div className="flex items-center justify-center mb-2 font-semibold text-gray-700">Return Date & Time</div>
-                        <div className="h-12 w-72 border rounded-md flex">
-                            <DatePicker
-                            minDate={minFinish()}
-                            selected={finishDate}
-                            onChange={(date) => setFinishDate(date)}
-                            dateFormat="MMMM d, yyyy"
-                            customInput={<CustomInput />}
-                            />
+    <div className="w-full flex justify-center pt-4">
+      <button
+        type="submit"
+        className="w-40 h-12 bg-blue-800 hover:bg-blue-900 text-white font-semibold rounded-xl transition duration-300 shadow-md"
+      >
+        Search
+      </button>
+    </div>
+  </form>
+</div>
 
-                            <ClockSelector
-                           onClockChange={setFinishClock}
-                           startClock={finishClock}
-                           />
-                        </div>
-                    </div>
-                </div>
-
-                <div className="flex items-center justify-center mt-8">
-                    <button type="submit" className="h-12 w-28 bg-blue-600 hover:bg-blue-700 text-xl font-bold text-white rounded-md cursor-pointer">Search</button>
-                </div>
-
-            </form>
-        </div>
     );
 }

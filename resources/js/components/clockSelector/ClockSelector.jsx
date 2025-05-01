@@ -13,7 +13,6 @@ export default function ClockSelector({ onClockChange, startClock }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Dışarı tıklanırsa menüyü kapat
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -25,17 +24,17 @@ export default function ClockSelector({ onClockChange, startClock }) {
   }, []);
 
   return (
-    <div ref={dropdownRef} className="relative w-32 flex items-center">
+    <div ref={dropdownRef} className="max-h-48 w-full flex items-center">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-center px-2 rounded-md text-left bg-white cursor-pointer"
+        className="relative z-10 w-full flex items-center justify-center px-2 rounded-md text-left bg-white cursor-pointer"
       >
         {startClock}
       </button>
 
       {isOpen && (
-        <ul className="absolute z-50 w-full max-h-48 overflow-y-auto bg-white mt-1 shadow-md rounded-md">
+        <ul className="absolute z-50 w-16 max-h-48 overflow-y-auto bg-white mt-1 shadow-md rounded-md">
           {clocks.map((clock) => (
             <li
               key={clock}

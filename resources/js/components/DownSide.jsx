@@ -14,14 +14,15 @@ export default function DownSide() {
                 <Link href="/campaigns" className="h-full w-full text-white flex items-center justify-center">Campaigns</Link>
             </li>
             <li className="h-full hover:bg-blue-700 flex flex-1 items-center justify-center rounded-md">
-                <Link href="/carporateRental" className="h-full w-full text-white flex items-center justify-center">Corporate Car Rental</Link>
+                <Link href="/carporateRental" className="h-full w-full text-white flex items-center justify-center text-center">Corporate Car Rental</Link>
             </li>
             <li className="h-full hover:bg-blue-700 flex flex-1 items-center justify-center rounded-md">
                 <Link href="/about" className="h-full w-full text-white flex items-center justify-center">About Us</Link>
             </li>
+            {/*
             <li className="h-full hover:bg-blue-700 flex flex-1 items-center justify-center rounded-md">
                 <Link href="/blog" className="h-full w-full text-white flex items-center justify-center">Blog</Link>
-            </li>
+            </li>*/}
         </ul>
     </nav>
     );

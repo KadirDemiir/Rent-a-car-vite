@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redis;
 use Inertia\Inertia;
 
 class AuthController extends Controller
@@ -35,15 +36,14 @@ class AuthController extends Controller
  
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
- 
+
             return redirect('/');
+        }else{
+            return Inertia::render('auth/Auth', [
+                'errorMessage' => 'Credentials do not match our records.',
+            ]);
         }
- 
-        return Inertia::render('auth/Auth', [
-            'errorMessage' => 'Credentials do not match our records.',
-
-        ]);
-
+            
     }
 
     public function signUp(Request $request)
@@ -70,7 +70,8 @@ class AuthController extends Controller
 
         if($user){
             return Inertia::render('auth/Auth', [
-                'message' => 'You have successfully registered!'
+                'message' => 'You have successfully registered!',
+                'page' => 'Login'
             ]);
         }
 
@@ -82,7 +83,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-            Auth::logout();
+        Auth::logout();
  
         $request->session()->invalidate();
  

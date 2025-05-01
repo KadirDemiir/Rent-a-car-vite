@@ -1,11 +1,15 @@
 import Navbar from '../components/Navbar';
+import LocationCard from '../components/locationCard/LocationCard';
 export default function About() {
     return (
         <div>
             < Navbar />
-            <div className="p-4">
-                <h1 className="text-2xl font-bold">Locations Page</h1>
-                <p>Learn more about locations!</p>
+            <div className="p-4 w-full flex justify-center bg-gray-100">
+                <div className="w-[90%]">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 sm:grid-col-1 gap-4">
+                    < LocationCard />
+                    </div>
+                </div>
             </div>
         </div>
     );

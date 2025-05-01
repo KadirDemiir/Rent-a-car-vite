@@ -9,7 +9,7 @@ export default function Car() {
     return (
         <div>
             < Navbar />
-            <div className="mt-8 w-full grid grid-cols-3 justify-items-center gap-6">
+            <div className="mt-8 w-full grid grid-cols-3 justify-items-center gap-6 bg-gray-50">
                 {cars.map((car) => (
                     <Link href={`/cars/${car.id}`}>
                         < CarCard key={car.id} car={car} />

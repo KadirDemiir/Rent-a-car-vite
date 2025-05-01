@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CampaignsController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\LocationsController;
 
@@ -9,7 +10,8 @@ Route::inertia('/', 'Home')->name('home');
 Route::get('/cars', [CarController::class, 'showAllCars'])->name('cars');
 Route::get('/cars/{id}', [CarController::class, 'showCar'])->name('car');
 Route::inertia('/locations', 'Locations')->name('locations');
-Route::inertia('/campaigns', 'Campaigns')->name('campaigns');
+Route::get('/campaigns', [CampaignsController::class, 'showAll'])->name('allCampaigns');
+Route::get('/campaigns/{id}', [CampaignsController::class, 'showIndex'])->name('showCampaign');
 Route::inertia('/carporateRental', 'CorporateRental')->name('carporateRental');
 Route::inertia('/about', 'About')->name('about');
 Route::inertia('/blog', 'Blog')->name('blog');

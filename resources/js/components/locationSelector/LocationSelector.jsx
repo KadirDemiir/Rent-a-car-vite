@@ -52,7 +52,7 @@ export default function LocationSelector({ selectedLocation, isOpen, setSelected
     }, []);
 
     return (
-        <>
+        <div className="relative">
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
@@ -89,6 +89,6 @@ export default function LocationSelector({ selectedLocation, isOpen, setSelected
                     </div>
                 </div>
             )}
-        </>
+        </div>
     );
 }

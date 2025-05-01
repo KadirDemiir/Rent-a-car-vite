@@ -4,7 +4,7 @@ import CarCardProperties from './CarCardProperties';
 import CarCardRequirements from './CarCardRequirements';
 export default function CarCard({car}) {
     return (
-        <div className="grid grid-rows-9 h-140 w-110 rounded-xl border border-gray-300 transition-transform duration-300 hover:scale-105 hover:outline-2 hover:outline-blue-500 hover:rounded-xl">
+        <div className="grid grid-rows-9 h-140 w-110 rounded-xl shadow-md bg-white transition-transform duration-300 hover:scale-105 hover:outline-2 hover:outline-blue-500 hover:rounded-xl">
             < CarCardUpSide 
             brand={car.brand}
             model={car.model}
