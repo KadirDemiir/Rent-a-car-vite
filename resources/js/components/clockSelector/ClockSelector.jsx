@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 
-export default function ClockSelector({ onClockChange, startClock }) {
+export default function ClockSelector({ onClockChange, selectedClock }) {
   const clocks = [
     "00.00", "00.30", "01.00", "01.30", "02.00", "02.30", "03.00", "03.30",
     "04.00", "04.30", "05.00", "05.30", "06.00", "06.30", "07.00", "07.30",
@@ -30,7 +30,7 @@ export default function ClockSelector({ onClockChange, startClock }) {
         onClick={() => setIsOpen(!isOpen)}
         className="relative z-10 w-full flex items-center justify-center px-2 rounded-md text-left bg-white cursor-pointer"
       >
-        {startClock}
+        {selectedClock}
       </button>
 
       {isOpen && (
@@ -43,7 +43,7 @@ export default function ClockSelector({ onClockChange, startClock }) {
                 setIsOpen(false);
               }}
               className={`px-2 py-1 hover:bg-blue-500 hover:text-white cursor-pointer border-b border-gray-300 ${
-                clock === startClock ? "bg-blue-100" : ""
+                clock === selectedClock ? "bg-blue-100" : ""
               }`}
             >
               {clock}

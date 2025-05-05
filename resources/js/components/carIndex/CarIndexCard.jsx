@@ -5,8 +5,8 @@ import CarIndexPhotos from "./CarIndexPhoto";
 
 export default function CarIndexCard({car}){
     return (
-      <div className="w-full h-1000 grid grid-cols-10 gap-4">
-          <div className="col-span-7 flex flex-col gap-16">
+      <div className="w-full grid lg:grid-cols-10 grid-cols-1 gap-4">
+          <div className="lg:col-span-7 sm:col-span-1 flex flex-col gap-16">
             <CarIndexPhotos />
             <div className="w-full border-1 border-blue-800 p-4 rounded-2xl">
               <h1 className="text-xl font-extrabold">Services Included For This Vehicle</h1>
@@ -31,7 +31,7 @@ export default function CarIndexCard({car}){
             
           </div>
 
-        <div className="col-span-3 flex flex-col items-center gap-4">
+        <div className="lg:col-span-3 sm-col-span-1 flex flex-col items-center gap-4">
           <CarIndexProp car={car}/>
           <CarIndexRequirement car={car} />
         </div>

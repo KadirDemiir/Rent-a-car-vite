@@ -33,7 +33,7 @@ export default function CarIndexPhotos(){
             <img
             src={`/storage/cars/${photos[currentIndex]}`}
             alt="Car Photo"
-            className="h-60 rounded-lg object-cover"
+            className="h-40 rounded-lg"
             />
             <button
                 onClick={prevPhoto}

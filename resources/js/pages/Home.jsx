@@ -1,11 +1,11 @@
 import NavBar from '../components/Navbar';
-import SearchReservation from '../components/SearchReservation';
+import SearchReservationForm from '../components/SearchReservationForm';
 
 export default function Home() {
     return(
         <div className="">
             <NavBar />
-            <SearchReservation />
+            <SearchReservationForm />
 
         </div>
     )

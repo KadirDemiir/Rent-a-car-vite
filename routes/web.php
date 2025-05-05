@@ -5,6 +5,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CampaignsController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\LocationsController;
+use App\Http\Controllers\ReservationController;
+use App\Models\Reservation;
 
 Route::inertia('/', 'Home')->name('home');
 Route::get('/cars', [CarController::class, 'showAllCars'])->name('cars');
@@ -16,10 +18,11 @@ Route::inertia('/carporateRental', 'CorporateRental')->name('carporateRental');
 Route::inertia('/about', 'About')->name('about');
 Route::inertia('/blog', 'Blog')->name('blog');
 Route::inertia('/auth', 'auth/Auth')->name('auth');
+Route::get('/searchReservations', [ReservationController::class, 'searchReservations'])->name('searchReservations');
 
 Route::post('/auth', [AuthController::class, 'auth'])->name('auth');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::post('/searchReservation', [AuthController::class, 'deneme'])->name('searchReservation');
+//Route::post('/searchReservations', [ReservationController::class, 'searchReservations'])->name('searchReservations');
 
 Route::get('/location', [LocationsController::class, 'index']);
