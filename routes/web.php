@@ -26,3 +26,4 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 //Route::post('/searchReservations', [ReservationController::class, 'searchReservations'])->name('searchReservations');
 
 Route::get('/location', [LocationsController::class, 'index']);
+

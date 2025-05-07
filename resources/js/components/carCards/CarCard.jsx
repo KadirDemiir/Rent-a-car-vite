@@ -2,32 +2,42 @@ import CarCardUpSide from './CarCardUpSide';
 import CarCardPhoto from './CarCardPhoto';
 import CarCardProperties from './CarCardProperties';
 import CarCardRequirements from './CarCardRequirements';
+import { useTranslation } from 'react-i18next';
 export default function CarCard({car}) {
+    const { t } = useTranslation("cars");
+    const upperFirstLetter = (str) => {
+        return str
+            .split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+    }
     return (
         <div className="grid grid-rows-9 h-140 w-110 rounded-xl shadow-md bg-white transition-transform duration-300 hover:scale-105 hover:outline-2 hover:outline-blue-500 hover:rounded-xl">
-            < CarCardUpSide 
+            < CarCardUpSide
             brand={car.brand}
             model={car.model}
-            segment={car.segment}
+            segment={upperFirstLetter(t(`segment.${car.segment}`))}
             />
             < CarCardPhoto
             photo_path="/storage/cars/volvo-xc90.png"
-            />  
+            />
             <div className="row-span-5 flex p-2 gap-2">
-                < CarCardProperties 
-                body_type={car.body_type}
-                seat_count={car.seat_count}
-                trunk_capacity={car.trunk_capacity}
-                fuel_type={car.fuel_type}
-                transmission_type={car.transmission_type}
+                < CarCardProperties
+                    compName={upperFirstLetter(t('car_properties'))}
+                    body_type={car.body_type}
+                    seat_count={`${car.seat_count} ${upperFirstLetter(t('seats'))}`}
+                    trunk_capacity={`${car.trunk_capacity} ${upperFirstLetter(t('luggage_capacity'))}`}
+                    fuel_type={upperFirstLetter(t(car.fuel_type))}
+                    transmission_type={upperFirstLetter(t(car.transmission_type))}
                 />
-                <div className="h-[90%] w-[1px] bg-gray-300"></div> 
-                < CarCardRequirements 
-                min_age="23 Min Age"
-                experience="3 Year Experience"
-                collateral="6000 lira peşinat." 
+                <div className="h-[90%] w-[1px] bg-gray-300"></div>
+                < CarCardRequirements
+                    compName={upperFirstLetter(t('requirements'))}
+                min_age={`23 ${upperFirstLetter(t('min_age'))}`}
+                experience={`3 ${upperFirstLetter(t('year'))} ${upperFirstLetter(t('experience'))}`}
+                collateral={`6000 ${upperFirstLetter(t('currencies.tl'))} ${upperFirstLetter(t('deposit'))}`}
                 />
             </div>
         </div>
     );
-}   
+}

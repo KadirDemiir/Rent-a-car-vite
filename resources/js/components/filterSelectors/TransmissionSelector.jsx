@@ -1,0 +1,16 @@
+import SelectOptions from "./SelectOptions";
+
+export default function TransmissionSelector({ value, onChange }) {
+  return (
+    <SelectOptions
+      value={value}
+      onChange={onChange}
+      options={[
+        { label: "Tümü", value: "" },
+        { label: "Otomatik", value: "automatic" },
+        { label: "Manuel", value: "Manuel" },
+      ]}
+      options_name="Transmission Type"
+    />
+  );
+}

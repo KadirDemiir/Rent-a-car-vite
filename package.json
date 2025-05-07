@@ -20,11 +20,14 @@
         "@inertiajs/progress": "^0.1.2",
         "@inertiajs/react": "^2.0.5",
         "autoprefixer": "^10.4.21",
+        "i18next": "^25.1.1",
+        "i18next-http-backend": "^3.0.2",
         "new": "^0.1.1",
         "postcss": "^8.5.3",
         "react": "^18.3.1",
         "react-datepicker": "^6.9.0",
         "react-dom": "^18.3.1",
+        "react-i18next": "^15.5.1",
         "version": "^0.0.1"
     }
 }
