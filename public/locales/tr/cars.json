@@ -1,0 +1,46 @@
+{
+    "car_properties": "araç özellikleri",
+    "requirements": "gereksinimler",
+    "diesel": "dizel",
+    "gasoline": "benzin",
+    "automatic": "otomatik",
+    "manuel": "manuel",
+    "seats": "koltuk",
+    "count": "sayı",
+    "luggage_capacity": "bagaj kapasitesi",
+    "vehicle_class": "araç sınıfı",
+    "min_age": "minimum yaş",
+    "year": "yıl",
+    "experience": "deneyim",
+    "currencies": {
+        "usd": "dolar",
+        "tl": "TL",
+        "euro": "euro"
+    },
+    "segment": {
+        "luxury": "lüks",
+        "economic": "ekonomik",
+        "intermediate": "orta segment",
+        "compact": "kompakt",
+        "suv": "suv",
+        "minivan": "minivan",
+        "full_size": "full size"
+    },
+    "deposit": "peşinat",
+    "services_included": "hizmetler",
+    "included_services": {
+        "traffic_insurance": "zorunlu trafik sigortası",
+        "roadside_assistance": "7/24 yol yardım",
+        "rental_insurance": "rent a car kaskosu",
+        "fair_fuel_policy": "adil yakıt politikası",
+        "daily_km_limit": "günlük 250 km limit"
+    },
+    "options_and_extras": "seçenekler ve ekstra hizmetler",
+    "extras": {
+        "additional_driver": "ek sürücü",
+        "child_seat": "çocuk koltuğu",
+        "out_of_hours_delivery": "mesai dışı teslim hizmeti",
+        "extra_km_package": "ilave 250 km paketi",
+        "super_protection": "süper koruma paketi"
+    }
+}
