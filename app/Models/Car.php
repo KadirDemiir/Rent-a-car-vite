@@ -28,5 +28,5 @@ class Car extends Model
     {
         return $this->belongsTo(Locations::class, 'location_id');
     }
-    
+
 }

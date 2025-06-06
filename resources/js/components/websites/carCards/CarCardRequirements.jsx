@@ -1,4 +1,4 @@
-import CarCardsProp from './carCardsProp/CarCardsProp';
+import CarCardsProp from './carCardsProp/CarCardsProp.jsx';
 
 export default function CarCardRequirements({min_age, experience, collateral, compName}){
     return(

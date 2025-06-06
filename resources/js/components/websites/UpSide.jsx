@@ -1,8 +1,8 @@
 import { Link, useForm } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
-import LanguageDropdown from '../components/LanguageDropdown';
-import i18n from '../i18n';
+import LanguageDropdown from './LanguageDropdown.jsx';
+import i18n from '../../i18n.js';
 
 export default function UpSide() {
     const { auth } = usePage().props;

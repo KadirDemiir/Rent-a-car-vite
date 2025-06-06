@@ -1,6 +1,6 @@
-import CarIndexPropComp from "./carIndexComp/CarIndexPropComp";
+import CarIndexPropComp from "./carIndexComp/CarIndexPropComp.jsx";
 
-export default function CarIndexRequirement({car}){ 
+export default function CarIndexRequirement({car}){
     return (
         <div className="grid grid-cols-2 gap-6 p-6 bg-white rounded-2xl shadow-md w-full border-1 border-blue-600">
             <div className="col-span-2 flex justify-center font-bold text-xl">Requirements</div>

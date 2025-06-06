@@ -1,5 +1,5 @@
-import Navbar from '../../components/Navbar'
-import SignUpForm from './SignUpForm'
+import Navbar from '../../components/websites/Navbar.jsx'
+import SignUpForm from './SignUpForm.jsx'
 import LogInForm from './LogInForm/'
 import { useState, useEffect } from 'react';
 import { usePage } from '@inertiajs/react';
@@ -35,5 +35,5 @@ export default function Auth() {
                 </div>
             </div>
         </div>
-    ); 
+    );
 }

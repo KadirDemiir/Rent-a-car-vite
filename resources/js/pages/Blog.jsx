@@ -1,4 +1,4 @@
-import Navbar from '../components/Navbar';
+import Navbar from '../components/websites/Navbar.jsx';
 export default function About() {
     return (
         <div>

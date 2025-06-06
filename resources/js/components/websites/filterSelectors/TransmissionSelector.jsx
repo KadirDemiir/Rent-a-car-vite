@@ -1,4 +1,4 @@
-import SelectOptions from "./SelectOptions";
+import SelectOptions from "./SelectOptions.jsx";
 
 export default function TransmissionSelector({ value, onChange }) {
   return (

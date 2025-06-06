@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import SortSelector from '../components/filterSelectors/SortSelector.jsx';
-import FuelSelector from '../components/filterSelectors/FuelSelector.jsx';
-import SegmentSelector from "../components/filterSelectors/SegmentSelector.jsx";
-import TransmissionSelector from "../components/filterSelectors/TransmissionSelector.jsx";
+import SortSelector from './filterSelectors/SortSelector.jsx';
+import FuelSelector from './filterSelectors/FuelSelector.jsx';
+import SegmentSelector from "./filterSelectors/SegmentSelector.jsx";
+import TransmissionSelector from "./filterSelectors/TransmissionSelector.jsx";
 
 export default function FilterReservations({ onFilterChange }) {
   const [sort, setSort] = useState("increase");

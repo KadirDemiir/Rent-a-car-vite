@@ -1,6 +1,6 @@
-import CarIndexProp from "./CarIndexProp";
-import CarIndexRequirement from "./CaRIndexRequirement";
-import CarIndexPhotos from "./CarIndexPhoto";
+import CarIndexProp from "./CarIndexProp.jsx";
+import CarIndexRequirement from "./CarIndexRequirement.jsx";
+import CarIndexPhotos from "./CarIndexPhoto.jsx";
 
 
 export default function CarIndexCard({car}){
@@ -28,7 +28,7 @@ export default function CarIndexCard({car}){
                   <li>Süper Koruma Paketi</li>
                 </ul><br /><br /><br /><br />
             </div>
-            
+
           </div>
 
         <div className="lg:col-span-3 sm-col-span-1 flex flex-col items-center gap-4">

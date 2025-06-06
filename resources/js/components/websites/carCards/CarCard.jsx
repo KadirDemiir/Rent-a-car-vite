@@ -1,7 +1,7 @@
-import CarCardUpSide from './CarCardUpSide';
-import CarCardPhoto from './CarCardPhoto';
-import CarCardProperties from './CarCardProperties';
-import CarCardRequirements from './CarCardRequirements';
+import CarCardUpSide from './CarCardUpSide.jsx';
+import CarCardPhoto from './CarCardPhoto.jsx';
+import CarCardProperties from './CarCardProperties.jsx';
+import CarCardRequirements from './CarCardRequirements.jsx';
 import { useTranslation } from 'react-i18next';
 export default function CarCard({car}) {
     const { t } = useTranslation("cars");

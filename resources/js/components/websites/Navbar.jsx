@@ -1,4 +1,4 @@
-import UpSide from './UpSide';
+import UpSide from './UpSide.jsx';
 import DownSide from './DownSide.jsx';
 
 const Navbar = () => {

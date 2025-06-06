@@ -1,5 +1,5 @@
-import Navbar from '../components/Navbar';
-import LocationCard from '../components/locationCard/LocationCard';
+import Navbar from '../components/websites/Navbar.jsx';
+import LocationCard from '../components/websites/locationCard/LocationCard.jsx';
 export default function About() {
     return (
         <div>

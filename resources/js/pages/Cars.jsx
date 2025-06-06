@@ -1,5 +1,5 @@
-import Navbar from '../components/Navbar';
-import CarCard from '../components/carCards/CarCard';
+import Navbar from '../components/websites/Navbar.jsx';
+import CarCard from '../components/websites/carCards/CarCard.jsx';
 import { usePage } from '@inertiajs/react';
 import { Link } from '@inertiajs/react';
 
@@ -17,5 +17,5 @@ export default function Car() {
                 ))}
             </div>
         </div>
-    ); 
+    );
 }

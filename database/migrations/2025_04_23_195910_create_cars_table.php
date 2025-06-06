@@ -11,20 +11,35 @@ return new class extends Migration
     {
         Schema::create('cars', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('locaiton_id')->constrained()->onDelete('cascade');
+            $table->foreignId('location_id')->constrained()->onDelete('cascade');
             $table->string('brand');
             $table->string('model');
             $table->year('year');
-            $table->string('segment');
-            $table->string('body_type');
+
+            $table->enum('segment', [
+                'economy', 'compact', 'midrange', 'premium'
+            ]);
+
+            $table->enum('body_type', [
+                'hatchback', 'sedan', 'suv', 'station', 'coupe', 'convertible', 'minivan', 'pickup'
+            ]);
+
             $table->unsignedTinyInteger('seat_count');
             $table->unsignedSmallInteger('trunk_capacity');
-            $table->string('fuel_type');
-            $table->string('transmission_type');
+
+            $table->enum('fuel_type', [
+                'benzin', 'dizel', 'elektrik', 'hibrit'
+            ]);
+
+            $table->enum('transmission_type', [
+                'manuel', 'otomatik'
+            ]);
+
             $table->string('license_plate');
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.

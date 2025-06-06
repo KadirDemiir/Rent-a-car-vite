@@ -1,4 +1,4 @@
-import CarIndexPropComp from "./carIndexComp/CarIndexPropComp";
+import CarIndexPropComp from "./carIndexComp/CarIndexPropComp.jsx";
 
 export default function CarIndexProp({car}){
     return (
@@ -12,10 +12,10 @@ export default function CarIndexProp({car}){
 
             < CarIndexPropComp photo_path={"/storage/svg/carFeatures/groups.svg"} title={"Seat Count"} content={car.seat_count}/>
 
-            < CarIndexPropComp photo_path={"/storage/svg/carFeatures/bag.svg"} title={"Luggage Volume"} content={car.trunk_capacity}/>  
+            < CarIndexPropComp photo_path={"/storage/svg/carFeatures/bag.svg"} title={"Luggage Volume"} content={car.trunk_capacity}/>
 
             < CarIndexPropComp photo_path={"/storage/svg/carFeatures/car.svg"} title={"Car Type"} content={car.body_type}/>
-        
+
         </div>
     );
 }

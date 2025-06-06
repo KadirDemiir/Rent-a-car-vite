@@ -1,4 +1,4 @@
-import CarCardsProp from './carCardsProp/CarCardsProp';
+import CarCardsProp from './carCardsProp/CarCardsProp.jsx';
 
 
 export default function CarCardProperties({fuel_type, transmission_type, seat_count, body_type, trunk_capacity, compName}){

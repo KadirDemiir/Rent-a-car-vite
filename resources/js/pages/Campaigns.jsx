@@ -1,5 +1,5 @@
-import CampaignsCard from '../components/campaignsCard/CampaignsCard';
-import Navbar from '../components/Navbar';
+import CampaignsCard from '../components/websites/campaignsCard/CampaignsCard.jsx';
+import Navbar from '../components/websites/Navbar.jsx';
 export default function Campaigns() {
     return (
         <div>

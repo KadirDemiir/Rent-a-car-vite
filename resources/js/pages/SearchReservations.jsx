@@ -1,9 +1,9 @@
 import { usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import Navbar from "../components/Navbar.jsx";
-import SearchReservationsFrom from "../components/SearchReservationForm.jsx";
-import SortSearchReservations from '../components/SortSearchReservations.jsx';
-import FilterReservations from "../components/FilterReservations.jsx"
+import Navbar from "../components/websites/Navbar.jsx";
+import SearchReservationsFrom from "../components/websites/SearchReservationForm.jsx";
+import SortSearchReservations from '../components/websites/SortSearchReservations.jsx';
+import FilterReservations from "../components/websites/FilterReservations.jsx"
 
 export default function SearchReservations(){
     const { availableCars, reservation } = usePage().props;

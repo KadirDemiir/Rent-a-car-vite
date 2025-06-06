@@ -1,9 +1,9 @@
 import { usePage } from "@inertiajs/react";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/websites/Navbar.jsx";
 
 export default function CampaignsIndex()
 {
-    const { campaign } = usePage().props; 
+    const { campaign } = usePage().props;
     return(
         <div>
             < Navbar />
