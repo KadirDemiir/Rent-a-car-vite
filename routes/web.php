@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AdminCarController;
+use App\Models\Car;
+use App\Models\Discount;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CampaignsController;
@@ -9,6 +11,7 @@ use App\Http\Controllers\LocationsController;
 use App\Http\Controllers\ReservationController;
 use App\Models\Reservation;
 use Inertia\Inertia;
+use function Sodium\add;
 
 Route::inertia('/', 'Home')->name('home');
 Route::get('/cars', [CarController::class, 'showAllCars'])->name('cars');
@@ -42,7 +45,17 @@ Route::inertia('/adminpanel/reservations', 'adminPanel/reservation/Reservations'
 Route::inertia('/adminpanel/add-reservation', 'adminPanel/reservations/AddReservation')->name('adminAddReservation ');
 Route::inertia('/adminpanel/users', 'adminPanel/users/Users')->name('adminUsers ');
 Route::inertia('/adminpanel/drop-price', 'adminPanel/price/DropPrice')->name('adminDropPrice ');
-Route::inertia('/adminpanel/discounts', 'adminPanel/price/Discounts')->name('adminAddDropPrice ');
+Route::get('/adminpanel/discounts', function () {
+    $discounts = Discount::with('car')->get();
+
+    return Inertia::render('adminPanel/price/Discounts', [
+        'data' => $discounts,
+    ]);
+})->name('adminAddDropPrice');
 Route::inertia('/adminpanel/discount/add', 'adminPanel/price/AddDiscount')->name('adminAddDiscount ');
 Route::inertia('/adminpanel/internal-services', 'adminPanel/additionalServices/InternalServices')->name('adminInternalServices ');
 Route::inertia('adminpanel/external-services', 'adminPanel/additionalServices/ExtraServices')->name('adminExternalServices ');
+
+Route::post('/deneme',[AuthController::class, 'deneme']);
+
+

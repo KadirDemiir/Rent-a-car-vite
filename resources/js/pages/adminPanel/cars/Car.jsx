@@ -18,9 +18,15 @@ export default function Car({car}){
 
               <div className="w-full flex flex-col gap-16">
                   < ModifyCar car={car}/>
-                  < CarReservations res={true}/>
-                  < CarReservations res={false}/>
-                  < IncomingGraph />
+                <div className="max-h-[40vh] overflow-y-hidden">
+                    <span className="font-bold ">Araca Ait Rezervasyonalar </span><span className="text-[14px]">(Detayar İçin Tıklayınız)</span>
+                    < CarReservations res={true}/>
+                </div>
+                <div className="max-h-[40vh] overflow-y-hidden">
+                    <span className="font-bold ">Araca Ait Geçmiş Rezervasyonalar </span><span className="text-[14px]">(Detayar İçin Tıklayınız)</span>
+                    < CarReservations res={false}/>
+                </div>
+                < IncomingGraph />
               </div>
           </div>
           <div className="w-full h-100"></div>

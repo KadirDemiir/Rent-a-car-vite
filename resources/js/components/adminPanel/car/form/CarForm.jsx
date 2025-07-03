@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import FormInput from "./FormInput.jsx";
 import FormSelect from "./FormSelect.jsx";
-import FileInput from "./FileInput.jsx";
+import CarPhoto from "../CarPhoto.jsx";
 
 export default function CarForm({ onSubmit, car = null, mode = "create" }) {
-
-    const [formData, setFormData] = useState({car});
-    const [photo, setPhoto] = useState(null);
+    const [formData, setFormData] = useState({ ...car });
+    const [photos, setPhotos] = useState([]);
+    const [coverIndex, setCoverIndex] = useState(null);
     const [error, setError] = useState({});
 
     const showPhoto = mode === "create";
@@ -39,10 +39,6 @@ export default function CarForm({ onSubmit, car = null, mode = "create" }) {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handlePhotoChange = (e) => {
-        setPhoto(e.target.files[0]);
-    };
-
     const handleSubmit = (e) => {
         e.preventDefault();
         if (Object.keys(error).length > 0) return;
@@ -63,8 +59,9 @@ export default function CarForm({ onSubmit, car = null, mode = "create" }) {
             ].forEach(key => data[key] = formData[key]);
         }
 
-        if (showPhoto && photo) {
-            data.photo = photo;
+        if (showPhoto && photos.length) {
+            data.photos = photos.map(p => p.file);
+            data.cover = coverIndex !== null ? photos[coverIndex].file : null;
         }
 
         onSubmit(data);
@@ -92,12 +89,6 @@ export default function CarForm({ onSubmit, car = null, mode = "create" }) {
                 </>
             )}
 
-            {showPhoto && (
-                <div className="md:col-span-2">
-                    <FileInput label="Araç Fotoğrafı" onChange={handlePhotoChange} />
-                </div>
-            )}
-
             {showPricing && (
                 <>
                     <FormInput type="number" name="dailyPrice" label="Günlük Fiyat" onChange={handleChange} value={formData.dailyPrice || ""} error={error.dailyPrice} />
@@ -106,6 +97,21 @@ export default function CarForm({ onSubmit, car = null, mode = "create" }) {
                     <FormInput name="deposit" label="Depozito" onChange={handleChange} value={formData.deposit || ""} error={error.deposit} />
                 </>
             )}
+
+            {showPhoto && (
+                <div className="md:col-span-2 flex items-center justify-center">
+                    <div className="w-[50%]">
+                        <CarPhoto
+                            maxFiles={4}
+                            onChange={(files, cover) => {
+                                setPhotos(files);
+                                setCoverIndex(cover);
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
+
 
             <div className="md:col-span-2 pt-4">
                 <button

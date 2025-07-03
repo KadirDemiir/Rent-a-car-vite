@@ -11,23 +11,42 @@ class Reservation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
         'car_id',
+        'name',
+        'surname',
+        'tc_number',
+        'phone_number',
         'pickup_location',
         'return_location',
-        'picup_dateTime',
-        'return_dateTime',
-        'price',
+        'pickup_datetime',
+        'return_datetime',
+        'rental_days',
+        'daily_price',
+        'extras_total',
+        'total_price',
+        'payment_type',
+        'payment_status',
         'status',
     ];
 
-    public function user() {
-        return $this->belongsTo(User::class, 'user_id');
+    protected $casts = [
+        'pickup_datetime' => 'datetime',
+        'return_datetime' => 'datetime',
+    ];
+
+    // İlişkiler
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
-    
-    public function car() {
-        return $this->belongsTo(Car::class, 'car_id');
+
+    public function car()
+    {
+        return $this->belongsTo(Car::class);
     }
-    
-    
+
+    public function extras()
+    {
+        return $this->hasMany(ReservationExtra::class);
+    }
 }

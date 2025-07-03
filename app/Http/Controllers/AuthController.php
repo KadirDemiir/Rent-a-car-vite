@@ -33,7 +33,7 @@ class AuthController extends Controller
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
- 
+
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
@@ -43,7 +43,7 @@ class AuthController extends Controller
                 'errorMessage' => 'Credentials do not match our records.',
             ]);
         }
-            
+
     }
 
     public function signUp(Request $request)
@@ -55,7 +55,7 @@ class AuthController extends Controller
             'birthday'  => ['required', 'date', 'before_or_equal:' . now()->subYears(18)->toDateString()],
             'phone_number' => ['required', 'digits:10'],
             'tc_number' => ['required', 'digits:11'],
-            'password' => ['required', 'min:6', 'confirmed'] 
+            'password' => ['required', 'min:6', 'confirmed']
         ]);
 
         $user = User::create([
@@ -84,11 +84,12 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         Auth::logout();
- 
+
         $request->session()->invalidate();
- 
+
         $request->session()->regenerateToken();
- 
+
         return redirect('/');
     }
+
 }

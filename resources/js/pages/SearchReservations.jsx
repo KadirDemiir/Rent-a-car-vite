@@ -39,17 +39,17 @@ export default function SearchReservations(){
 
                     <div className="w-full m-4 mt-8">
 
-                        <div className="w-full flex items-center justify-between mb-4">
+                        <div className="w-full flex items-center justify-center mb-4">
                             < FilterReservations onFilterChange={handleFilterChange}/>
                         </div>
 
                         {availableCars.length > 0 ?
                         (
                             < SortSearchReservations availableCars={availableCars}
-                            sortBy={sortBy}
-                            fuelType={fuelType}
-                            transmissionType={transmissionType}
-                            segment={segment}
+                                sortBy={sortBy}
+                                fuelType={fuelType}
+                                transmissionType={transmissionType}
+                                segment={segment}
                             />
                         ) :
                         (<div className=" flex items-center justify-center">Seçilen Tarih Ve Konum İçin Uygun Arabamız Bulunmamaktadr.</div>)

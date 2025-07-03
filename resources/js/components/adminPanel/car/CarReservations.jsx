@@ -1,21 +1,27 @@
+import { useState } from "react";
 import Td from "../table/Td.jsx";
 import ShowResCard from "../reservations/ShowResCard.jsx";
-import {useState} from "react";
-import Reservations from "../../../pages/adminPanel/reservation/Reservations.jsx";
+import ChevronNavigation from "../reservations/ChevronNavigation.jsx";
 
-export default function CarReservations({res}) {
-    const [selectedReservation, setSelectedReservation] = useState(null);
-    const TDclass = "border border-gray-500 px-4 py-2";
-    const headers = [
-        "Ad", "Soyad", "Numara", "Alış", "Alış Yeri", "İade", "İade Yeri",
-        "Ekstra Tutar", "Toplam Tutar", "Ödeme Yöntemi", "Ödeme Durumu"
-    ];
-    const handleRowClick = (reservation) => {
-        setSelectedReservation(reservation);
-    };
+export default function CarReservations({ res }) {
+  const [selectedReservation, setSelectedReservation] = useState(null);
+  const [startIndex, setStartIndex] = useState(0);
+  const perPage = 3;
 
-    const reservations = [
-        {
+  const TDclass = "border border-gray-500 px-4 py-2";
+  const headers = [
+    "Ad Soyad", "Alış", "Alış Yeri", "İade", "İade Yeri", "Ödeme Durumu", "Durum"
+  ];
+
+  const handleRowClick = (reservation) => {
+    setSelectedReservation(reservation);
+  };
+
+  const closeModal = () => {
+    setSelectedReservation(null);
+  };
+
+  const reservations =  [{
             ad: "Ali",
             soyad: "Yılmaz",
             numara: "0555 123 45 67",
@@ -25,7 +31,7 @@ export default function CarReservations({res}) {
             iadeYeri: "Ankara",
             ekstra: "1000",
             toplam: "4.200₺",
-            odemeYontemi: "Kredi Kartı",
+            durum: "Tamamlanmadı",
             odemeDurumu: "Ödendi"
         },
         {
@@ -38,7 +44,7 @@ export default function CarReservations({res}) {
             iadeYeri: "Ankara",
             ekstra: "1000",
             toplam: "4.200₺",
-            odemeYontemi: "Kredi Kartı",
+            durum: "Tamamlanmadı",
             odemeDurumu: "Ödendi"
         },
         {
@@ -51,7 +57,7 @@ export default function CarReservations({res}) {
             iadeYeri: "Ankara",
             ekstra: "1000",
             toplam: "4.200₺",
-            odemeYontemi: "Kredi Kartı",
+            durum: "Tamamlanmadı",
             odemeDurumu: "Ödendi"
         },
         {
@@ -64,7 +70,7 @@ export default function CarReservations({res}) {
             iadeYeri: "Ankara",
             ekstra: "1000",
             toplam: "4.200₺",
-            odemeYontemi: "Kredi Kartı",
+            durum: "Tamamlanmadı",
             odemeDurumu: "Ödendi"
         },
         {
@@ -77,7 +83,7 @@ export default function CarReservations({res}) {
             iadeYeri: "Ankara",
             ekstra: "1000",
             toplam: "4.200₺",
-            odemeYontemi: "Kredi Kartı",
+            durum: "Tamamlanmadı",
             odemeDurumu: "Ödendi"
         },
         {
@@ -90,7 +96,7 @@ export default function CarReservations({res}) {
             iadeYeri: "Ankara",
             ekstra: "1000",
             toplam: "4.200₺",
-            odemeYontemi: "Kredi Kartı",
+            durum: "Tamamlanmadı",
             odemeDurumu: "Ödendi"
         },
         {
@@ -103,52 +109,73 @@ export default function CarReservations({res}) {
             iadeYeri: "Nevşehir",
             ekstra: "500",
             toplam: "4.700₺",
-            odemeYontemi: "Kredi Kartı",
+            durum: "Tamamlanmadı",
             odemeDurumu: "Ödendi"
         }
     ];
 
-    const closeModal = () => {
-        setSelectedReservation(null);
-    };
+  const handlePrev = () => {
+    setStartIndex((prev) => Math.max(prev - perPage, 0));
+  };
 
-    return (
-        <div className="relative">
-            <div className="space-x-4">
-                <span className="font-bold">Aracın {res ? "Rezervasyonları" : "Geçmiş Kiralama Kayıtları"}</span>
-                <span className="text-sm font-thin">{res ? "(Rezervasyonu yönetmek için tıklayınız)" : "(Detaylar İçin Tıklayınız)"}</span>
-            </div>
-            <div className="max-h-[40vh] overflow-y-scroll">
-                <table className="table-auto w-full border border-gray-500 border-collapse mt-2">
-                    <thead className="bg-gray-100">
-                    <tr>
-                        <Td cls={TDclass} contents={headers} as="th" />
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {reservations.map((r, index) => (
-                        <tr key={index} onClick={() => handleRowClick(r)} className="cursor-pointer hover:bg-gray-100">
-                            <Td
-                                cls={TDclass}
-                                contents={[
-                                    r.ad, r.soyad, r.numara, r.alis, r.alisYeri,
-                                    r.iade, r.iadeYeri, r.ekstra, r.toplam,
-                                    r.odemeYontemi,
-                                    <span className="text-green-600 font-semibold" key="odeme">
-                                            {r.odemeDurumu}
-                                        </span>
-                                ]}
-                            />
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-            </div>
+  const handleNext = () => {
+    if (startIndex + perPage < reservations.length) {
+      setStartIndex(startIndex + perPage);
+    }
+  };
 
-            {selectedReservation && (
-                < ShowResCard res = {selectedReservation} closeModal = {closeModal} isRes={res}/>
-            )}
+  const currentReservations = reservations.slice(startIndex, startIndex + perPage);
+  const totalPages = Math.ceil(reservations.length / perPage);
+  const currentPage = Math.floor(startIndex / perPage) + 1;
 
-        </div>
-    );
+  return (
+    <div className="relative">
+      <table className="table-auto w-full border border-gray-500 border-collapse mt-2">
+        <thead className="bg-gray-100">
+          <tr>
+            <Td cls={TDclass} contents={headers} as="th" />
+          </tr>
+        </thead>
+        <tbody>
+          {currentReservations.map((r, index) => (
+            <tr
+              key={startIndex + index}
+              onClick={() => handleRowClick(r)}
+              className="cursor-pointer hover:bg-gray-100"
+            >
+              <Td
+                cls={TDclass}
+                contents={[
+                  r.ad + " " + r.soyad,
+                  r.alis,
+                  r.alisYeri,
+                  r.iade,
+                  r.iadeYeri,
+                  <span className="text-green-600 font-semibold" key="odeme">
+                    {r.odemeDurumu}
+                  </span>,
+                    <span className={`font-semibold ${r.durum.toLocaleLowerCase() === "tamamlandı" ? "text-green-600" : "text-red-600"}`}>
+                      {r.durum}
+                  </span>,
+                ]}
+              />
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      < ChevronNavigation 
+        handlePrev={handlePrev}
+        handleNext={handleNext}
+        startIndex={startIndex}
+        perPage={perPage}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        length={reservations.length}
+      />
+      {selectedReservation && (
+        <ShowResCard res={selectedReservation} closeModal={closeModal} isRes={res} />
+      )}
+    </div>
+  );
 }

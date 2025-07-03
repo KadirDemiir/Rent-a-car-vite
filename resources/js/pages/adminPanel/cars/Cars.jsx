@@ -1,5 +1,6 @@
 import Navbar from "../../../components/adminPanel/navbar/Navbar.jsx";
 import {router} from "@inertiajs/react";
+import FilterCar from "../../../components/adminPanel/car/FilterCar.jsx";
 
 export default function Cars({cars}){
     const handleClick = (id) => {
@@ -11,10 +12,9 @@ export default function Cars({cars}){
         <div className="w-full">
             < Navbar />
             <div className="pl-64 pt-24 w-full">
-                <div className="w-full flex items-center justify-center bg-red-50">
-                    Filtrele
+                <div className="mr-4">
+                    <FilterCar />
                 </div>
-
                 <div className="mt-8 mr-4">
                     <table className="table-auto w-full border-collapse border border-gray-300">
                         <thead>

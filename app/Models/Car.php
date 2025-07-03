@@ -20,11 +20,11 @@ class Car extends Model
         'license_plate'
     ];
 
-    public function reservations() {
+    public function reservation() {
         return $this->hasMany(Reservation::class);
     }
 
-    public function locations()
+    public function location()
     {
         return $this->belongsTo(Locations::class, 'location_id');
     }

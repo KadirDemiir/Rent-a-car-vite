@@ -1,9 +1,17 @@
 import Navbar from "../../../components/adminPanel/navbar/Navbar";
 import CarForm from "../../../components/adminPanel/car/form/CarForm.jsx";
+import {router} from "@inertiajs/react";
 
 export default function AddCars(){
 
     const onSubmit = (formData) => {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        router.post('/deneme', formData, {
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+            },
+        });
+
       console.log("Form gönderildi:\n", formData);
     };
 
