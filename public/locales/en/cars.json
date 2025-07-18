@@ -20,7 +20,7 @@
     },
     "segment": {
         "luxury": "luxury",
-        "economic": "economic",
+        "economy": "economic",
         "intermediate": "intermediate",
         "compact": "compact",
         "suv": "SUV",

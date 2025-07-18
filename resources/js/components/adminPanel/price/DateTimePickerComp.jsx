@@ -1,4 +1,5 @@
 import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 export default function DateTimePickerComp({startDate, onchange, start = true}){
     const header = start ? "Başlangıç" : "Bitiş";

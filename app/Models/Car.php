@@ -3,7 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @method static where(string $string, $id)
+ */
 class Car extends Model
 {
     protected $fillable = [
@@ -14,11 +18,16 @@ class Car extends Model
         'segment',
         'body_type',
         'seat_count',
+        'price',
+        'price_currency',
+        'deposit_currency',
+        'deposit',
         'trunk_capacity',
         'fuel_type',
         'transmission_type',
         'license_plate'
     ];
+
 
     public function reservation() {
         return $this->hasMany(Reservation::class);
@@ -27,6 +36,13 @@ class Car extends Model
     public function location()
     {
         return $this->belongsTo(Locations::class, 'location_id');
+    }
+    public function photos(): HasMany
+    {
+        return $this->hasMany(Photo::class);
+    }
+    public function discount(): HasMany{
+        return $this->hasMany(Discount::class);
     }
 
 }

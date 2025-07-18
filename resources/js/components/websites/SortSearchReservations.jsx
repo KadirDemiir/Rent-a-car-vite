@@ -39,7 +39,7 @@ export default function SortSearchReservations({ availableCars, sortBy, segment,
     setFilteredCars(sorted);
   }, [availableCars, sortBy, segment, fuelType, transmissionType]);
   return (
-    <>
+    <div className={`space-y-4`}>
       {filteredCars.map((filteredCar) => (
         <div
           key={filteredCar.id}
@@ -48,8 +48,8 @@ export default function SortSearchReservations({ availableCars, sortBy, segment,
           <div className="col-span-1 lg:col-span-2 flex items-center justify-center p-4">
             <div className="w-full p-2">
               <img
-                src="/storage/cars/volvo-xc90.png"
-                alt={`${filteredCar.brand} ${filteredCar.model}`}
+                  src={`/storage/${filteredCar.photos.find(p => p.is_cover)?.photo_path}`}
+                  alt={`${filteredCar.brand} ${filteredCar.model}`}
                 className="w-full object-contain h-40"
               />
             </div>
@@ -132,6 +132,6 @@ export default function SortSearchReservations({ availableCars, sortBy, segment,
           </div>
         </div>
       ))}
-    </>
+    </div>
   );
 }

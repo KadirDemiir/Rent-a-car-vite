@@ -3,8 +3,7 @@ import CarCard from '../components/websites/carCards/CarCard.jsx';
 import { usePage } from '@inertiajs/react';
 import { Link } from '@inertiajs/react';
 
-export default function Car() {
-    const { cars } = usePage().props;
+export default function Car({cars}) {
 
     return (
         <div>

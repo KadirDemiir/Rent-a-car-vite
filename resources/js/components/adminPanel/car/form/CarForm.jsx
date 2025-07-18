@@ -1,126 +1,74 @@
-import React, { useState, useEffect } from "react";
-import FormInput from "./FormInput.jsx";
-import FormSelect from "./FormSelect.jsx";
-import CarPhoto from "../CarPhoto.jsx";
+import React, { useRef } from "react";
+import CarDetailForm from "./CarDetailForm.jsx";
+import CarPricingForm from "./CarPricingForm.jsx";
+import CarPhotoForm from "./CarPhotoForm.jsx";
 
-export default function CarForm({ onSubmit, car = null, mode = "create" }) {
-    const [formData, setFormData] = useState({ ...car });
-    const [photos, setPhotos] = useState([]);
-    const [coverIndex, setCoverIndex] = useState(null);
-    const [error, setError] = useState({});
+export default function CarForm({ car = null, mode, onSubmit }) {
+    const detailRef = useRef();
+    const pricingRef = useRef();
+    const photoRef = useRef();
 
-    const showPhoto = mode === "create";
-    const showPricing = mode === "create" || mode === "pricing";
-    const showDetails = mode === "create" || mode === "edit";
+    const handleSubmit = () => {
+        let combined = new FormData();
+        combined.append('mode', mode);
+        if (mode === "create") {
+            console.log("geldi");
+            const detailData = detailRef.current.submit();
+            const pricingData = pricingRef.current.submit();
+            const photoData = photoRef.current.submit();
 
-    useEffect(() => {
-        if (car && mode !== "create") {
-            setFormData({ ...car });
+            if (!detailData || !pricingData || !photoData) return;
+
+            for (let pair of detailData.entries()) combined.append(pair[0], pair[1]);
+            for (let pair of pricingData.entries()) combined.append(pair[0], pair[1]);
+            for (let pair of photoData.entries()) combined.append(pair[0], pair[1]);
+            console.log("sdfsd");
+        } else if (mode === "edit") {
+            const detailData = detailRef.current.submit();
+            if (detailData) {
+                for (let pair of detailData.entries()) combined.append(pair[0], pair[1]);
+            }
+        } else if (mode === "pricing") {
+            const pricingData = pricingRef.current.submit();
+            if (pricingData) {
+                for (let pair of pricingData.entries()) combined.append(pair[0], pair[1]);
+            }
+        } else if (mode === "photo") {
+            const photoData = photoRef.current.submit();
+            if (photoData) {
+                for (let pair of photoData.entries()) combined.append(pair[0], pair[1]);
+            }
         }
-    }, [car, mode]);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        const isNumericField = [
-            "year", "seat_count", "trunk_capacity",
-            "dailyPrice", "monthlyPrice", "weeklyPrice", "deposit"
-        ].includes(name);
-
-        if (isNumericField && /[^0-9]/.test(value)) {
-            setError(prev => ({ ...prev, [name]: "Sadece sayı girilebilir" }));
-        } else {
-            setError(prev => {
-                const newErrors = { ...prev };
-                delete newErrors[name];
-                return newErrors;
-            });
-        }
-
-        setFormData(prev => ({ ...prev, [name]: value }));
+        if (combined.entries().next().done) return;
+        onSubmit(combined);
     };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (Object.keys(error).length > 0) return;
-
-        const data = {};
-
-        if (showDetails) {
-            [
-                "license_plate", "year", "brand", "model",
-                "seat_count", "trunk_capacity", "segment",
-                "body_type", "fuel_type", "transmission_type"
-            ].forEach(key => data[key] = formData[key]);
-        }
-
-        if (showPricing) {
-            [
-                "dailyPrice", "weeklyPrice", "monthlyPrice", "deposit"
-            ].forEach(key => data[key] = formData[key]);
-        }
-
-        if (showPhoto && photos.length) {
-            data.photos = photos.map(p => p.file);
-            data.cover = coverIndex !== null ? photos[coverIndex].file : null;
-        }
-
-        onSubmit(data);
-    };
-
-    const segmentOptions = ["economy", "compact", "midrange", "suv", "premium", "minivan"];
-    const bodyTypeOptions = ["hatchback", "sedan", "suv", "station", "coupe", "convertible", "minivan", "pickup"];
-    const fuelOptions = ["benzin", "dizel", "elektrik", "hibrit"];
-    const transmissionOptions = ["manuel", "otomatik"];
 
     return (
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4" encType="multipart/form-data">
-            {showDetails && (
+        <>
+            {mode === "create" && (
                 <>
-                    <FormInput name="license_plate" label="Araç Plakası" value={formData.license_plate || ""} onChange={handleChange} error={error.license_plate} />
-                    <FormInput name="year" label="Model Yılı" type="number" value={formData.year || ""} onChange={handleChange} error={error.year} />
-                    <FormInput name="brand" label="Marka" value={formData.brand || ""} onChange={handleChange} error={error.brand} />
-                    <FormInput name="model" label="Model" value={formData.model || ""} onChange={handleChange} error={error.model} />
-                    <FormInput name="seat_count" label="Koltuk Sayısı" type="number" value={formData.seat_count || ""} onChange={handleChange} error={error.seat_count} />
-                    <FormInput name="trunk_capacity" label="Bagaj Kapasitesi" type="number" value={formData.trunk_capacity || ""} onChange={handleChange} error={error.trunk_capacity} />
-                    <FormSelect name="segment" label="Segment" value={formData.segment || ""} onChange={handleChange} options={segmentOptions} />
-                    <FormSelect name="body_type" label="Kasa Tipi" value={formData.body_type || ""} onChange={handleChange} options={bodyTypeOptions} />
-                    <FormSelect name="fuel_type" label="Yakıt Türü" value={formData.fuel_type || ""} onChange={handleChange} options={fuelOptions} />
-                    <FormSelect name="transmission_type" label="Vites Türü" value={formData.transmission_type || ""} onChange={handleChange} options={transmissionOptions} />
+                    <CarDetailForm car={car} ref={detailRef}/><br/>
+                    <CarPricingForm car={car} ref={pricingRef} ddopen={true}/><br/>
+                    <CarPhotoForm car={car} ref={photoRef} /><br/>
                 </>
             )}
 
-            {showPricing && (
-                <>
-                    <FormInput type="number" name="dailyPrice" label="Günlük Fiyat" onChange={handleChange} value={formData.dailyPrice || ""} error={error.dailyPrice} />
-                    <FormInput name="weeklyPrice" label="Haftalık Fiyat" onChange={handleChange} value={formData.weeklyPrice || ""} error={error.weeklyPrice} />
-                    <FormInput name="monthlyPrice" label="Aylık Fiyat" onChange={handleChange} value={formData.monthlyPrice || ""} error={error.monthlyPrice} />
-                    <FormInput name="deposit" label="Depozito" onChange={handleChange} value={formData.deposit || ""} error={error.deposit} />
-                </>
+            {mode === "edit" && (
+                <CarDetailForm car={car} ref={detailRef}/>
             )}
 
-            {showPhoto && (
-                <div className="md:col-span-2 flex items-center justify-center">
-                    <div className="w-[50%]">
-                        <CarPhoto
-                            maxFiles={4}
-                            onChange={(files, cover) => {
-                                setPhotos(files);
-                                setCoverIndex(cover);
-                            }}
-                        />
-                    </div>
-                </div>
+            {mode === "pricing" && (
+                <CarPricingForm car={car} ref={pricingRef} />
             )}
 
-
-            <div className="md:col-span-2 pt-4">
-                <button
-                    type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl"
-                >
-                    {mode === "edit" ? "Güncelle" : "Kaydet"}
+            {mode === "photo" && (
+                <CarPhotoForm defPhotos={car?.photos} ref={photoRef} />
+            )}
+            <div className="pt-4">
+                <button type="submit" onClick={handleSubmit} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl cursor-pointer">
+                    Kaydet
                 </button>
             </div>
-        </form>
+        </>
     );
 }

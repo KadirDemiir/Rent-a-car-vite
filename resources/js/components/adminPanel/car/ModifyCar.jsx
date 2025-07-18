@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import CarModify from "./CarModify.jsx";
 import CarPrize from "./CarPrize.jsx";
 import CarPhotoUpload from "./CarPhotoUpload.jsx";
@@ -8,19 +8,19 @@ export default function ModifyCar({ car }) {
   const [openCarModify, setOpenCarModify] = useState(false);
   const [openCarPrice, setOpenCarPrice] = useState(false);
   const [openUploadPhoto, setOpenUploadPhoto] = useState(false);
-
   const closeModalCM = () => setOpenCarModify(false);
   const closeModalCp = () => setOpenCarPrice(false);
   const closeModalUP = () => setOpenUploadPhoto(false);
 
   return (
     <div className="w-full bg-white rounded-xl shadow-md p-6">
+        <br/>
       <div className="flex flex-col lg:flex-row gap-6 items-stretch">
         <div
           className="flex-1 min-w-[300px] h-60 border border-gray-300 rounded-lg overflow-hidden bg-gray-50 cursor-pointer hover:opacity-90 transition"
           onClick={() => setOpenUploadPhoto(true)}
         >
-          <CarModifyPhoto />
+          <CarModifyPhoto photos={car.photos}/>
         </div>
 
         <div className="w-full lg:w-1/3 flex flex-col justify-center gap-4 bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-200">
@@ -58,9 +58,10 @@ export default function ModifyCar({ car }) {
       )}
       {openUploadPhoto && (
         <ModalWrapper>
-          <CarPhotoUpload closeModal={closeModalUP} />
+          <CarPhotoUpload car={car} closeModal={closeModalUP} />
         </ModalWrapper>
       )}
+        <div className={`w-full flex items-center justify-end p-4`}><button className={`px-6 bg-red-500 rounded-lg hover:bg-red-600 text-white text-lg cursor-pointer`}>Sil</button></div>
     </div>
   );
 }

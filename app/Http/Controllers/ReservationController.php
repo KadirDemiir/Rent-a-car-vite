@@ -22,7 +22,7 @@ class ReservationController extends Controller
             'selectedPULocation' => 'required|string',
             'selectedRLocation' => 'required|string',
         ]);
-        $cars = Car::with(['locations:id,city'])->get();
+        $cars = Car::with('location', 'photos')->get();
         $availableCars = [];
 
         foreach ($cars as $car) {
@@ -35,7 +35,7 @@ class ReservationController extends Controller
                 )
                     $a = false;
             }
-            if($a && ($request->selectedPULocation == $car->locations->city))
+            if($a && ($request->selectedPULocation == $car->location->city))
                 $availableCars [] = $car;
         }
 

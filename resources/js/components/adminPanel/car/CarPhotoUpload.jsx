@@ -1,22 +1,24 @@
-import { useState } from "react";
-import CarPhoto from "./CarPhoto.jsx";
+import { router } from "@inertiajs/react";
+import CarForm from "./form/CarForm.jsx";
 
-export default function CarPhotoUpload({ closeModal }) {
-    const [photos, setPhotos] = useState([]);
-    const [coverIndex, setCoverIndex] = useState(null);
+export default function CarPhotoUpload({car, closeModal, }) {
 
-    const handleChange = (next, cover) => {
-        setPhotos(next);
-        setCoverIndex(cover);
-    };
-
-    const handleSave = () => {
-        const files = photos.map((p) => p.file);
-        const cover = coverIndex !== null ? photos[coverIndex].file : null;
-
-        console.log("Seçilenler:", files);
-        console.log("Kapak:", cover);
-        closeModal();
+    const submitHandler = (data) => {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        router.post(`/adminpanel/cars/${car.id}`, data, {
+            heading: {
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            onSuccess: () => {
+                closeModal();
+                router.reload({
+                    preserveScroll: true
+                });
+            },
+            onError: () => {
+                closeModal();
+            }
+        })
     };
 
     return (
@@ -28,19 +30,8 @@ export default function CarPhotoUpload({ closeModal }) {
                 &times;
             </button>
 
-            <div className="">
-                <CarPhoto maxFiles={4} onChange={handleChange} />
-            </div>
+            < CarForm mode="photo" car={car} onSubmit={submitHandler}/>
 
-            <div className="text-right pt-4">
-                <button
-                    onClick={handleSave}
-                    disabled={photos.length === 0}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-                >
-                    Kaydet
-                </button>
-            </div>
         </div>
     );
 }

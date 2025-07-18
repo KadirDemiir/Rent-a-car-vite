@@ -2,23 +2,23 @@ import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
-import path from 'path';  // path modülünü ekledik
+import path from 'path';
 
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.jsx'],  // Gerekli input dosyaları
+            input: ['resources/css/app.css', 'resources/js/app.jsx'],
             refresh: true,
         }),
         react(),
         tailwindcss(),
     ],
     esbuild: {
-        jsx: 'automatic',  // JSX otomatik dönüşüm
+        jsx: 'automatic',
     },
     resolve: {
         alias: {
-            'ziggy-js': path.resolve(__dirname, 'vendor/tightenco/ziggy'),  // 'resolve' fonksiyonu ile path
+            'ziggy-js': path.resolve(__dirname, 'vendor/tightenco/ziggy'),
         },
     },
 });

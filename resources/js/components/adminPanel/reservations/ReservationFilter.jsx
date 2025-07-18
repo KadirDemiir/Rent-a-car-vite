@@ -1,5 +1,5 @@
 import { useState } from "react";
-import SelectOptions from "../websites/filterSelectors/SelectOptions.jsx";
+import SelectOptions from "../../websites/filterSelectors/SelectOptions.jsx";
 
 export default function ReservationFilter() {
     const [status, setStatus] = useState("");

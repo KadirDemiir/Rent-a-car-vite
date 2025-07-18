@@ -1,8 +1,16 @@
 import { useState, useRef } from "react";
 
-export default function CarPhoto({ maxFiles = 4, onChange }) {
-    const [photos, setPhotos] = useState([]);
-    const [coverIndex, setCoverIndex] = useState(null);
+export default function CarPhoto({defPhotos, maxFiles = 4, onChange }) {
+    console.log("defPhotos:", defPhotos);
+    const [photos, setPhotos] = useState(() =>
+        (defPhotos || []).map((p) => ({
+            file: null,
+            url: p.url ? p.url : `/storage/${p.photo_path}`,
+        }))
+    );
+    const [coverIndex, setCoverIndex] = useState(() =>
+        (defPhotos || []).findIndex((p) => p.is_cover)
+    );
     const fileInputRef = useRef();
 
     const handleFileChange = (e) => {
@@ -53,7 +61,7 @@ export default function CarPhoto({ maxFiles = 4, onChange }) {
     };
 
     return (
-        <div className="space-y-3">
+        <div className="space-y-3 bg-white">
             <input
                 ref={fileInputRef}
                 type="file"
@@ -95,6 +103,7 @@ export default function CarPhoto({ maxFiles = 4, onChange }) {
                                 title="Kapak olarak ayarla"
                             />
                             <button
+                                type="button"
                                 onClick={() => handleDelete(i)}
                                 className="absolute top-0 right-0 text-white bg-black bg-opacity-60 px-1 text-xs"
                             >

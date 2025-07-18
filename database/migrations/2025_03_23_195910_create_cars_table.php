@@ -34,7 +34,10 @@ return new class extends Migration
             $table->enum('transmission_type', [
                 'manuel', 'otomatik'
             ]);
-
+            $table->decimal('price', 10, 2);
+            $table->decimal('deposit', 10, 2);
+            $table->char('price_currency', 3);
+            $table->char('deposit_currency', 3);
             $table->string('license_plate');
             $table->timestamps();
         });

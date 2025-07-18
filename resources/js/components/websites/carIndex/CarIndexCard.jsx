@@ -7,7 +7,7 @@ export default function CarIndexCard({car}){
     return (
       <div className="w-full grid lg:grid-cols-10 grid-cols-1 gap-4">
           <div className="lg:col-span-7 sm:col-span-1 flex flex-col gap-16">
-            <CarIndexPhotos />
+            <CarIndexPhotos photos={car.photos}/>
             <div className="w-full border-1 border-blue-800 p-4 rounded-2xl">
               <h1 className="text-xl font-extrabold">Services Included For This Vehicle</h1>
               <hr className="border-blue-800" /><br /><br />

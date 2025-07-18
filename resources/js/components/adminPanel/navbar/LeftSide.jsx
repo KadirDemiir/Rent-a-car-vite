@@ -17,7 +17,7 @@ export default function LeftSide() {
             title: "Araç",
             subSec: [
                 { name: "Araçlar", href: "/adminpanel/cars" },
-                { name: "Araç Ekle", href: "/adminpanel/add-car" },
+                { name: "Araç Ekle", href: "/adminpanel/car/add" },
             ],
         },
         {

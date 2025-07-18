@@ -1,8 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 
-export default function CarIndexPhotos(){
-    
-    const photos = ["volvo-xc90.png", "volvo-xc90-2.png"];
+export default function CarIndexPhotos({photos}){
+
     const [currentIndex, setCurrentIndex] = useState(0);
     const intervalRef = useRef(null);
 
@@ -31,7 +30,7 @@ export default function CarIndexPhotos(){
     return(
         <div className="h-80 flex items-center justify-center relative bg-white rounded-2xl border-1 border-blue-600">
             <img
-            src={`/storage/cars/${photos[currentIndex]}`}
+            src={`/storage/${photos[currentIndex].photo_path}`}
             alt="Car Photo"
             className="h-40 rounded-lg"
             />

@@ -11,6 +11,11 @@ export default function CarCard({car}) {
             .map(w => w.charAt(0).toUpperCase() + w.slice(1))
             .join(' ');
     }
+    const carCoverPhotoPaths = car.photos.filter(c => {
+        return c.is_cover === 1;
+    });
+console.log(car);
+
     return (
         <div className="grid grid-rows-9 h-140 w-110 rounded-xl shadow-md bg-white transition-transform duration-300 hover:scale-105 hover:outline-2 hover:outline-blue-500 hover:rounded-xl">
             < CarCardUpSide
@@ -19,7 +24,7 @@ export default function CarCard({car}) {
             segment={upperFirstLetter(t(`segment.${car.segment}`))}
             />
             < CarCardPhoto
-            photo_path="/storage/cars/volvo-xc90.png"
+            photo_path={`/storage/${carCoverPhotoPaths[0].photo_path}`}
             />
             <div className="row-span-5 flex p-2 gap-2">
                 < CarCardProperties

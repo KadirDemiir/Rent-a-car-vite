@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Discount extends Model
 {
@@ -11,14 +11,23 @@ class Discount extends Model
         "discount_type",
         "discount_value",
         "target_type",
+        "currency",
         "car_id",
+        "campaign_id",
+        "min_days",
+        "max_days",
         "segment_name",
         "start_date",
         "end_date",
         "status",
     ];
 
-    public function car(){
+    public function car(): BelongsTo{
         return $this->belongsTo(Car::class);
     }
+
+    public function campaigns(): BelongsTo{
+        return $this->belongsTo(Campaigns::class);
+    }
+
 }

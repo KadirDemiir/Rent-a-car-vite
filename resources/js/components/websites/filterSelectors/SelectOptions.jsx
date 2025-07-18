@@ -48,9 +48,7 @@
         <div ref={wrapperRef} className="flex flex-col w-full relative">
           <label className="mb-1 text-sm font-semibold text-gray-700 text-center">{options_name}</label>
 
-          <button
-            onClick={() => setOpen(!open)}
-            className="px-4 py-2 border border-gray-300 rounded-md bg-white shadow-sm flex justify-between items-center"
+          <button type="button" onClick={() => setOpen(!open)}  className="px-4 py-2 border border-gray-300 rounded-md bg-white shadow-sm flex justify-between items-center"
           >
             <span className="truncate">{getSelectedLabels()}</span>
             <svg className="w-4 h-4 ml-2 text-gray-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

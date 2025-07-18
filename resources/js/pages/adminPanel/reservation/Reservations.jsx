@@ -1,6 +1,6 @@
 import CarReservations from "../../../components/adminPanel/car/CarReservations.jsx";
 import Navbar from "../../../components/adminPanel/navbar/Navbar.jsx";
-import ReservationFilter from "../../../components/adminPanel/ReservationFilter.jsx";
+import ReservationFilter from "../../../components/adminPanel/reservations/ReservationFilter.jsx";
 
 export default function Reservations(){
     return(
