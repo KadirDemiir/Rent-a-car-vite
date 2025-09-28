@@ -1,9 +1,10 @@
 import { router } from '@inertiajs/react'
 import {useState} from 'react'
 import Input from '../../components/websites/formElement/Input.jsx';
+import {useTranslation} from "react-i18next";
 
-export default function LogInForm()
-    {
+export default function LogInForm() {
+    const {t} = useTranslation();
       const [formData, setFormData] = useState({});
       const [errors, setErrors] = useState({});
 
@@ -24,7 +25,6 @@ export default function LogInForm()
       e.preventDefault();
       const hasErrors = Object.values(errors).some(   error => typeof error === 'string' && error !== '');
       if (hasErrors) {
-          alert('Lütfen hataları düzeltin.');
           return;
       }
 
@@ -38,10 +38,10 @@ export default function LogInForm()
   };
 
         const validateEmail = (value) =>
-            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? 'Geçersiz e-posta' : '';
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? t("website.auth.login.invalid_email") : '';
 
           const validatePassword = (value) =>
-            value.length < 6 ? 'Şifre en az 6 karakter olmalı' : '';
+            value.length < 6 ? t("website.auth.login.he_password_must_be_at_least_6_characters_long") : '';
 
           return (
             <div className="mt-4 border w-full">
@@ -50,7 +50,7 @@ export default function LogInForm()
                 <Input
                   type="email"
                   elementName="email"
-                  labelName="E-posta"
+                  labelName={t("website.auth.login.email_label")}
                   validate={validateEmail}
                   onChange={(val, err) => handleInputChange('email', val, err)}
                 />
@@ -58,7 +58,7 @@ export default function LogInForm()
                 <Input
                   type="password"
                   elementName="password"
-                  labelName="Şifre"
+                  labelName={t("website.auth.login.password_label")}
                   validate={validatePassword}
                   onChange={(val, err) => handleInputChange('password', val, err)}
                 />
@@ -67,7 +67,7 @@ export default function LogInForm()
                   type="submit"
                   className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
                 >
-                  Giriş Yap
+                    {t("website.auth.login.button.save")}
                 </button>
               </form>
             </div>

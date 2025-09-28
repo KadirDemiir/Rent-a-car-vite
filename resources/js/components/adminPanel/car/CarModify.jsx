@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import CarForm from "./form/CarForm.jsx";
 import {router, usePage} from "@inertiajs/react";
+import {useTranslation} from "react-i18next";
 
 export default function CarModify({ closeModal = null, car = null, }) {
+    const {t} = useTranslation();
     const {success, error} = usePage().props;
     const handleSubmit = (data) => {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -27,7 +29,7 @@ export default function CarModify({ closeModal = null, car = null, }) {
                 &times;
             </button>
 
-            <h2 className="text-2xl font-semibold mb-6">Araç Bilgilerini Düzenle</h2>
+            <h2 className="text-2xl font-semibold mb-6">{t("adminpanel.car.car_modify.edit_car_information.edit_car_information")}</h2>
             {success && (
                 <div className="mb-4 p-3 rounded bg-green-100 text-green-800 border border-green-300">
                     {success}

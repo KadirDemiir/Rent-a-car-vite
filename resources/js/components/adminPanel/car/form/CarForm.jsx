@@ -2,8 +2,10 @@ import React, { useRef } from "react";
 import CarDetailForm from "./CarDetailForm.jsx";
 import CarPricingForm from "./CarPricingForm.jsx";
 import CarPhotoForm from "./CarPhotoForm.jsx";
+import {useTranslation} from "react-i18next";
 
 export default function CarForm({ car = null, mode, onSubmit }) {
+    const {t} = useTranslation();
     const detailRef = useRef();
     const pricingRef = useRef();
     const photoRef = useRef();
@@ -12,7 +14,6 @@ export default function CarForm({ car = null, mode, onSubmit }) {
         let combined = new FormData();
         combined.append('mode', mode);
         if (mode === "create") {
-            console.log("geldi");
             const detailData = detailRef.current.submit();
             const pricingData = pricingRef.current.submit();
             const photoData = photoRef.current.submit();
@@ -22,7 +23,6 @@ export default function CarForm({ car = null, mode, onSubmit }) {
             for (let pair of detailData.entries()) combined.append(pair[0], pair[1]);
             for (let pair of pricingData.entries()) combined.append(pair[0], pair[1]);
             for (let pair of photoData.entries()) combined.append(pair[0], pair[1]);
-            console.log("sdfsd");
         } else if (mode === "edit") {
             const detailData = detailRef.current.submit();
             if (detailData) {
@@ -40,6 +40,7 @@ export default function CarForm({ car = null, mode, onSubmit }) {
             }
         }
         if (combined.entries().next().done) return;
+        console.log("gitti");
         onSubmit(combined);
     };
 
@@ -66,7 +67,7 @@ export default function CarForm({ car = null, mode, onSubmit }) {
             )}
             <div className="pt-4">
                 <button type="submit" onClick={handleSubmit} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl cursor-pointer">
-                    Kaydet
+                    {t("adminpanel.car.car_modify.save")}
                 </button>
             </div>
         </>

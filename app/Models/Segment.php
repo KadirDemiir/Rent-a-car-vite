@@ -7,8 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class Segment extends Model
 {
     protected $fillable = [
-        'name',
+        'translation_key_id',
         'coefficient',
         'is_active'
     ];
+
+    public function translationKey(){
+        return $this->belongsTo(TranslationKey::class, 'translation_key_id');
+    }
 }

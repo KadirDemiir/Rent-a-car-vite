@@ -1,55 +1,56 @@
 import Navbar from "../../../components/adminPanel/navbar/Navbar.jsx";
 import {router} from "@inertiajs/react";
 import FilterCar from "../../../components/adminPanel/car/FilterCar.jsx";
+import {useTranslation} from "react-i18next";
+import {useState} from "react";
 
 export default function Cars({cars}){
+    const [filteredCars, setFilteredCars] = useState(cars);
+    const {i18n, t} = useTranslation();
     const handleClick = (id) => {
-        router.visit(`/adminpanel/cars/${id}`)
+        router.visit(`/${i18n.language}/${t("address.adminpanel")}/${t("address.cars")}/${id}`)
     };
 
-    console.log(cars);
     return(
         <div className="w-full">
-            < Navbar />
-            <div className="pl-64 pt-24 w-full">
-                <div className="mr-4">
-                    <FilterCar />
-                </div>
-                <div className="mt-8 mr-4">
-                    <table className="table-auto w-full border-collapse border border-gray-300">
-                        <thead>
-                        <tr className="bg-gray-100">
-                            <th className="border px-4 py-2">Plaka</th>
-                            <th className="border px-4 py-2">Marka</th>
-                            <th className="border px-4 py-2">Model</th>
-                            <th className="border px-4 py-2">Yıl</th>
-                            <th className="border px-4 py-2">Vites</th>
-                            <th className="border px-4 py-2">Segment</th>
-                            <th className="border px-4 py-2">Araç Tipi</th>
-                            <th className="border px-4 py-2">Yakıt Tipi</th>
-                            <th className="border px-4 py-2">Bagaj Kapasitesi</th>
+            < Navbar>
+                    <div className="mr-4">
+                        <FilterCar cars={cars} setFilteredCars={setFilteredCars}/>
+                    </div>
+                    <div className="mt-8 mr-4">
+                        <table className="table-auto w-full border-collapse border border-gray-300">
+                            <thead>
+                            <tr className="bg-gray-100">
+                                <th className="border px-4 py-2">{t("adminpanel.car.list.license_plate")}</th>
+                                <th className="border px-4 py-2">{t("adminpanel.car.list.brand")}</th>
+                                <th className="border px-4 py-2">{t("adminpanel.car.list.model")}</th>
+                                <th className="border px-4 py-2">{t("adminpanel.car.list.year")}</th>
+                                <th className="border px-4 py-2">{t("adminpanel.car.list.transmission_type")}</th>
+                                <th className="border px-4 py-2">{t("adminpanel.car.list.segment")}</th>
+                                <th className="border px-4 py-2">{t("adminpanel.car.list.body_type")}</th>
+                                <th className="border px-4 py-2">{t("adminpanel.car.list.fuel_type")}</th>
+                                <th className="border px-4 py-2">{t("adminpanel.car.list.trunk_capacity")}</th>
 
-                        </tr>
-                        </thead>
-                        <tbody>
-                            {cars && cars.map((car) => (
-                            <tr key={car.id} onClick={() => handleClick(car.id)} className="cursor-pointer">
-                                <td className="border px-4 py-2">{car.license_plate}</td>
-                                <td className="border px-4 py-2">{car.brand}</td>
-                                <td className="border px-4 py-2">{car.model}</td>
-                                <td className="border px-4 py-2">{car.year}</td>
-                                <td className="border px-4 py-2">{car.transmission_type}</td>
-                                <td className="border px-4 py-2">{car.segment}</td>
-                                <td className="border px-4 py-2">{car.body_type}</td>
-                                <td className="border px-4 py-2">{car.fuel_type}</td>
-                                <td className="border px-4 py-2">{car.trunk_capacity}</td>
                             </tr>
-                        ))}
-                        </tbody>
-                    </table>
-
+                            </thead>
+                            <tbody>
+                                {filteredCars && filteredCars.map((car) => (
+                                <tr key={car.id} onClick={() => handleClick(car.id)} className="cursor-pointer">
+                                    <td className="border px-4 py-2">{car.license_plate}</td>
+                                    <td className="border px-4 py-2">{car.brand}</td>
+                                    <td className="border px-4 py-2">{car.model}</td>
+                                    <td className="border px-4 py-2">{car.year}</td>
+                                    <td className="border px-4 py-2">{car.transmission_type}</td>
+                                    <td className="border px-4 py-2">{car.segment}</td>
+                                    <td className="border px-4 py-2">{car.body_type}</td>
+                                    <td className="border px-4 py-2">{car.fuel_type}</td>
+                                    <td className="border px-4 py-2">{car.trunk_capacity}</td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
                 </div>
-            </div>
+            </Navbar>
         </div>
     );
 }

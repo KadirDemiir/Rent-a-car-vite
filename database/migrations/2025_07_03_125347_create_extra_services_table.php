@@ -13,16 +13,18 @@ return new class extends Migration
     {
         Schema::create('extra_services', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->decimal('one_three_day_price', 8, 2)->nullable();
-            $table->decimal('four_seven_day_price', 8, 2)->nullable();
-            $table->decimal('eight_fifteen_day_price', 8, 2)->nullable();
-            $table->decimal('more_than_fifteen_day_price', 8, 2)->nullable();
-            $table->integer('stock')->nullable();
-            $table->integer('max_limit')->nullable();
-            $table->text('description')->nullable();
+            $table->json('name');
+            $table->decimal('one_three_day_price', 8, 2);
+            $table->decimal('four_seven_day_price', 8, 2);
+            $table->decimal('eight_fifteen_day_price', 8, 2);
+            $table->decimal('more_than_fifteen_day_price', 8, 2);
+            $table->string('currency');
+            $table->integer('stock');
+            $table->integer('max_limit');
+            $table->json('description');
             $table->timestamps();
         });
+
     }
 
     /**

@@ -12,6 +12,7 @@ class ExtraServices extends Model
         'four_seven_day_price',
         'eight_fifteen_day_price',
         'more_than_fifteen_day_price',
+        'currency',
         'stock',
         'max_limit',
         'description',

@@ -1,9 +1,10 @@
 import { router } from '@inertiajs/react'
 import Input from '../../components/websites/formElement/Input.jsx';
 import {useState} from 'react'
+import {useTranslation} from "react-i18next";
 
 export default function SignUpForm() {
-
+    const {t} = useTranslation();
     const [formData, setFormData] = useState({});
     const [errors, setErrors] = useState({});
 
@@ -27,7 +28,6 @@ export default function SignUpForm() {
         e.preventDefault();
         const hasErrors = Object.values(errors).some(   error => typeof error === 'string' && error !== '');
         if (hasErrors) {
-            alert('Lütfen hataları düzeltin.');
             return;
         }
 
@@ -45,30 +45,30 @@ export default function SignUpForm() {
 
     };
 
-    const validateName = (value) => value.trim() === '' ? '*Bu alan boş bırakılamaz.' : '';
-    const validateEmail = (value) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? '*Geçersiz e-posta adresi.' : '';
-    const validatePassword = (value) => value.length < 6 ? '*Şifre en az 6 karakter olmalıdır.' : '';
+    const validateName = (value) => value.trim() === '' ? '*'+t("website.auth.signup.this_area_cannot_be_empty") : '';
+    const validateEmail = (value) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? '*'+t("website.auth.signup.invalid_email") : '';
+    const validatePassword = (value) => value.length < 6 ? '*'+t("website.auth.signup.he_password_must_be_at_least_6_characters_long") : '';
     const validatePasswordConfirm = (value, value2) => {
         if(value.length < 6)
-            return '*Şifre en az 6 karakter olmalıdır.';
+            return '*'+t("website.auth.signup.he_password_must_be_at_least_6_characters_long");
         if(value2  && value !== value2)
-            return "*Şifreler aynı olmalı";
+            return '*'+t("website.auth.signup.passwords_do_not_match");
         return "";
     }
 
     const validateTcNumber = (value) => {
         if(!( /^\d+$/.test(value)))
-            return '*Sadece sayı girebilirsiniz.';
+            return '*'+t("website.auth.signup.you_can_enter_only_number");
         if(value.length != 11)
-            return 'bu alanı eksiksiz doldurunuz';
+            return '*'+t("website.auth.signup.this_area_cannot_be_empty");
         return
     };
 
     const validatePhoneNumber = (value) => {
         if(!( /^\d+$/.test(value)))
-            return '*Sadece sayı girebilirsiniz.';
+            return '*'+t("website.auth.signup.you_can_enter_only_number");
         if(value.length != 10)
-            return 'bu alanı eksiksiz doldurunuz';
+            return '*'+t("website.auth.signup.this_area_cannot_be_empty");
         return '';
     };
 
@@ -81,15 +81,15 @@ export default function SignUpForm() {
                  < Input
                  type={'text'}
                  elementName={'name'}
-                 labelName={'Name'}
+                 labelName={t("website.auth.signup.name")}
                  validate={validateName}
                  onChange={(value, error) => handleInputChange('name', value, error)}
                  />
 
                  < Input
                  type={'text'}
+                 labelName={t("website.auth.signup.surname")}
                  elementName={'surname'}
-                 labelName={'Surname'}
                  validate={validateName}
                  onChange={(value, error) => handleInputChange('surname', value, error)}
                   />
@@ -97,7 +97,7 @@ export default function SignUpForm() {
                  < Input
                  type={'email'}
                  elementName={'email'}
-                 labelName={'Email'}
+                 labelName={t("website.auth.signup.email")}
                  validate={validateEmail}
                  onChange={(value, error) => handleInputChange('email', value, error)}
                   />
@@ -105,7 +105,7 @@ export default function SignUpForm() {
                  < Input
                  type={'date'}
                  elementName={'birthday'}
-                 labelName={'Birthday'}
+                 labelName={t("website.auth.signup.birthday")}
                  validate={validateName}
                  onChange={(value, error) => handleInputChange('birthday', value, error)}
                   />
@@ -113,7 +113,7 @@ export default function SignUpForm() {
                  < Input
                  type={'text'}
                  elementName={'phone_number'}
-                 labelName={'Phone Number'}
+                 labelName={t("website.auth.signup.phone_number")}
                  validate={validatePhoneNumber}
                  onChange={(value, error) => handleInputChange('phone_number', value, error)}
                  maxV={13}
@@ -123,7 +123,7 @@ export default function SignUpForm() {
                  < Input
                  type={'text'}
                  elementName={'tc_number'}
-                 labelName={'TC Number'}
+                 labelName={t("website.auth.signup.tc_number")}
                  validate={validateTcNumber}
                  onChange={(value, error) => handleInputChange('tc_number', value, error)}
                  maxV={11}
@@ -132,7 +132,7 @@ export default function SignUpForm() {
                  < Input
                  type={'password'}
                  elementName={'password'}
-                 labelName={'Password'}
+                 labelName={t("website.auth.signup.password")}
                  validate={validatePassword}
                  onChange={(value, error) => handleInputChange('password', value, error)}
                   />
@@ -141,12 +141,12 @@ export default function SignUpForm() {
                  < Input
                  type={'password'}
                  elementName={'password_confirmation'}
-                 labelName={'Password Confirmation'}
+                 labelName={t("website.auth.signup.password_confirmation")}
                  validate={(value) => validatePasswordConfirm(value, formData.password)}
                  onChange={(value, error) => handleInputChange('password_confirmation', value, error)}
                   />
 
-                 <button type="submit" className="cursor-pointer h-10 w-26 bg-blue-500 text-white hover:bg-blue-600 rounded-lg">Sign In</button>
+                 <button type="submit" className="cursor-pointer h-10 w-26 bg-blue-500 text-white hover:bg-blue-600 rounded-lg">{t("website.auth.signup.button.save")}</button>
 
              </form>
         </div>

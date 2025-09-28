@@ -2,8 +2,10 @@ import SelectOptions from "../../../websites/filterSelectors/SelectOptions.jsx";
 import DropForm from "./DropForm.jsx";
 import {useEffect, useState} from "react";
 import {router} from "@inertiajs/react";
+import {useTranslation} from "react-i18next";
 
 export default function DropLocations({locations: locationObjects, dropPrice}) {
+    const {t} = useTranslation();
     const [formattedLocations, setFormattedLocations] = useState([]);
     const [pickUpLocation, setPickUpLocation] = useState("");
     const [loading, setLoading] = useState(true);
@@ -83,7 +85,7 @@ export default function DropLocations({locations: locationObjects, dropPrice}) {
     return (
         <div className="grid grid-cols-4 gap-4 bg-gray-50 shadow-md rounded-xl p-6 ">
             <h3 className="col-span-4 flex items-center justify-center font-semibold">Lokasyonlar Arası Ücretler</h3>
-            <p className="col-span-4 text-sm font-semibold">*Alış Yeri Yenilemenizde Fiyatlar Sıfırlanır.</p>
+            <p className="col-span-4 text-sm font-semibold">*{t("adminpanel.pricing.drop_price.locations_price.your_purchase_history_is_reset_every_time_you_renew")}</p>
             <div className="col-span-4">
                 {formError && <div className="p-2 border-l-12 border-red-600 bg-red-400 text-white">{formError}</div>}
             </div>
@@ -96,13 +98,13 @@ export default function DropLocations({locations: locationObjects, dropPrice}) {
                         setLocationData({});
                         setLocationError({});
                     }}
-                    options_name={"Alış Yeri"}
+                    options_name={t("adminpanel.pricing.drop_price.locations_price.pick_up_location")}
                 />
                 <SelectOptions
                     options={currencyOptions}
                     value={currency}
                     onChange={(e) => setCurrency(e)}
-                    options_name="Para Birimi"
+                    options_name={t("adminpanel.pricing.drop_price.locations_price.pick_up_location")}
                 />
             </div>
             <DropForm

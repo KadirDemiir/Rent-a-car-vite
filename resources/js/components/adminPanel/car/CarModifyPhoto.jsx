@@ -1,4 +1,4 @@
-export default function CarModifyPhoto({photos}){
+export default function  CarModifyPhoto({photos}){
     const coverPhoto = photos.find((photo) => photo.is_cover);
     const otherPhoto = photos.filter((photo) => !photo.is_cover);
     return(

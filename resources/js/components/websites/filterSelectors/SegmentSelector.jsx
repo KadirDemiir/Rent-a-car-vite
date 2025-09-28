@@ -1,6 +1,8 @@
 import SelectOptions from "./SelectOptions.jsx";
+import {useTranslation} from "react-i18next";
 
 export default function SegmentSelector({ value, onChange }) {
+    const {t} = useTranslation();
   return (
       <div className="w-48">
         <SelectOptions
@@ -13,7 +15,7 @@ export default function SegmentSelector({ value, onChange }) {
             { label: "lüks", value: "lux" },
             { label: "minivan", value: "minivan" },
             ]}
-            options_name="Segment"
+            options_name= {t("website.searchReservation.filter.segments_label")}
         />
       </div>
   );

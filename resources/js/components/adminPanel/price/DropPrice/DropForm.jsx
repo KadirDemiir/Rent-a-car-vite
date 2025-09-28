@@ -1,4 +1,7 @@
+import {useTranslation} from "react-i18next";
+
 export default function DropForm({ handleSubmit, opt, data, setData, error, setError, minZero = true, pickup = null}) {
+    const {t} = useTranslation();
     const handleInputOnchange = (e) => {
         const { name, value } = e.target;
         const regex = /^\d*\.?\d*$/;
@@ -55,7 +58,7 @@ export default function DropForm({ handleSubmit, opt, data, setData, error, setE
                 onClick={handleSubmit}
                 className="p-4 justify-self-end w-24 col-span-4 bg-blue-500 text-white rounded-xl hover:bg-blue-700 cursor-pointer"
             >
-                Kaydet
+                {t("adminpanel.pricing.drop_price.locations_price.save")}
             </button>
         </>
     );

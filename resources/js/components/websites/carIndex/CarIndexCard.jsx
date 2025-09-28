@@ -1,15 +1,16 @@
 import CarIndexProp from "./CarIndexProp.jsx";
 import CarIndexRequirement from "./CarIndexRequirement.jsx";
 import CarIndexPhotos from "./CarIndexPhoto.jsx";
-
+import {useTranslation} from "react-i18next";
 
 export default function CarIndexCard({car}){
+    const { t } = useTranslation();
     return (
       <div className="w-full grid lg:grid-cols-10 grid-cols-1 gap-4">
           <div className="lg:col-span-7 sm:col-span-1 flex flex-col gap-16">
             <CarIndexPhotos photos={car.photos}/>
             <div className="w-full border-1 border-blue-800 p-4 rounded-2xl">
-              <h1 className="text-xl font-extrabold">Services Included For This Vehicle</h1>
+              <h1 className="text-xl font-extrabold">{t("website.car.services_included_for_this_vehicle")}</h1>
               <hr className="border-blue-800" /><br /><br />
                 <ul className="list-disc ml-4 font-semibold text-gray-700">
                   <li>Zorunlu Trafik Sigortası</li>
@@ -18,7 +19,7 @@ export default function CarIndexCard({car}){
                   <li>Adil Yakıt Politikası</li>
                   <li>Günlük 250 KM Limit</li>
                 </ul><br /><br /><br /><br />
-                <h1 className="text-xl font-extrabold">Options and Extras</h1>
+                <h1 className="text-xl font-extrabold">{t("website.car.options_and_extras")}</h1>
                 <hr className="border-blue-800" /><br /><br />
                 <ul className="list-disc ml-4 font-semibold text-gray-700">
                   <li>Ek Sürücü</li>

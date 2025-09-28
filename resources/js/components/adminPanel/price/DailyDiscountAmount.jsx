@@ -1,8 +1,9 @@
 import SelectOptions from "../../websites/filterSelectors/SelectOptions.jsx";
 import { useState } from "react";
+import {useTranslation} from "react-i18next";
 
 export default function DailyDiscountAmount({ dayDiscount, setDayDiscount }) {
-    console.log(dayDiscount);
+    const {t} = useTranslation();
 
     const ddtOnChange = (value, i, type) => {
         const updated = [...dayDiscount];
@@ -63,36 +64,35 @@ export default function DailyDiscountAmount({ dayDiscount, setDayDiscount }) {
 
     return (
         <div className="w-full py-4 rounded-md gap-8 ">
-            <h6 className="font-bold col-span-full flex items-center justify-center">Güne Göre indirim</h6>
+            <h6 className="font-bold col-span-full flex items-center justify-center">{t("adminpanel.pricing.add_discount.day_based_discount")}</h6>
             <div className={`flex flex-col py-4 gap-4`}>
                 {dayDiscount?.map((dd, i) => (
                     <div
                         key={i}
                         className="w-full bg-white border border-gray-200 shadow-md rounded-lg py-4"
                     >
-                        {/* 👇 BURASI GÜNCELLENDİ */}
                         <div className="w-full flex flex-wrap justify-center gap-4">
                             <div className="min-w-[250px] flex flex-col items-center justify-center">
-                                <div className="text-center">Minimum Gün</div>
+                                <div className="text-center">{t("adminpanel.pricing.add_discount.min_days")}</div>
                                 <input
                                     onChange={(e) => dayInputOnchange(e.target.value, dd.max_day, i, "min_day")}
                                     type="text"
                                     className={`outline-none border ${
                                         dd.day_error ? "border-red-500" : "border-gray-300"
                                     } py-2 px-4 rounded-md bg-white shadow-sm`}
-                                    placeholder="Minimum Gün"
+                                    placeholder={t("adminpanel.pricing.add_discount.min_days")}
                                     value={dd.min_day}
                                 />
                             </div>
                             <div className="min-w-[250px] flex flex-col items-center justify-center">
-                                <div className="text-center">Maximum Gün</div>
+                                <div className="text-center">{t("adminpanel.pricing.add_discount.max_days")}</div>
                                 <input
                                     onChange={(e) => dayInputOnchange(dd.min_day, e.target.value, i, "max_day")}
                                     type="text"
                                     className={`outline-none border ${
                                         dd.day_error ? "border-red-500" : "border-gray-300"
                                     } py-2 px-4 rounded-md bg-white shadow-sm`}
-                                    placeholder="Maximum Gün"
+                                    placeholder={t("adminpanel.pricing.add_discount.max_days")}
                                     value={dd.max_day}
                                 />
                             </div>
@@ -100,18 +100,18 @@ export default function DailyDiscountAmount({ dayDiscount, setDayDiscount }) {
                                 <SelectOptions options={[
                                     { label: "Sabit Tutar", value: "fixed" },
                                     { label: "Yüzde İndirim", value: "percentage" }
-                                ]} value={dd.discount_type} onChange={(e) => ddtOnChange(e, i, "discount_type")} options_name="İndirim Tİpi"/>
+                                ]} value={dd.discount_type} onChange={(e) => ddtOnChange(e, i, "discount_type")} options_name={t("adminpanel.pricing.add_discount.discount_type")}/>
                             </div>
                             {dd.discount_type === "fixed" && (
                                 <div className="min-w-[250px] flex flex-col items-center justify-center px-4">
                                     <SelectOptions options={[
                                         { label: "TL", value: "try" },
                                         { label: "Euro", value: "eur" }
-                                    ]} value={dd.currency} onChange={(e) => currencyOnChange(e, i)} options_name="Para Birimi"/>
+                                    ]} value={dd.currency} onChange={(e) => currencyOnChange(e, i)} options_name={t("adminpanel.pricing.add_discount.currency")}/>
                                 </div>
                             )}
                             <div className="min-w-[250px] flex flex-col items-center justify-center">
-                                <div className="text-center">İndirim Tutarı</div>
+                                <div className="text-center">{t("adminpanel.pricing.add_discount.discount_amount")}</div>
                                 <input
                                     onChange={(e) =>
                                         discountAmountOnChange(e.target.value, i, dd.discount_type, "discount_amount")
@@ -120,13 +120,13 @@ export default function DailyDiscountAmount({ dayDiscount, setDayDiscount }) {
                                     className={`outline-none border ${
                                         dd.amount_error ? "border-red-500" : "border-gray-300"
                                     } py-2 px-4 rounded-md bg-white shadow-sm`}
-                                    placeholder="İndirim Tutarı"
+                                    placeholder={t("adminpanel.pricing.add_discount.discount_amount")}
                                     value={dd.discount_amount}
                                 />
                             </div>
                             <div className="min-w-[250px] flex items-end justify-center">
                                 <button type="button" onClick={() => removeDiscount(i)} className="text-white w-32 bg-red-500 py-2 rounded-md hover:bg-red-600 cursor-pointer">
-                                    Sil
+                                    {t("adminpanel.pricing.add_discount.delete")}
                                 </button>
                             </div>
                         </div>
@@ -150,7 +150,7 @@ export default function DailyDiscountAmount({ dayDiscount, setDayDiscount }) {
                     onClick={createNewddt}
                     className="w-32 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 cursor-pointer"
                 >
-                    Yeni Ekle
+                    {t("adminpanel.pricing.add_discount.add_new")}
                 </button>
             </div>
         </div>

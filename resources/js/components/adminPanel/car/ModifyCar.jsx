@@ -3,16 +3,18 @@ import CarModify from "./CarModify.jsx";
 import CarPrize from "./CarPrize.jsx";
 import CarPhotoUpload from "./CarPhotoUpload.jsx";
 import CarModifyPhoto from "./CarModifyPhoto.jsx";
+import {useTranslation} from "react-i18next";
 
 export default function ModifyCar({ car }) {
-  const [openCarModify, setOpenCarModify] = useState(false);
-  const [openCarPrice, setOpenCarPrice] = useState(false);
-  const [openUploadPhoto, setOpenUploadPhoto] = useState(false);
-  const closeModalCM = () => setOpenCarModify(false);
-  const closeModalCp = () => setOpenCarPrice(false);
-  const closeModalUP = () => setOpenUploadPhoto(false);
+    const {t} = useTranslation();
+    const [openCarModify, setOpenCarModify] = useState(false);
+    const [openCarPrice, setOpenCarPrice] = useState(false);
+    const [openUploadPhoto, setOpenUploadPhoto] = useState(false);
+    const closeModalCM = () => setOpenCarModify(false);
+    const closeModalCp = () => setOpenCarPrice(false);
+    const closeModalUP = () => setOpenUploadPhoto(false);
 
-  return (
+    return (
     <div className="w-full bg-white rounded-xl shadow-md p-6">
         <br/>
       <div className="flex flex-col lg:flex-row gap-6 items-stretch">
@@ -24,24 +26,24 @@ export default function ModifyCar({ car }) {
         </div>
 
         <div className="w-full lg:w-1/3 flex flex-col justify-center gap-4 bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-200">
-          <h3 className="text-gray-800 font-semibold text-lg mb-2">İşlemler</h3>
+          <h3 className="text-gray-800 font-semibold text-lg mb-2">{t("adminpanel.car.car_modify.operations")}</h3>
           <button
             onClick={() => setOpenCarPrice(true)}
             className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition cursor-pointer"
           >
-            Fiyat Bilgisi Düzenle
+              {t("adminpanel.car.car_modify.edit_price_information.edit_price_information")}
           </button>
           <button
             onClick={() => setOpenCarModify(true)}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition cursor-pointer"
           >
-            Araç Bilgisi Düzenle
+              {t("adminpanel.car.car_modify.edit_car_information.edit_car_information")}
           </button>
           <button
             onClick={() => setOpenUploadPhoto(true)}
             className="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition cursor-pointer"
           >
-            Fotoğrafları Düzenle
+              {t("adminpanel.car.car_modify.edit_photos.edito_photos")}
           </button>
         </div>
       </div>
@@ -61,17 +63,17 @@ export default function ModifyCar({ car }) {
           <CarPhotoUpload car={car} closeModal={closeModalUP} />
         </ModalWrapper>
       )}
-        <div className={`w-full flex items-center justify-end p-4`}><button className={`px-6 bg-red-500 rounded-lg hover:bg-red-600 text-white text-lg cursor-pointer`}>Sil</button></div>
+        <div className={`w-full flex items-center justify-end p-4`}><button className={`px-6 bg-red-500 rounded-lg hover:bg-red-600 text-white text-lg cursor-pointer`}>{t("adminpanel.car.car_modify.delete")}</button></div>
     </div>
-  );
-}
+    );
+    }
 
-function ModalWrapper({ children }) {
-  return (
+    function ModalWrapper({ children }) {
+    return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
         <div className="bg-white w-[50%] max-h-[90vh] overflow-y-auto rounded-xl shadow-lg p-12 relative">
             {children}
         </div>
     </div>
-  );
+    );
 }

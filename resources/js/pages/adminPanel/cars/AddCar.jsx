@@ -1,25 +1,52 @@
 import Navbar from "../../../components/adminPanel/navbar/Navbar";
 import CarForm from "../../../components/adminPanel/car/form/CarForm.jsx";
 import { router } from "@inertiajs/react";
+import {useTranslation} from "react-i18next";
+import axios from "axios";
+import {useState} from "react";
 
-export default function AddCars({error, success}) {
-
+export default function AddCars() {
+    const {t} = useTranslation();
+    const [success, setSuccess] = useState();
+    const [error, setError] = useState();
     const onSubmit = (data) => {
         if (data instanceof FormData) {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            router.post("/adminpanel/car/add", data, {
+            axios.post("/adminpanel/car/add", data, {
                 headers: {
                     'X-CSRF-TOKEN': csrfToken,
                 },
-            });
+            })
+                .then(res => {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+
+                    if (res.data.success) {
+                        setSuccess("Added Succesfully");
+                        setError(null);
+                    } else if (res.data.error) {
+                        setError(res.data.error);
+                        setSuccess(null);
+                    }
+                })
+                .catch(err => {
+                    if (err.response?.status === 422) {
+                        const validationErrors = err.response.data.errors;
+                        const firstError = Object.values(validationErrors)[0][0];
+                        setError(firstError);
+                    } else {
+                        setError(err.response?.data?.error || err.message);
+                    }
+                    setSuccess(null);
+                });
+
+
         }
     };
 
     return (
         <div className="w-full">
-            <Navbar />
-            <div className="pl-64 pt-24 pr-4 w-full">
-                <h3>Araç Ekle</h3>
+            <Navbar >
+                <h3>{t("adminpanel.add_car.add_car")}</h3>
                 <hr />
                 {success && (
                     <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
@@ -32,9 +59,9 @@ export default function AddCars({error, success}) {
                     </div>
                 )}
                 <div className="w-[90%] m-8 shadow-lg p-4">
-                    <CarForm mode="create" onSubmit={onSubmit}/>
+                    <CarForm mode="create" onSubmit={onSubmit} />
                 </div>
-            </div>
+            </Navbar>
             <div className="w-full h-50"></div>
         </div>
     );

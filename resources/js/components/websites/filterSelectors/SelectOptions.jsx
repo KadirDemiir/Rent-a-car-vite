@@ -1,5 +1,6 @@
     import { useState } from "react";
     import useClickOutside from "../../useClickOutside.jsx"
+    import React from "react";
 
     export default function SelectedOptions({ value = [], onChange, options = [], options_name, multiple= false}) {
       const [open, setOpen] = useState(false);
@@ -24,7 +25,6 @@
               newValue = [""];
           } else {
             newValue.push(selectedValue);
-            console.log(newValue, newValue.length === 3);
           }
             if(newValue.length === options.length-1)
                 onChange([""]);
@@ -33,14 +33,18 @@
         }
       };
 
-      const getSelectedLabels = () => {
-        if (value.length === 0 || (value.length === 1 && value[0] === ""))
-          return options[0].label;
-          const selectedOptions = options.filter(opt =>
-              JSON.stringify(value).includes(JSON.stringify(opt.value))
-          );
-          return selectedOptions.map((opt) => opt.label).join(", ");
-      };
+        const getSelectedLabels = () => {
+            if (value.length === 0 || (value.length === 1 && value[0] === ""))
+                return options[0]?.label ?? null;
+            const selectedOptions = options ? options.filter(opt => value.includes(opt.value)) : "";
+            if (selectedOptions.length === 1) return selectedOptions[0].label;
+            return selectedOptions.map((opt, i) => (
+                <span key={opt.value}>
+                  {opt.label}{i < selectedOptions.length - 1 ? ", " : ""}
+                </span>
+            ));
+        };
+
 
       const isSelected = (val) => JSON.stringify(value).includes(JSON.stringify(val));
 
@@ -66,7 +70,11 @@
                   }`}
                   onClick={() => toggleSelection(opt.value)}
                 >
-                  {opt.label}
+                    {typeof opt.label === "string" ? (
+                        opt.label
+                    ) : (
+                        React.isValidElement(opt.label) ? opt.label : opt.label
+                    )}
                   {isSelected(opt.value) && (
                     <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />

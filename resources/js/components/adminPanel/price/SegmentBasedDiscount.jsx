@@ -1,7 +1,9 @@
 import SelectOptions from "../../websites/filterSelectors/SelectOptions.jsx";
 import { useState, useEffect } from "react";
+import {useTranslation} from "react-i18next";
 
 export default function SegmentBasedDiscount({ selectedSegment, onChange }) {
+    const {t} = useTranslation();
     const options = [
         { label: "--Seçiniz--", value: "" },
         { label: "Economy", value: "economy" },
@@ -27,7 +29,7 @@ export default function SegmentBasedDiscount({ selectedSegment, onChange }) {
                 value={value}
                 options={options}
                 onChange={handleChange}
-                options_name="Segment seçiniz"
+                options_name={t("adminpanel.pricing.add_discount.choose_a_segment")}
             />
         </div>
     );

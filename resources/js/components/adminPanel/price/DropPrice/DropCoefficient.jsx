@@ -2,8 +2,10 @@ import DropForm from "./DropForm.jsx";
 import {useEffect, useState} from "react";
 import {router} from "@inertiajs/react";
 import {use} from "i18next";
+import {useTranslation} from "react-i18next";
 
 export default function DropCoefficient({segments}){
+    const {t} = useTranslation();
     const name = segments.map(s => s.name);
     const [coeffiData, setCoeffiData] = useState({});
     const [coeffiError, setCoeffiError] = useState({});
@@ -43,11 +45,11 @@ export default function DropCoefficient({segments}){
     };
     return(
         <>
-            <h3 className="font-semibold">Drop Ücretleri</h3>
+            <h3 className="font-semibold">{t("adminpanel.pricing.drop_price.drop_price")}</h3>
             <hr/><br/>
             <br/><br/>
             <div className="grid grid-cols-4 gap-4 bg-gray-50 shadow-md rounded-xl p-6 ">
-                <h3 className="col-span-4 flex items-center justify-center font-semibold">Araç Segment Katsayısı</h3>
+                <h3 className="col-span-4 flex items-center justify-center font-semibold">{t("adminpanel.pricing.drop_price.vehicle_segment_coefficient.vehicle_segment_coefficient")}</h3>
                 <div className={`col-span-4`}>
                     {formError && <div className={`p-2 border-l-12 border-red-600 bg-red-400 text-white`}>{formError}</div>}
                 </div>

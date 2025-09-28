@@ -1,5 +1,6 @@
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import {useTranslation} from "react-i18next";
 
 const modules = {
     toolbar: [
@@ -19,10 +20,11 @@ const modules = {
 };
 
 export default function CampaignTextEditor({ content, setContent, currLan }) {
+    const {t} = useTranslation()
     return (
         <div>
             <label className="block text-lg font-semibold mb-2 text-gray-700">
-                Kampanya Metni:
+                {t("adminpanel.pricing.add_campaign.campaign_content")}
             </label>
             <div
                 className="resize overflow-auto border rounded-md"
@@ -42,7 +44,7 @@ export default function CampaignTextEditor({ content, setContent, currLan }) {
                     style={{ height: "100%", borderRadius: "0.5rem" }}
                 />
             </div>
-            <span>{content.replace(/<[^>]*>/g, "").length} karakter</span>
+            <span>{content.replace(/<[^>]*>/g, "").length} char</span>
         </div>
     );
 }

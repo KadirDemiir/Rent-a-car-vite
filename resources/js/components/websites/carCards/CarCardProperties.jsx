@@ -9,23 +9,23 @@ export default function CarCardProperties({fuel_type, transmission_type, seat_co
             </div>
 
             < CarCardsProp
-            photo_path = "storage/svg/carFeatures/gas_station.svg"
+            photo_path = "/storage/svg/carFeatures/gas_station.svg"
             context = {fuel_type}
             />
             < CarCardsProp
-            photo_path = "storage/svg/carFeatures/transmission.svg"
+            photo_path = "/storage/svg/carFeatures/transmission.svg"
             context = {transmission_type}
             />
             < CarCardsProp
-            photo_path = "storage/svg/carFeatures/groups.svg"
+            photo_path = "/storage/svg/carFeatures/groups.svg"
             context = {`${seat_count}`}
             />
             < CarCardsProp
-            photo_path = "storage/svg/carFeatures/car.svg"
+            photo_path = "/storage/svg/carFeatures/car.svg"
             context={body_type}
             />
             < CarCardsProp
-            photo_path = "storage/svg/carFeatures/bag.svg"
+            photo_path = "/storage/svg/carFeatures/bag.svg"
             context = {`${trunk_capacity}`}
             />
         </div>

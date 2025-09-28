@@ -3,8 +3,10 @@ import Navbar from "../../../components/adminPanel/navbar/Navbar.jsx";
 import "react-datepicker/dist/react-datepicker.css";
 import DiscountForm from "../../../components/adminPanel/price/DiscountForm.jsx";
 import {router} from "@inertiajs/react";
+import {useTranslation} from "react-i18next";
 
 export default function AddDiscounts({success, errors}) {
+    const {t} = useTranslation();
     const [selectedDiscount, setSelectedDiscount] = useState("segment");
     const [dayDiscount, setDayDiscount] = useState([
         { min_day: "", max_day: "", discount_type: "fixed", currency: "try", discount_amount: "", day_error: "", amount_error: "" }
@@ -60,10 +62,9 @@ export default function AddDiscounts({success, errors}) {
 
     return (
         <div className="w-full h-600">
-            <Navbar />
-            <div className="pl-64 pt-24 pr-4">
+            <Navbar >
                 <div className="border border-gray-300 rounded-md shadow-md p-4">
-                    <h3 className="text-2xl font-extrabold">İndirim Ekle</h3>
+                    <h3 className="text-2xl font-extrabold">{t("adminpanel.pricing.add_discount.add_discount")}</h3>
                     <hr className="my-6" />
                     {success && (
                         <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
@@ -94,16 +95,16 @@ export default function AddDiscounts({success, errors}) {
                         discountTarget={discountTarget}
                         setDiscountTarget={setDiscountTarget}
                     />
-                    <div className="flex items-center justify-center mt-4">
+                    <div className="flex items-center justify-end mt-4">
                         <button
                             onClick={handleSubmit}
                             className="bg-blue-500 w-48 py-2 text-white rounded-md hover:bg-blue-600 cursor-pointer"
                         >
-                            İndirim Ekle
+                            {t("adminpanel.pricing.add_discount.save")}
                         </button>
                     </div>
                 </div>
-            </div>
+            </Navbar>
         </div>
     );
 }

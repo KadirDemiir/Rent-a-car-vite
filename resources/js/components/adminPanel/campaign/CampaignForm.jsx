@@ -4,14 +4,25 @@ import DiscountForm from "../price/DiscountForm.jsx";
 import SelectOptions from "../../websites/filterSelectors/SelectOptions.jsx";
 import DateTimePickerComp from "../price/DateTimePickerComp.jsx";
 import Confirm from "../../Confirm.jsx";
-import { router } from "@inertiajs/react";
+import {router, usePage} from "@inertiajs/react";
+import {useTranslation} from "react-i18next";
 
-export default function CampaignForm({ mode = "add", campaign = null, onSubmit }) {
-    const supportedLangs = [{ label: "Türkçe", value: "tr" }, { label: "İngilizce", value: "en" }];
-    const [currentLang, setCurrentLang] = useState("tr");
+export default function CampaignForm({languages, mode = "add", campaign = null, onSubmit }) {
+    const {t} = useTranslation();
+    const { url } = usePage();
+    const params = new URLSearchParams(url.split('?')[1]);
+    const lang = params.get('lang');
+    const supportedLangs = languages.map(lang => ({label: lang.name, value: lang.code}));
+    const [currentLang, setCurrentLang] = useState(lang ?? languages[0].code);
     const [isDiscountOpen, setIsDiscountOpen] = useState(campaign?.discounts.length || false);
-    const [title, setTitle] = useState({ tr: "", en: "" });
-    const [content, setContent] = useState({ tr: "", en: "" });
+    const [title, setTitle] = useState(() =>
+        languages.reduce((acc, lang) => {
+            acc[lang.code] = "";
+            return acc;}, []));
+    const [content, setContent] = useState(() =>
+        languages.reduce((acc, lang) => {
+        acc[lang.code] = "";
+        return acc;}, []));
     const [discountTarget, setDiscountTarget] = useState("");
     const [imagePreview, setImagePreview] = useState(null);
     const [imageFile, setImageFile] = useState(null);
@@ -77,13 +88,15 @@ export default function CampaignForm({ mode = "add", campaign = null, onSubmit }
     };
 
     const validateAndSubmit = () => {
+        const {t} = useTranslation();
         setFormErrors(null);
-        if (!title.tr || !title.en) {
+        if (supportedLangs.some(sl => !title[sl.value])) {
             setFormErrors("Lütfen her dil için kampanya başlığı oluşturun.");
             window.scrollTo({ top: 0, behavior: "smooth" });
             return;
         }
-        if (!content.tr || !content.en) {
+
+        if (supportedLangs.some(sl => !content[sl.value])) {
             setFormErrors("Lütfen her dil için kampanya metni oluşturun.");
             window.scrollTo({ top: 0, behavior: "smooth" });
             return;
@@ -162,7 +175,6 @@ export default function CampaignForm({ mode = "add", campaign = null, onSubmit }
         if (confirmMessage.event === "delete") deleteCampaign();
         setConfirmMessage({});
     };
-
     return (
         <div className="w-full p-4 shadow-lg rounded-md bg-white">
             {formErrors && (
@@ -170,22 +182,14 @@ export default function CampaignForm({ mode = "add", campaign = null, onSubmit }
             )}
             {isConfirmOpen && <Confirm message={confirmMessage.message} confirm={handleConfirm} />}
             <div className="flex justify-between gap-2 mb-4 md:w-[30%]">
-                <SelectOptions options={supportedLangs} onChange={(e) => setCurrentLang(e)} value={currentLang} options_name="Kampanya Dili Seçiniz" />
+                <SelectOptions options={supportedLangs} onChange={(e) => setCurrentLang(e)} value={currentLang} options_name={t("adminpanel.pricing.add_campaign.select_language")} />
             </div>
 
-            <AddCampaignInfo
-                titleOnChange={titleOnChange}
-                title={title[currentLang]}
-                handleImageChange={handleImageChange}
-                image={imagePreview}
-                content={content[currentLang]}
-                setOnChange={contentOnChange}
-                currLan={currentLang}
-            />
+            <AddCampaignInfo titleOnChange={titleOnChange} title={title[currentLang]} handleImageChange={handleImageChange} image={imagePreview} content={content[currentLang]} setOnChange={contentOnChange} currLan={currentLang}/>
 
             <div className="mt-4">
                 <button onClick={() => setIsDiscountOpen(!isDiscountOpen)} className={`py-2 w-36 ${isDiscountOpen ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} flex items-center justify-center rounded-md text-white cursor-pointer`}>
-                    {isDiscountOpen ? "Vazgeç" : "İndirim Ekle"}
+                    {isDiscountOpen ? t("adminpanel.pricing.add_campaign.button.cancel_a_discount") : t("adminpanel.pricing.add_campaign.button.add_a_discount")}
                 </button>
             </div>
 
@@ -227,7 +231,7 @@ export default function CampaignForm({ mode = "add", campaign = null, onSubmit }
                     className="bg-blue-600 hover:bg-blue-700 transition text-white px-4 py-2 rounded-md cursor-pointer"
                     onClick={validateAndSubmit}
                 >
-                    {mode === "edit" ? "Güncelle" : "Kaydet"}
+                    {mode === "edit" ? t("adminpanel.pricing.update_campaign.buttonsave") : t("adminpanel.pricing.add_campaign.button.save")}
                 </button>
             </div>
         </div>

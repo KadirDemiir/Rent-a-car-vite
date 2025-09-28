@@ -15,25 +15,12 @@ return new class extends Migration
             $table->string('brand');
             $table->string('model');
             $table->year('year');
-
-            $table->enum('segment', [
-                'economy', 'compact', 'midrange', 'premium'
-            ]);
-
-            $table->enum('body_type', [
-                'hatchback', 'sedan', 'suv', 'station', 'coupe', 'convertible', 'minivan', 'pickup'
-            ]);
-
+            $table->foreignId('segment_id')->constrained('segments')->onDelete('restrict');
+            $table->foreignId('fuel_id')->constrained('fuels')->onDelete('restrict');
+            $table->foreignId('transmission_id')->constrained('transmissions')->onDelete('restrict');
+            $table->foreignId('body_type_id')->constrained('body_types')->onDelete('restrict');
             $table->unsignedTinyInteger('seat_count');
             $table->unsignedSmallInteger('trunk_capacity');
-
-            $table->enum('fuel_type', [
-                'benzin', 'dizel', 'elektrik', 'hibrit'
-            ]);
-
-            $table->enum('transmission_type', [
-                'manuel', 'otomatik'
-            ]);
             $table->decimal('price', 10, 2);
             $table->decimal('deposit', 10, 2);
             $table->char('price_currency', 3);
@@ -41,6 +28,7 @@ return new class extends Migration
             $table->string('license_plate');
             $table->timestamps();
         });
+
     }
 
 

@@ -1,6 +1,8 @@
 import ReservationAction from "./ReservationAction.jsx";
+import {useTranslation} from "react-i18next";
 
 export default function ShowResCard({ res, closeModal, isRes}) {
+    const {t} = useTranslation();
     res.ekstraHizmetler = [
         { ad: "Bebek Koltuğu", tutar: "800₺" },
         { ad: "Navigasyon", tutar: "200₺" }
@@ -23,50 +25,47 @@ export default function ShowResCard({ res, closeModal, isRes}) {
                 >
                     &times;
                 </button>
-                <h2 className="text-xl font-bold mb-6">Rezervasyon Detayı</h2>
+                <h2 className="text-xl font-bold mb-6">{t("adminpanel.reservation.reservation_modal.reservation_detail")}</h2>
 
-                {/* FLEX Container: Ana Bilgiler ve Ekstra Hizmetler Yan Yana */}
                 <div className="flex flex-col lg:flex-row gap-6">
-                    {/* Sol Sütun: Rezervasyon Bilgileri */}
                     <dl className="grid grid-cols-2 gap-x-6 gap-y-4 flex-1">
-                        <dt className="font-semibold">Ad</dt>
+                        <dt className="font-semibold">{t("adminpanel.reservation.reservation_modal.name")}</dt>
                         <dd>{res.ad}</dd>
 
-                        <dt className="font-semibold">Soyad</dt>
+                        <dt className="font-semibold">{t("adminpanel.reservation.reservation_modal.surname")}</dt>
                         <dd>{res.soyad}</dd>
 
-                        <dt className="font-semibold">Numara</dt>
+                        <dt className="font-semibold">{t("adminpanel.reservation.reservation_modal.phone_number")}</dt>
                         <dd>{res.numara}</dd>
 
-                        <dt className="font-semibold">Alış</dt>
+                        <dt className="font-semibold">{t("adminpanel.reservation.reservation_modal.pick_up_date")}</dt>
                         <dd>{res.alis}</dd>
 
-                        <dt className="font-semibold">Alış Yeri</dt>
+                        <dt className="font-semibold">{t("adminpanel.reservation.reservation_modal.pick_up_location")}</dt>
                         <dd>{res.alisYeri}</dd>
 
-                        <dt className="font-semibold">İade</dt>
+                        <dt className="font-semibold">{t("adminpanel.reservation.reservation_modal.return_date")}</dt>
                         <dd>{res.iade}</dd>
 
-                        <dt className="font-semibold">İade Yeri</dt>
+                        <dt className="font-semibold">{t("adminpanel.reservation.reservation_modal.return_location")}</dt>
                         <dd>{res.iadeYeri}</dd>
 
-                        <dt className="font-semibold">Ekstra Tutar</dt>
+                        <dt className="font-semibold">{t("adminpanel.reservation.reservation_modal.extra_price")}</dt>
                         <dd>{res.ekstra}</dd>
 
-                        <dt className="font-semibold">Toplam Tutar</dt>
+                        <dt className="font-semibold">{t("adminpanel.reservation.reservation_modal.total_price")}</dt>
                         <dd>{res.toplam}</dd>
 
-                        <dt className="font-semibold">Ödeme Yöntemi</dt>
+                        <dt className="font-semibold">{t("adminpanel.reservation.reservation_modal.payment_method")}</dt>
                         <dd>{res.odemeYontemi}</dd>
 
-                        <dt className="font-semibold">Ödeme Durumu</dt>
+                        <dt className="font-semibold">{t("adminpanel.reservation.reservation_modal.payment_status")}</dt>
                         <dd className="text-green-600 font-semibold">{res.odemeDurumu}</dd>
                     </dl>
 
-                    {/* Sağ Sütun: Ekstra Hizmetler */}
                     {res.ekstraHizmetler?.length > 0 && (
                         <div className="flex-1">
-                            <h3 className="text-lg font-semibold mb-2">Alınan Ekstra Hizmetler</h3>
+                            <h3 className="text-lg font-semibold mb-2">{t("adminpanel.reservation.reservation_modal.taken_extra_services")}</h3>
                             <dl className="space-y-2">
                                 {res.ekstraHizmetler.map((hizmet, index) => (
                                     <div key={index} className="flex items-center gap-x-2">

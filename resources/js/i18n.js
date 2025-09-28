@@ -1,26 +1,38 @@
-import i18n from 'i18next';
+import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import HttpBackend from 'i18next-http-backend';
+import axios from 'axios';
 
-i18n
-    .use(HttpBackend)
-    .use(initReactI18next)
-    .init({
-        lng: 'tr',
-        fallbackLng: 'en',
+const initI18n = async () => {
+    let supportedLngs;
+    let resources = {};
+    let current ;
 
-        ns: ['upside', 'downside', 'cars', 'reservationForm'],
-        defaultNS: 'upside',
+    try {
+        const currentRes = await axios.get('/get-current-language');
+        current = currentRes.data;
 
-        supportedLngs: ['tr', 'en'],
+        const langs = await axios.get('/supported-languages');
+        if (langs.data.length) supportedLngs = langs.data;
 
-        backend: {
-            loadPath: '/locales/{{lng}}/{{ns}}.json',
-        },
+        for (const lng of supportedLngs) {
+            const res = await axios.get(`/translations/${lng}`);
+            resources[lng] = { translation: res.data };
+        }
+    } catch (e) {
+        console.error('Diller veya çeviriler alınamadı, default kullanılıyor.', e);
+    }
 
-        interpolation: {
-            escapeValue: false,
-        },
-    });
+    await i18next
+        .use(initReactI18next)
+        .init({
+            supportedLngs,
+            fallbackLng: 'tr',
+            lng: current,
+            interpolation: { escapeValue: false },
+            resources,
+        });
 
-export default i18n;
+    return i18next;
+};
+
+export default initI18n;

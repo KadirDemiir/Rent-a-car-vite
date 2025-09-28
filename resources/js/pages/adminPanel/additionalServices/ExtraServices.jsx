@@ -2,12 +2,14 @@ import Navbar from "../../../components/adminPanel/navbar/Navbar.jsx";
 import Td from "../../../components/adminPanel/table/Td.jsx";
 import { useState } from "react";
 import ExternalServiceModal from "../../../components/adminPanel/price/ExternalServiceModal.jsx";
+import {useTranslation} from "react-i18next";
 
-export default function ExtraServices({ extraServices }) {
+export default function ExtraServices({ extraServices, success, error }) {
+    const {t} = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [instantService, setInstantService] = useState(null);
 
-    const header = ["Ekstra Hizmet", "1-3 Günlük Fiyat", "4-7 Günlük Fiyat", "8-15 Günlük Fiyat", "15+ Fiyat", "Stok", "Max Sınır", "Mevcut Sayı", "Açıklama"];
+    const header = [t("adminpanel.pricing.adding_services.external_services.service"), t("adminpanel.pricing.adding_services.external_services.1-3_days_price"), t("adminpanel.pricing.adding_services.external_services.4-7_days_price"), t("adminpanel.pricing.adding_services.external_services.8-15_days_price"), t("adminpanel.pricing.adding_services.external_services.more_than_15_days_price"), t("adminpanel.pricing.adding_services.external_services.stock"), t("adminpanel.pricing.adding_services.external_services.max_limit"), t("adminpanel.pricing.adding_services.external_services.current_stock"), t("adminpanel.pricing.adding_services.external_services.description")];
     const TDclass = "border border-gray-500 px-4 py-2";
 
     const handleService = (id) => {
@@ -28,13 +30,13 @@ export default function ExtraServices({ extraServices }) {
 
     return (
         <div className="w-full min-h-screen">
-            <Navbar />
-            <div className="pl-64 pt-24 pr-4">
-                <h3 className="text-2xl font-extrabold">Ekstra Hizmetler</h3>
+            <Navbar >
+                <h3 className="text-2xl font-extrabold">{t("adminpanel.pricing.adding_services.external_services.external_services")}</h3>
                 <hr className="my-4" />
-
+                {error && <div className={`border-l-12 border-red-600 bg-red-400 text-white`}>{error}</div>}
+                {success && <div className={`border-l-12 border-green-600 bg-green-400 text-white`}>{success}</div>}
                 <div className="w-full">
-                    <h2 className="text-xl font-bold p-2">Ekstra Hizmetler</h2>
+                    <h2 className="text-xl font-bold p-2">{t("adminpanel.pricing.adding_services.external_services.external_services")}</h2>
                     <table className="w-full">
                         <thead>
                         <tr>
@@ -43,11 +45,13 @@ export default function ExtraServices({ extraServices }) {
                         </thead>
                         <tbody>
                         {extraServices.map((es, index) => {
+                            const name = JSON.parse(es.name);
+                            const description = JSON.parse(es.description);
                             return (
                                 <tr key={index} onClick={() => handleService(es.id)} className="cursor-pointer">
                                     <Td
                                         contents={[
-                                            es.name,
+                                            name["tr"],
                                             es.one_three_day_price,
                                             es.four_seven_day_price,
                                             es.eight_fifteen_day_price,
@@ -55,7 +59,7 @@ export default function ExtraServices({ extraServices }) {
                                             es.stock,
                                             es.max_limit,
                                             es.current_count ?? "-",
-                                            es.description
+                                            description['tr']
                                         ]}
                                         cls={TDclass}
                                     />
@@ -72,10 +76,10 @@ export default function ExtraServices({ extraServices }) {
                         onClick={createService}
                         className="w-36 py-2 bg-green-600 hover:bg-green-700 text-white cursor-pointer rounded-xl"
                     >
-                        Yeni Servis Ekle
+                        {t("adminpanel.pricing.adding_services.external_services.button.add_new_service")}
                     </button>
                 </div>
-            </div>
+            </Navbar>
 
             {isModalOpen && (
                 <ExternalServiceModal service={instantService} close={closeModal} />

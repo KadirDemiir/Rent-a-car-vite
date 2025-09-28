@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Campaigns;
 use App\Models\Discount;
+use App\Models\Language;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -42,8 +43,10 @@ class CampaignsController extends Controller
     public function showIndexAdminPanel($id)
     {
         $campaign = Campaigns::with('discounts')->findOrFail($id);
+        $languages = Language::where('status', 'active')->get();
 
         return Inertia::render('adminPanel/campaigns/Campaign', [
+            'languages' => $languages,
             'campaign' => $campaign,
             'success' => session('success'),
         ]);
@@ -101,6 +104,7 @@ class CampaignsController extends Controller
             DB::commit();
 
             return Inertia::render('adminPanel/campaigns/AddCampaign', [
+                'languages' => Language::where('status', 'active')->get(),
                 'success' => 'Kampanya ve indirimler başarıyla eklendi!',
             ]);
         } catch (\Exception $e) {

@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import {useTranslation} from "react-i18next";
 
 
 const applyFilters = (cars, segment, fuelType, transmissionType) => {
@@ -27,7 +28,7 @@ const applySorting = (cars, sortBy) => {
 };
 
 export default function SortSearchReservations({ availableCars, sortBy, segment, fuelType, transmissionType }) {
-  console.log("SortSearchReservations render edildi");
+    const {t} = useTranslation();
 
   const [filteredCars, setFilteredCars] = useState([]);
 
@@ -59,7 +60,7 @@ export default function SortSearchReservations({ availableCars, sortBy, segment,
           <div className="col-span-1 lg:col-span-5 flex flex-col items-center justify-between gap-4 p-2">
             <div className="flex items-center gap-4 flex-wrap justify-center text-center">
               <span className="text-blue-700 font-bold bg-blue-100 px-3 py-1 rounded-full text-sm">
-                Lüks
+                {filteredCar.segment}
               </span>
               <h2 className="text-lg font-semibold text-gray-800">
                 {filteredCar.brand} {filteredCar.model} • {filteredCar.fuel_type} • {filteredCar.transmission_type}
@@ -78,7 +79,7 @@ export default function SortSearchReservations({ availableCars, sortBy, segment,
                 },
                 {
                   icon: "/storage/svg/carFeatures/groups.svg",
-                  label: `${filteredCar.seat_count} Kişilik`
+                  label: t("website.car_card.properties.seat_count_{count}")
                 }
               ].map((item, i) => (
                 <div key={i} className="flex flex-col items-center justify-center p-2 rounded-xl w-20 shadow-xl">
@@ -92,15 +93,15 @@ export default function SortSearchReservations({ availableCars, sortBy, segment,
               {[
                 {
                   icon: "/storage/svg/requirements/assurance.svg",
-                  label: "6000 TL Teminat"
+                  label: t("website.car_card.requirement.{amount}_{currency}_deposit")
                 },
                 {
                   icon: "/storage/svg/requirements/calendar.svg",
-                  label: "26 Yaş"
+                  label: t("website.car_card.requirements.required_min_{age}")
                 },
                 {
                   icon: "/storage/svg/requirements/steering-wheel.svg",
-                  label: "3 Yıl Ehliyet"
+                  label: t("website.car_card.requirements.{year}_year_experience")
                 }
               ].map((item, i) => (
                 <div key={i} className="flex flex-col items-center justify-center p-2 rounded-xl w-24 shadow-2xl">
@@ -127,7 +128,7 @@ export default function SortSearchReservations({ availableCars, sortBy, segment,
               </div>
             </div>
             <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition duration-300">
-              Hemen Kirala
+                {t("website.searchReservation.rent_now")}
             </button>
           </div>
         </div>

@@ -2,15 +2,17 @@ import { useState } from "react";
 import Td from "../table/Td.jsx";
 import ShowResCard from "../reservations/ShowResCard.jsx";
 import ChevronNavigation from "../reservations/ChevronNavigation.jsx";
+import {useTranslation} from "react-i18next";
 
 export default function CarReservations({ res }) {
+    const {t} = useTranslation();
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [startIndex, setStartIndex] = useState(0);
   const perPage = 3;
 
   const TDclass = "border border-gray-500 px-4 py-2";
   const headers = [
-    "Ad Soyad", "Alış", "Alış Yeri", "İade", "İade Yeri", "Ödeme Durumu", "Durum"
+    t("adminpanel.reservation.name_and_surname"), t("adminpanel.reservation.pick_up_date"), t("adminpanel.reservation.return_date"), t("adminpanel.reservation.payment_status"), t("adminpanel.reservation.status")
   ];
 
   const handleRowClick = (reservation) => {
@@ -21,7 +23,8 @@ export default function CarReservations({ res }) {
     setSelectedReservation(null);
   };
 
-  const reservations =  [{
+  const reservations =  [
+        {
             ad: "Ali",
             soyad: "Yılmaz",
             numara: "0555 123 45 67",
@@ -148,9 +151,7 @@ export default function CarReservations({ res }) {
                 contents={[
                   r.ad + " " + r.soyad,
                   r.alis,
-                  r.alisYeri,
                   r.iade,
-                  r.iadeYeri,
                   <span className="text-green-600 font-semibold" key="odeme">
                     {r.odemeDurumu}
                   </span>,
@@ -164,7 +165,7 @@ export default function CarReservations({ res }) {
         </tbody>
       </table>
 
-      < ChevronNavigation 
+      < ChevronNavigation
         handlePrev={handlePrev}
         handleNext={handleNext}
         startIndex={startIndex}

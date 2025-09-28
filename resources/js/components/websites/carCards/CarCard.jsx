@@ -4,7 +4,7 @@ import CarCardProperties from './CarCardProperties.jsx';
 import CarCardRequirements from './CarCardRequirements.jsx';
 import { useTranslation } from 'react-i18next';
 export default function CarCard({car}) {
-    const { t } = useTranslation("cars");
+    const { t } = useTranslation();
     const upperFirstLetter = (str) => {
         return str
             .split(' ')
@@ -28,19 +28,19 @@ console.log(car);
             />
             <div className="row-span-5 flex p-2 gap-2">
                 < CarCardProperties
-                    compName={upperFirstLetter(t('car_properties'))}
+                    compName={upperFirstLetter(t('website.car_card.properties.properties_label'))}
                     body_type={car.body_type}
-                    seat_count={`${car.seat_count} ${upperFirstLetter(t('seats'))}`}
-                    trunk_capacity={`${car.trunk_capacity} ${upperFirstLetter(t('luggage_capacity'))}`}
-                    fuel_type={upperFirstLetter(t(car.fuel_type))}
-                    transmission_type={upperFirstLetter(t(car.transmission_type))}
+                    seat_count={`${upperFirstLetter(t('website.car_card.properties.seat_count_{count}', {count : car.seat_count }))}`}
+                    trunk_capacity={`${upperFirstLetter(t('website.car_card.properties.trunk_capacity_{trunk_capacity}', {trunk_capacity: car.trunk_capacity}))}`}
+                    fuel_type={car.fuel_type}
+                    transmission_type={car.transmission_type}
                 />
                 <div className="h-[90%] w-[1px] bg-gray-300"></div>
                 < CarCardRequirements
-                    compName={upperFirstLetter(t('requirements'))}
-                min_age={`23 ${upperFirstLetter(t('min_age'))}`}
-                experience={`3 ${upperFirstLetter(t('year'))} ${upperFirstLetter(t('experience'))}`}
-                collateral={`6000 ${upperFirstLetter(t('currencies.tl'))} ${upperFirstLetter(t('deposit'))}`}
+                compName={upperFirstLetter(t('website.car_card.requirements.requirements_label'))}
+                min_age={`${upperFirstLetter(t('website.car_card.requirements.required_min_{age}', { age: 23 }))}`}
+                experience={`${upperFirstLetter(t('website.car_card.requirements.{year}_year_experience', {year: 2}))}`}
+                collateral={`${upperFirstLetter(t('website.car_card.requirement.{amount}_{currency}_deposit', {amount: 6000, currency: 'tl'}))}`}
                 />
             </div>
         </div>

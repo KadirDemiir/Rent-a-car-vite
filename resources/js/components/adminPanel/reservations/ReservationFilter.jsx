@@ -1,7 +1,9 @@
 import { useState } from "react";
 import SelectOptions from "../../websites/filterSelectors/SelectOptions.jsx";
+import {useTranslation} from "react-i18next";
 
 export default function ReservationFilter() {
+    const {t} = useTranslation();
     const [status, setStatus] = useState("");
     const [sort, setSort] = useState("");
     const [filter, setFilter] = useState("");
@@ -13,13 +15,13 @@ export default function ReservationFilter() {
                     value={sort}
                     onChange={setSort}
                     options={[
-                        { label: "Önerilen", value: "primary" },
-                        { label: "Fiyata Göre (artan)", value: "priceInc" },
-                        { label: "Fiyata Göre (azalan)", value: "priceDesc" },
-                        { label: "Tarihe Göre (önce en yeni)", value: "recently" },
-                        { label: "Tarihe Göre (önce en eski)", value: "oldest" },
+                        { label: t("adminpanel.reservation.filter.sort.suggested"), value: "primary" },
+                        { label: t("adminpanel.reservation.filter.sort.increase_based_price"), value: "priceInc" },
+                        { label: t("adminpanel.reservation.filter.sort.decrease_based_price"), value: "priceDesc" },
+                        { label: t("adminpanel.reservation.filter.sort.newest"), value: "recently" },
+                        { label: t("adminpanel.reservation.filter.sort.latest"), value: "oldest" },
                     ]}
-                    options_name="Sırala"
+                    options_name={t("adminpanel.reservation.filter.sort.sort_label")}
                 />
             </div>
 
@@ -34,15 +36,15 @@ export default function ReservationFilter() {
                         { label: "İptal", value: "cancelled" },
                         { label: "Tamamlandı", value: "completed" },
                     ]}
-                    options_name="Durum"
+                    options_name={t("adminpanel.reservation.filter.status")}
                 />
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:ml-auto">
-                <label className="text-sm font-medium text-gray-700">Filtrele:</label>
+                <label className="text-sm font-medium text-gray-700">{t("adminpanel.reservation.filter.filer")}</label>
                 <input
                     type="text"
-                    placeholder="Kullanıcı, araç vb."
+                    placeholder={t("adminpanel.reservation.filter.filer")}
                     value={filter}
                     onChange={(e) => setFilter(e.target.value)}
                     className="border rounded px-3 py-1 text-sm w-full sm:w-auto"

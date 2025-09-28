@@ -40,7 +40,7 @@ export default function SearchReservation({ defPickupLocation, defReturnLocation
   const [isROpen, setIsROpen] = useState(false);
   const [minFinish, setMinFinish] = useState(new Date(startDate));
 
-  const { t } = useTranslation('reservationForm');
+  const {i18n, t } = useTranslation();
 
   const upperFirstLetter = (str) => {
       return str
@@ -48,17 +48,11 @@ export default function SearchReservation({ defPickupLocation, defReturnLocation
           .map(w => w.charAt(0).toUpperCase() + w.slice(1))
           .join(' ');
   }
-
-
-
-
   useEffect(() => {
     const newMinFinish = new Date(startDate);
     newMinFinish.setDate(newMinFinish.getDate() + 2);
     setMinFinish(newMinFinish);
   }, [startDate]);
-
-
   useEffect(() => {
     if (!defReturnDate) {
       const newFinishDate = new Date(startDate);
@@ -97,7 +91,7 @@ export default function SearchReservation({ defPickupLocation, defReturnLocation
       selectedRLocation,
     };
 
-    router.get('/searchReservations', formData);
+    router.get(`/${i18n.language}/${t('address.searchReservations')}`, formData);
   };
 
   return (
@@ -105,7 +99,7 @@ export default function SearchReservation({ defPickupLocation, defReturnLocation
       <form onSubmit={submitHandler} className="flex flex-wrap gap-6 items-end justify-center">
         <div className="w-72">
           <label className="block mb-1 text-sm font-semibold text-blue-800">
-              {upperFirstLetter(t('pick_up'))} {upperFirstLetter(t('location'))}
+              {upperFirstLetter(t('website.home.pick_up_location'))}
           </label>
           <LocationSelector
             selectedLocation={selectedPULocation}
@@ -118,7 +112,7 @@ export default function SearchReservation({ defPickupLocation, defReturnLocation
 
         <div className="w-72">
           <label className="block mb-1 text-sm font-semibold text-blue-800">
-              {upperFirstLetter(t('return'))} {upperFirstLetter(t('location'))}
+              {upperFirstLetter(t('website.home.return_location'))}
           </label>
           <LocationSelector
             selectedLocation={selectedRLocation}
@@ -131,7 +125,7 @@ export default function SearchReservation({ defPickupLocation, defReturnLocation
 
         <div className="w-72">
           <label className="block mb-1 text-sm font-semibold text-blue-800">
-              {upperFirstLetter(t('pick_up'))} {upperFirstLetter(t('date'))} & {upperFirstLetter(t('time'))}
+              {upperFirstLetter(t('website.home.pick_up_date_and_time'))}
           </label>
           <div className="flex border rounded-md overflow-hidden shadow-sm">
             <DatePicker
@@ -147,7 +141,7 @@ export default function SearchReservation({ defPickupLocation, defReturnLocation
 
         <div className="w-72">
           <label className="block mb-1 text-sm font-semibold text-blue-800">
-              {upperFirstLetter(t('return'))} {upperFirstLetter(t('date'))} & {upperFirstLetter(t('time'))}
+              {upperFirstLetter(t('website.home.return_date_and_time'))}
           </label>
           <div className="flex border rounded-md overflow-hidden shadow-sm">
             <DatePicker
@@ -166,7 +160,7 @@ export default function SearchReservation({ defPickupLocation, defReturnLocation
             type="submit"
             className="w-40 h-12 bg-blue-800 hover:bg-blue-900 text-white font-semibold rounded-xl transition duration-300 shadow-md"
           >
-              {upperFirstLetter(t('search'))}
+              {upperFirstLetter(t('website.home.button.save'))}
           </button>
         </div>
       </form>

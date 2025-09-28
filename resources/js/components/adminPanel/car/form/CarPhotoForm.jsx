@@ -1,6 +1,8 @@
 import React, { useState, useRef, forwardRef, useImperativeHandle } from "react";
+import {useTranslation} from "react-i18next";
 
 const CarPhotoForm = forwardRef(({ defPhotos, maxFiles = 4, onSubmit }, ref) => {
+    const {t} = useTranslation();
     const [photos, setPhotos] = useState(() =>
         (defPhotos || []).map((p) => ({
             file: null,
@@ -117,8 +119,8 @@ const CarPhotoForm = forwardRef(({ defPhotos, maxFiles = 4, onSubmit }, ref) => 
                 }`}
             >
                 {photos.length >= maxFiles
-                    ? `Maksimum ${maxFiles} fotoğraf yüklendi`
-                    : "Fotoğraf eklemek için tıklayın"}
+                    ? t("adminpanel.car.car_modify.edit_photos.max_{count}_photos_added", { count: maxFiles })
+                    : t("adminpanel.car.car_modify.edit_photos.click_for_add_photo")}
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -147,7 +149,7 @@ const CarPhotoForm = forwardRef(({ defPhotos, maxFiles = 4, onSubmit }, ref) => 
                             </button>
                             {coverIndex === i && (
                                 <div className="absolute bottom-0 left-0 bg-blue-600 text-white text-[10px] px-1 w-full text-center">
-                                    Kapak
+                                    {t("adminpanel.car.car_modify.edit_photos.cover")}
                                 </div>
                             )}
                         </div>
@@ -156,7 +158,7 @@ const CarPhotoForm = forwardRef(({ defPhotos, maxFiles = 4, onSubmit }, ref) => 
                             key={`empty-${i}`}
                             className="flex items-center justify-center h-24 text-gray-300 border border-dashed rounded"
                         >
-                            Boş
+                            {t("adminpanel.car.car_modify.edit_photos.empty")}
                         </div>
                     );
                 })}

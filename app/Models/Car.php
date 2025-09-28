@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -10,13 +11,22 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Car extends Model
 {
+    /** @use HasFactory<\Database\Factories\CarFactory> */
+    use HasFactory;
+
+    protected static function newFactory(): \Database\Factories\CarFactory
+    {
+        return \Database\Factories\CarFactory::new();
+    }
+
+
     protected $fillable = [
         'location_id',
         'brand',
         'model',
         'year',
         'segment',
-        'body_type',
+        'body_type_id',
         'seat_count',
         'price',
         'price_currency',
@@ -44,5 +54,11 @@ class Car extends Model
     public function discount(): HasMany{
         return $this->hasMany(Discount::class);
     }
+
+    public function bodyType()
+    {
+        return $this->belongsTo(BodyType::class);
+    }
+
 
 }

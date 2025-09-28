@@ -7,12 +7,16 @@ use App\Models\Discount;
 use App\Models\Photo;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class  CarController extends Controller
 {
     public function showAllCars(){
+        session(['lang' => 'a']);
+        App::setLocale(session('lang'));
         $cars = Car::with('photos')->get();
         return Inertia::render('Cars', [
             'cars' => $cars
@@ -35,7 +39,7 @@ class  CarController extends Controller
             'seat_count' => 'required|int',
             'trunk_capacity' => 'required|int',
             'segment' => 'required|string|max:255',
-            'body_type' => 'required|string|max:255',
+            'body_type' => 'required|exists:body_types,id',
             'fuel_type' => 'required|string|max:255',
             'transmission_type' => 'required|string|max:255',
             'deposit_currency' => 'required|string|max:3',
@@ -103,14 +107,17 @@ class  CarController extends Controller
                 $newPhoto->save();
             }
             DB::commit();
-            return Inertia::render('adminPanel/cars/AddCar', [
-                'success' => 'Araç Başarıyla Eklendi.',
+            return response()->json([
+                'success' => true,
+                'car' => $newCar
             ]);
         }catch (\Exception $e){
             DB::rollBack();
-            return Inertia::render('adminPanel/cars/AddCar', [
-                'error' => $e->getMessage(),
-            ]);
+            Log::error('Hata oluştu: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
         }
 
 

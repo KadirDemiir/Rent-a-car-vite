@@ -7,11 +7,11 @@ export default function CarCardRequirements({min_age, experience, collateral, co
             {compName}
         </div>
         <CarCardsProp
-        photo_path = "storage/svg/requirements/calendar.svg"
+        photo_path = "/storage/svg/requirements/calendar.svg"
         context = {min_age}
         />
         <CarCardsProp
-        photo_path = "storage/svg/requirements/steering-wheel.svg"
+        photo_path = "/storage/svg/requirements/steering-wheel.svg"
         context = {experience}
         />
         <CarCardsProp

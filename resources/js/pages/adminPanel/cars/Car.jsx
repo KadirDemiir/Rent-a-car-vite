@@ -8,10 +8,9 @@ import {usePage} from "@inertiajs/react";
 export default function Car({success, car}){
     return(
       <div className="w-full">
-          < Navbar />
-          <div className="pl-64 pt-24 pr-4 w-full">
+          < Navbar>
               <div className="font-bold">
-                  {car.license_plate} - {car.brand} {car.model} {car.fuel_type} {car.transmission_type} {car.year}
+                  {car?.license_plate} - {car?.brand} {car?.model} {car?.fuel_type} {car?.transmission_type} {car?.year}
               </div>
               <hr/><br/><br/>
               {success && (
@@ -31,7 +30,7 @@ export default function Car({success, car}){
                 </div>
                 < IncomingGraph />
               </div>
-          </div>
+          </Navbar>
           <div className="w-full h-100"></div>
       </div>
     );

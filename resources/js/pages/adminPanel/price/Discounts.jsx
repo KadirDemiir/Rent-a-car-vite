@@ -3,12 +3,14 @@ import {useState} from "react";
 import SelectOptions from "../../../components/websites/filterSelectors/SelectOptions.jsx";
 import {Link} from "@inertiajs/react";
 import DiscountList from "../../../components/adminPanel/price/DiscountList.jsx";
+import {useTranslation} from "react-i18next";
 
 export default function Discounts({data}){
+    const {t} = useTranslation();
     const [sort, setSort] = useState("lates");
     const [isActive, setIsActive] = useState("all");
-    const sortOptions = [{label: "Yeni (Başlangıç)", value: "lates"}, {label: "Eski (Başlangıç)", value: "oldest"}];
-    const isActivetOptions = [{label: "Tümü", value: "all"}, {label: "Aktif", value: "active"}, {label: "Geçmiş", value: "inactive"}]
+    const sortOptions = [{label: t("adminpanel.pricing.discounts.filter.sort.newest_based_on_start_date"), value: "lates"}, {label: t("adminpanel.pricing.discounts.filter.sort.oldest_based_on_start_date"), value: "oldest"}];
+    const isActivetOptions = [{label: "all", value: "all"}, {label: t("adminpanel.pricing.discounts.filter.status.active"), value: "active"}, {label: t("adminpanel.pricing.discounts.filter.status.passed"), value: "inactive"}]
 
 
     const sortOnChange = (e) => setSort(e);
@@ -30,21 +32,20 @@ export default function Discounts({data}){
     const sortedData = sortData(data);
     return(
         <div className="w-full h-600">
-            < Navbar />
-            <div className="pl-64 pt-24 pr-4">
-                <h3 className={`text-2xl font-extrabold`}>İndirimler</h3><hr/><br/>
+            < Navbar >
+                <h3 className={`text-2xl font-extrabold`}>{t("adminpanel.pricing.discounts.discounts")}</h3><hr/><br/>
                 <div className={`p-4  sm:grid md:flex gap-4`}>
-                    <SelectOptions value={sort} options={sortOptions} onChange={sortOnChange} options_name={"Sırala"}/>
-                    <SelectOptions value={isActive} options={isActivetOptions} onChange={activeOnChange} options_name={"Durum"}/>
+                    <SelectOptions value={sort} options={sortOptions} onChange={sortOnChange} options_name={t("adminpanel.pricing.discounts.filter.sort.sort")}/>
+                    <SelectOptions value={isActive} options={isActivetOptions} onChange={activeOnChange} options_name={t("adminpanel.pricing.discounts.filter.status.status")}/>
                 </div>
 
                 < DiscountList data={sortedData} isActive={isActive}/>
                 <br/>
                 <div className={`w-full pr-8 flex items-center justify-end`}>
-                    <Link href={"/adminpanel/discount/add"} className={`p-2 w-32 bg-green-500 text-white hover:bg-green-600 rounded-xl cursor-pointer flex items-center justify-center`}>Yeni</Link>
+                    <Link href={"/adminpanel/discount/add"} className={`p-2 w-32 bg-green-500 text-white hover:bg-green-600 rounded-xl cursor-pointer flex items-center justify-center`}>{t("adminpanel.pricing.discounts.add_new")}</Link>
                 </div>
 
-            </div>
+            </Navbar>
         </div>
     );
 }

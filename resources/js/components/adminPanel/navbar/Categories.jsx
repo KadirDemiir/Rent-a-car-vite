@@ -18,13 +18,14 @@ export default function Categories({clickHandle, index, isOpenSection, menuSecti
                 <ul className="ml-8 mt-2 text-sm text-white space-y-2">
                     {menuSection.subSec.map((sec) => {
                         const hrefNormalized = sec.href.toLowerCase().replace(/\s+/g, '');
-                        const isActive = currentPath.includes(hrefNormalized);
+                        const isActive = currentPath === hrefNormalized;
 
                         return (
                             <li key={sec.name}>
                                 <Link
                                     href={sec.href}
-                                    preserveState
+                                    preserveState={true}
+                                    preserveScroll={true}
                                     className={`block cursor-pointer px-2 py-1 rounded-2xl hover:underline ${
                                         isActive ? "bg-red-800" : ""
                                     }`}

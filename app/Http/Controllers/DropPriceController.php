@@ -14,7 +14,7 @@ class DropPriceController extends Controller
     {
         $dropPrice = DropPrice::all();
         $locations = Locations::all();
-        $segments = Segment::all();
+            $segments = Segment::all();
         return Inertia::render('adminPanel/price/DropPrice', [
             'dropPrice' => $dropPrice,
             'locations' => $locations,
@@ -30,6 +30,10 @@ class DropPriceController extends Controller
         else if ($request->type === "segment_coefficient"){
             return $this->updateSegmentCoefficient($request);
         }
+        else
+            return redirect()->back()->withErrors([
+                'general' => 'Fiyatlar güncellenirken bir hata oluştu. Lütfen tekrar deneyin.'
+            ]);
     }
 
     public function updateDropPrice(Request $request){
