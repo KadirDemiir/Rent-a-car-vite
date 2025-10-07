@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import {useMemo, useCallback } from "react";
 
 export default function CarPriceDetailForm({ data, setData, errors, setErrors }) {
     const months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
@@ -121,11 +121,7 @@ export default function CarPriceDetailForm({ data, setData, errors, setErrors })
                                         <button onClick={() => removeColumn(dayKey)} className="absolute -top-3 -right-3 cursor-pointer bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-sm hover:bg-red-600" aria-label={`Remove ${dayKey} column`}>&times;</button>
                                         <input defaultValue={dayKey} className={`outline-none bg-blue-200 rounded-md w-full text-center px-2 ${error ? 'border-2 border-red-500' : ''}`}
                                             onBlur={(e) => handleDayKeyChange(dayKey, e.target.value, index)}
-                                            onKeyPress={(e) => {
-                                                const allowedChars = /[0-9\-+]/;
-                                                if (!allowedChars.test(e.key)) {
-                                                    e.preventDefault();
-                                                }}}/>
+/>
                                     </div>
                                     {error && (<div className="text-red-500 text-xs mt-1 text-center">{error}</div>)}
                                 </th>
@@ -140,7 +136,7 @@ export default function CarPriceDetailForm({ data, setData, errors, setErrors })
                             <th className="bg-blue-200 rounded-md px-4 py-2 font-semibold">{month}</th>
                             {dayKeys.map((dayKey, j) => (
                                 <td key={`${i}-${j}`} className="rounded-lg">
-                                    <input value={data.price[i + 1]?.[dayKey] || ''} className="w-full border border-gray-300 px-2 rounded-lg outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                                    <input value={data.price[i + 1]?.[dayKey] || ''} className={`w-full border-gray-300 px-2 rounded-lg outline-none border-2 transition-all ${errors.price[i+1][dayKey] ? 'border-red-500' : 'focus:border-blue-500'}`}
                                        onBlur={(e) => validatePrice(e, i, dayKey)}
                                         onChange={(e) => {
                                             setData(prev => ({
