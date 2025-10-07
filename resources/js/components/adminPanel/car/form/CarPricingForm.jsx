@@ -52,44 +52,10 @@ const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen=false}, ref) => 
 
     return (
         <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {(() => {
-                const hasError = (obj) =>
-                    Object.values(obj).some(val =>
-                        (typeof val === "string" && val) ||
-                        (typeof val === "object" && val !== null && hasError(val))
-                    );
-                return hasError(error) && (
-                    <div className="col-span-2 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded">
-                        <ul className="list-disc pl-5 space-y-1 text-sm">
-                            {(() => {
-                                const render = (obj, parentKey = "") =>
-                                    Object.entries(obj).map(([key, val]) => {
-                                        const fullKey = parentKey ? `${parentKey}.${key}` : key;
-                                        if (typeof val === "string" && val) return <li key={fullKey}>{fullKey}: {val}</li>;
-                                        if (typeof val === "object" && val !== null) return render(val, fullKey);
-                                        return null;
-                                    });
-                                return render(error);
-                            })()}
-                        </ul>
-                    </div>
-                );
-            })()}
-            <SelectOptions
-                options={currencyTypeOptions}
-                options_name={t("adminpanel.car.car_modify.edit_price_information.deopsit_currency")}
-                onChange={(e) => setFormData(prev => ({...prev, deposit_currency: e}))}
-                value={formData.deposit_currency}
-            />
-            <SelectOptions
-                options={currencyTypeOptions}
-                options_name={t("adminpanel.car.car_modify.edit_price_information.daily_price_currency")}
-                onChange={(e) => setFormData(prev => ({...prev, price_currency: e}))}
-                value={formData.price_currency}
-            />
-            <div className={`col-span-2`}>
-                <CarPriceDetailForm data={formData} setData={setFormData} errors={error} setErrors={setError}/>
-            </div>
+            <SelectOptions options={currencyTypeOptions} options_name={t("adminpanel.car.car_modify.edit_price_information.deopsit_currency")} onChange={(e) => setFormData(prev => ({...prev, deposit_currency: e}))} value={formData.deposit_currency}/>
+            <SelectOptions options={currencyTypeOptions} options_name={t("adminpanel.car.car_modify.edit_price_information.daily_price_currency")} onChange={(e) => setFormData(prev => ({...prev, price_currency: e}))} value={formData.price_currency}/>
+            {error?.price && Object.values(error.price).map((err, i) => (Object.values(err).some(er => er.trim()) && (<p key={i} className="p-2 col-span-2 border-l-12 border-red-500 bg-red-200 text-red-600 font-semibold">*değerler sadece sayı içermelidir örn: 1, 1.50</p>)))}
+            <div className={`col-span-2`}><CarPriceDetailForm data={formData} setData={setFormData} errors={error} setErrors={setError}/></div>
         </form>
     );
 });
