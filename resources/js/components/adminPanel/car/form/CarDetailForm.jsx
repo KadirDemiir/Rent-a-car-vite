@@ -3,7 +3,6 @@ import FormInput from "./FormInput.jsx";
 import SelectOptions from "../../../websites/filterSelectors/SelectOptions.jsx";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
-import {languages} from "../../../../constans/language.js";
 
 
 const CarDetailsForm = forwardRef(({ car = {}, onSubmit }, ref) => {
@@ -62,7 +61,6 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit }, ref) => {
             setError(prev => ({ ...prev, [name]: "Sadece sayı girilebilir" }));
             return;
         }
-
         setError(prev => {
             const copy = { ...prev };
             delete copy[name];
@@ -162,8 +160,6 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit }, ref) => {
     }
 
     if (loading) return <div>Yükleniyor...</div>;
-
-
     return (
         <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {Object.keys(error).length > 0 && (

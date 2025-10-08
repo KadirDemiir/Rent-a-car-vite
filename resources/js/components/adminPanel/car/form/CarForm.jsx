@@ -11,33 +11,31 @@ export default function CarForm({ car = null, mode, onSubmit }) {
     const photoRef = useRef();
 
     const handleSubmit = () => {
+        console.log("form kısmına geldi");
         let combined = new FormData();
         combined.append('mode', mode);
         if (mode === "create") {
             const detailData = detailRef.current.submit();
             const pricingData = pricingRef.current.submit();
             const photoData = photoRef.current.submit();
-
+            console.log(detailData, pricingData, photoData);
             if (!detailData || !pricingData || !photoData) return;
-
+            console.log(2);
             for (let pair of detailData.entries()) combined.append(pair[0], pair[1]);
             for (let pair of pricingData.entries()) combined.append(pair[0], pair[1]);
             for (let pair of photoData.entries()) combined.append(pair[0], pair[1]);
         } else if (mode === "edit") {
             const detailData = detailRef.current.submit();
-            if (detailData) {
+            if (detailData)
                 for (let pair of detailData.entries()) combined.append(pair[0], pair[1]);
-            }
         } else if (mode === "pricing") {
             const pricingData = pricingRef.current.submit();
-            if (pricingData) {
+            if (pricingData)
                 for (let pair of pricingData.entries()) combined.append(pair[0], pair[1]);
-            }
         } else if (mode === "photo") {
             const photoData = photoRef.current.submit();
-            if (photoData) {
+            if (photoData)
                 for (let pair of photoData.entries()) combined.append(pair[0], pair[1]);
-            }
         }
         if (combined.entries().next().done) return;
         console.log("gitti");

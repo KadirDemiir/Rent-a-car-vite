@@ -1,6 +1,5 @@
 import Navbar from "../../../components/adminPanel/navbar/Navbar";
 import CarForm from "../../../components/adminPanel/car/form/CarForm.jsx";
-import { router } from "@inertiajs/react";
 import {useTranslation} from "react-i18next";
 import axios from "axios";
 import {useState} from "react";
@@ -10,6 +9,7 @@ export default function AddCars() {
     const [success, setSuccess] = useState();
     const [error, setError] = useState();
     const onSubmit = (data) => {
+        console.log("geldi");
         if (data instanceof FormData) {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             axios.post("/adminpanel/car/add", data, {

@@ -1,7 +1,6 @@
 export default function FormInput({ name, label, value, onChange, type = "text", required = true, error}) {
         const handleChangeNumber = (e) => {
             if(/[^0-9]/.test(e.target.value)){
-                error = "sorun var";
                 console.log(1);
             }
             onChange(e);
@@ -9,9 +8,10 @@ export default function FormInput({ name, label, value, onChange, type = "text",
 
         return (
         <div>
-            <label className="block text-gray-700 mb-1">{label}</label>
+            <label className=" text-gray-700 mb-1 flex items-center justify-center">{label}</label>
             <input
                 type="text"
+                required={required}
                 name={name}
                 value={value || ""}
                 onChange={(type === "number") ? handleChangeNumber : onChange}

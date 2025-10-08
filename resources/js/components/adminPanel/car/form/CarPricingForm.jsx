@@ -2,6 +2,7 @@ import React, { useState, forwardRef, useImperativeHandle } from "react";
 import SelectOptions from "../../../websites/filterSelectors/SelectOptions.jsx";
 import {useTranslation} from "react-i18next";
 import CarPriceDetailForm from "./CarPriceDetailForm.jsx";
+import FormInput from "./FormInput.jsx";
 
 const currencyTypeOptions = [{ label: "TL", value: "try" }, { label: "Euro", value: "eur" },];
 
@@ -32,19 +33,42 @@ const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen=false}, ref) => 
     useImperativeHandle(ref, () => ({
         submit: () => {
             const errors = {};
-            if (!formData.deposit) errors.deposit = "Depozito gerekli";
-            if (!formData.price) errors.price = "Fiyat gerekli";
 
-            setError(errors);
+            if (!formData.deposit)
+                errors.deposit = "Depozito gerekli";
+            else if(error.deposit)
+                errors.deposit = error.deposit;
+
+            if (Object.values(formData.price).some(price => Object.values(price).some(prc => !prc.toString().trim()))) {
+                const newPriceErrors = {};
+
+                Object.entries(formData.price).forEach(([monthKey, monthPrices]) => {
+                    newPriceErrors[monthKey] = {};
+                    Object.entries(monthPrices).forEach(([dayKey, priceValue]) => {
+                        if (!priceValue.toString().trim())
+                            newPriceErrors[monthKey][dayKey] = "Boş olamaz";
+                        else
+                            newPriceErrors[monthKey][dayKey] = error.price[monthKey][dayKey] ?? "";
+                    });
+                    if (Object.keys(newPriceErrors[monthKey]).length === 0)
+                        delete newPriceErrors[monthKey];
+                });
+
+                errors.price = newPriceErrors;
+            }
+
+            setError(prev => ({...prev, ...errors, price: errors.price || prev.price}));
+
             if (Object.keys(errors).length > 0) {
+                console.log(1);
                 window.scrollTo({ top: 0, behavior: "smooth" });
                 return null;
             }
 
             const data = new FormData();
-            data.append("deposit", formData.deposit);
+            data.append('deposit', formData.deposit);
             data.append("deposit_currency", formData.deposit_currency);
-            data.append("price", formData.price);
+            data.append("price", JSON.stringify(formData.price));
             data.append("price_currency", formData.price_currency);
             return data;
         }
@@ -53,8 +77,12 @@ const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen=false}, ref) => 
     return (
         <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <SelectOptions options={currencyTypeOptions} options_name={t("adminpanel.car.car_modify.edit_price_information.deopsit_currency")} onChange={(e) => setFormData(prev => ({...prev, deposit_currency: e}))} value={formData.deposit_currency}/>
-            <SelectOptions options={currencyTypeOptions} options_name={t("adminpanel.car.car_modify.edit_price_information.daily_price_currency")} onChange={(e) => setFormData(prev => ({...prev, price_currency: e}))} value={formData.price_currency}/>
-            {error?.price && Object.values(error.price).map((err, i) => (Object.values(err).some(er => er.trim()) && (<p key={i} className="p-2 col-span-2 border-l-12 border-red-500 bg-red-200 text-red-600 font-semibold">*değerler sadece sayı içermelidir örn: 1, 1.50</p>)))}
+            <FormInput name="deposit" label={t("adminpanel.car.car_modify.edit_price_information.deopsit_currency")} type="number" value={formData.deposit} onChange={(e) => {
+                setError(prev => ({...prev, deposit: /[^0-9]/.test(e.target.value) ? "Sadece sayı olmalı" : ""}))
+                setFormData(prev => ({...prev, deposit: e.target.value}))
+            }} error={error.deposit} />
+            <div className={`col-span-2`}><SelectOptions options={currencyTypeOptions} options_name={t("adminpanel.car.car_modify.edit_price_information.daily_price_currency")} onChange={(e) => setFormData(prev => ({...prev, price_currency: e}))} value={formData.price_currency}/></div>
+            {error?.price && Object.values(error.price).some(err => Object.values(err).some(er => er.trim())) && (<p className="p-2 col-span-2 border-l-12 border-red-500 bg-red-200 text-red-600 font-semibold">*Değerler sadece sayı içermelidir örn: 1, 1.50</p>)}
             <div className={`col-span-2`}><CarPriceDetailForm data={formData} setData={setFormData} errors={error} setErrors={setError}/></div>
         </form>
     );

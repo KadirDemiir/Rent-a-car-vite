@@ -29,8 +29,8 @@ class  CarController extends Controller
             'car' => $car
         ]);
     }
-    public function addCar(Request $request)
-    {
+    public function addCar(Request $request){
+        Log::info('car', ['car' => $request->all()]);
         $validated = $request->validate([
             'license_plate' => 'required|unique:cars|max:255',
             'brand' => 'required|string|max:255',
