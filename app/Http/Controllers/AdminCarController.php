@@ -12,7 +12,7 @@ class AdminCarController extends Controller
 {
     public function showAll()
     {
-        $cars = Car::all();
+        $cars = Car::with(['brandKey', 'modelKey'])->get();
 
         return Inertia::render('adminPanel/cars/Cars', [
             'cars' => $cars

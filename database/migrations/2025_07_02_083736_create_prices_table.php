@@ -13,7 +13,18 @@ return new class extends Migration
     {
         Schema::create('prices', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('car_id')->constrained('cars')->onDelete('cascade');
+            $table->enum('month', ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']);
+            $table->unsignedSmallInteger('min_days');
+            $table->unsignedSmallInteger('max_days');
+            $table->char('price_currency', 3)
+                ->default('TRY')
+                ->comment('ISO 4217 Para Birimi Kodu');
+            $table->decimal('price', 10, 2);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
+
+            $table->unique(['car_id', 'month', 'min_days', 'max_days'], 'unique_price_combination');
         });
     }
 

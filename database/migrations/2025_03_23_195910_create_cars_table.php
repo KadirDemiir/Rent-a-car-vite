@@ -12,8 +12,8 @@ return new class extends Migration
         Schema::create('cars', function (Blueprint $table) {
             $table->id();
             $table->foreignId('location_id')->constrained()->onDelete('cascade');
-            $table->string('brand');
-            $table->string('model');
+            $table->foreignId('brand_translation_key_id')->constrained('translation_keys')->onDelete('cascade');
+            $table->foreignId('model_translation_key_id')->constrained('translation_keys')->onDelete('cascade');
             $table->year('year');
             $table->foreignId('segment_id')->constrained('segments')->onDelete('restrict');
             $table->foreignId('fuel_id')->constrained('fuels')->onDelete('restrict');
@@ -21,9 +21,7 @@ return new class extends Migration
             $table->foreignId('body_type_id')->constrained('body_types')->onDelete('restrict');
             $table->unsignedTinyInteger('seat_count');
             $table->unsignedSmallInteger('trunk_capacity');
-            $table->decimal('price', 10, 2);
             $table->decimal('deposit', 10, 2);
-            $table->char('price_currency', 3);
             $table->char('deposit_currency', 3);
             $table->string('license_plate');
             $table->timestamps();

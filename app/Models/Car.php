@@ -22,14 +22,12 @@ class Car extends Model
 
     protected $fillable = [
         'location_id',
-        'brand',
-        'model',
+        'brand_translation_key_id',
+        'model_translation_key_id',
         'year',
         'segment',
         'body_type_id',
         'seat_count',
-        'price',
-        'price_currency',
         'deposit_currency',
         'deposit',
         'trunk_capacity',
@@ -58,6 +56,20 @@ class Car extends Model
     public function bodyType()
     {
         return $this->belongsTo(BodyType::class);
+    }
+
+    public function brandKey()
+    {
+        return $this->belongsTo(TranslationKey::class, 'brand_translation_key_id');
+    }
+
+    public function modelKey()
+    {
+        return $this->belongsTo(TranslationKey::class, 'model_translation_key_id');
+    }
+
+    public function price() {
+        return $this->hasMany(Price::class, 'car_id');
     }
 
 

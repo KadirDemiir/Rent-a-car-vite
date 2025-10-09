@@ -6,5 +6,37 @@ use Illuminate\Database\Eloquent\Model;
 
 class Price extends Model
 {
-    //
+    protected $fillable = [
+        'car_id',
+        'month',
+        'min_days',
+        'max_days',
+        'price_currency',
+        'price',
+        'is_active',
+    ];
+
+    public function car()
+    {
+        return $this->belongsTo(Car::class);
+    }
+
+    protected static function booted()
+    {
+        static::saving(function ($price) {
+            if ($price->is_active) {
+                $exists = static::where('car_id', $price->car_id)
+                    ->where('month', $price->month)
+                    ->where('min_days', $price->min_days)
+                    ->where('max_days', $price->max_days)
+                    ->where('is_active', true)
+                    ->where('id', '!=', $price->id)
+                    ->exists();
+
+                if ($exists) {
+                    throw new \Exception('Bu kombinasyon için zaten aktif bir fiyat kaydı mevcut.');
+                }
+            }
+        });
+    }
 }

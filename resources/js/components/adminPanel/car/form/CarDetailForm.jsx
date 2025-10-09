@@ -125,8 +125,8 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit }, ref) => {
 
         const data = new FormData();
         data.append("license_plate", currentData.license_plate);
-        data.append("brand", currentData.brand);
-        data.append("model", currentData.model);
+        data.append("brand", JSON.stringify(currentData.brand));
+        data.append("model", JSON.stringify(currentData.model));
         data.append("year", currentData.year);
         data.append("seat_count", currentData.seat_count);
         data.append("trunk_capacity", currentData.trunk_capacity);

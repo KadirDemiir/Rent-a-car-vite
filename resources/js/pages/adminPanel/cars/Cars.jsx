@@ -5,6 +5,7 @@ import {useTranslation} from "react-i18next";
 import {useState} from "react";
 
 export default function Cars({cars}){
+
     const [filteredCars, setFilteredCars] = useState(cars);
     const {i18n, t} = useTranslation();
     const handleClick = (id) => {
@@ -37,13 +38,13 @@ export default function Cars({cars}){
                                 {filteredCars && filteredCars.map((car) => (
                                 <tr key={car.id} onClick={() => handleClick(car.id)} className="cursor-pointer">
                                     <td className="border px-4 py-2">{car.license_plate}</td>
-                                    <td className="border px-4 py-2">{car.brand}</td>
-                                    <td className="border px-4 py-2">{car.model}</td>
+                                    <td className="border px-4 py-2">{t(car.brand_key.key)}</td>
+                                    <td className="border px-4 py-2">{t(car.model_key.key)}</td>
                                     <td className="border px-4 py-2">{car.year}</td>
-                                    <td className="border px-4 py-2">{car.transmission_type}</td>
-                                    <td className="border px-4 py-2">{car.segment}</td>
-                                    <td className="border px-4 py-2">{car.body_type}</td>
-                                    <td className="border px-4 py-2">{car.fuel_type}</td>
+                                    <td className="border px-4 py-2">{t(`fuel.${car.transmission_id}`)}</td>
+                                    <td className="border px-4 py-2">{t(`segment.`+car.segment_id)}</td>
+                                    <td className="border px-4 py-2">{t(`body_type.${car.body_type_id}`)}</td>
+                                    <td className="border px-4 py-2">{t(`fuel.${car.fuel_id}`)}</td>
                                     <td className="border px-4 py-2">{car.trunk_capacity}</td>
                                 </tr>
                             ))}

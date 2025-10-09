@@ -11,6 +11,7 @@ export default function AddCars() {
     const onSubmit = (data) => {
         console.log("geldi");
         if (data instanceof FormData) {
+            console.log(1);
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             axios.post("/adminpanel/car/add", data, {
                 headers: {
@@ -18,6 +19,7 @@ export default function AddCars() {
                 },
             })
                 .then(res => {
+                    console.log(2);
                     window.scrollTo({ top: 0, behavior: "smooth" });
 
                     if (res.data.success) {
@@ -29,6 +31,7 @@ export default function AddCars() {
                     }
                 })
                 .catch(err => {
+                    console.log(3);
                     if (err.response?.status === 422) {
                         const validationErrors = err.response.data.errors;
                         const firstError = Object.values(validationErrors)[0][0];
@@ -38,8 +41,6 @@ export default function AddCars() {
                     }
                     setSuccess(null);
                 });
-
-
         }
     };
 

@@ -4,12 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Car;
 use App\Models\Discount;
+use App\Models\Language;
 use App\Models\Photo;
+use App\Models\Price;
+use App\Models\Translation;
+use App\Models\TranslationKey;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class  CarController extends Controller
@@ -33,68 +38,98 @@ class  CarController extends Controller
         Log::info('car', ['car' => $request->all()]);
         $validated = $request->validate([
             'license_plate' => 'required|unique:cars|max:255',
-            'brand' => 'required|string|max:255',
-            'model' => 'required|string|max:255',
+            'brand' => 'required|json',
+            'model' => 'required|json',
             'year' => 'required|int',
             'seat_count' => 'required|int',
             'trunk_capacity' => 'required|int',
-            'segment' => 'required|string|max:255',
+            'segment' => 'required|int',
             'body_type' => 'required|exists:body_types,id',
-            'fuel_type' => 'required|string|max:255',
-            'transmission_type' => 'required|string|max:255',
+            'fuel_type' => 'required|int',
+            'transmission_type' => 'required|int',
             'deposit_currency' => 'required|string|max:3',
             'price_currency' => 'required|string|max:3',
             'deposit' => 'required|int',
-            'price' => 'required|int',
-            'hasDiscount' => 'required|int',
-            'dayDiscount' => 'json',
-            'start_date' => 'date',
-            'end_date' => 'date',
+            'price' => 'required|json|',
             'photos' => 'required|array|min:1|max:4',
             'photos.*' => 'mimes:jpeg,jpg,png,gif|max:10240',
             'coverIndex' => 'required|int',
         ]);
+        Log::info('car', ['aşama 1' => 1]);
         try {
             DB::beginTransaction();
+            $brandTranslationKey = TranslationKey::create([
+                'key' => 'car.brand.' . Str::uuid(),
+                'description' => 'car brand name',
+            ]);
+            $modelTranslationKey = TranslationKey::create([
+                'key' => 'car.model.' . Str::uuid(),
+                'description' => 'car model name',
+            ]);
+            $brandName = json_decode($validated['brand'], true);
+            $modelName = json_decode($validated['model'], true);
+
+            foreach ($brandName as $brand => $value) {
+                $lang_id = Language::where('code', $brand)->get()->first()->id;
+                Translation::create([
+                    'language_id' => $lang_id,
+                    'translation_key_id' => $brandTranslationKey->id,
+                    'value' => $value,
+                ]);
+            }
+            foreach ($modelName as $model => $value) {
+                $lang_id = Language::where('code', $model)->get()->first()->id;
+                Translation::create([
+                    'language_id' => $lang_id,
+                    'translation_key_id' => $modelTranslationKey->id,
+                    'value' => $value,
+                ]);
+            }
             $newCar = new Car();
             $newCar->location_id = 1;
             $newCar->license_plate = $validated['license_plate'];
-            $newCar->brand = $validated['brand'];
-            $newCar->model = $validated['model'];
+            $newCar->brand_translation_key_id = $brandTranslationKey->id;
+            $newCar->model_translation_key_id = $modelTranslationKey->id;
             $newCar->year = $validated['year'];
-            $newCar->segment = $validated['segment'];
-            $newCar->body_type = $validated['body_type'];
+            $newCar->segment_id = (int)$validated['segment'];
+            $newCar->body_type_id =(int) $validated['body_type'];
             $newCar->seat_count  = $validated['seat_count'];
-            $newCar->trunk_capacity = $validated['trunk_capacity'];
-            $newCar->fuel_type = $validated['fuel_type'];
-            $newCar->transmission_type = $validated['transmission_type'];
-            $newCar->price = $validated['price'];
-            $newCar->price_currency  = $validated['price_currency'];
+            $newCar->trunk_capacity = (int)$validated['trunk_capacity'];
+            $newCar->fuel_id = (int)$validated['fuel_type'];
+            $newCar->transmission_id = $validated['transmission_type'];
             $newCar->deposit = $validated['deposit'];
             $newCar->deposit_currency  = $validated['deposit_currency'];
             $newCar->save();
-            $discounts = json_decode($validated['dayDiscount'], true);
-            if ($validated['hasDiscount']){
-                $now = Carbon::now();
-                foreach ($discounts as $item) {
-                    $nd = new Discount();
-                    $nd->discount_type = $item['discount_type'];
-                    $nd->discount_value = $item['discount_amount'];
-                    $nd->currency = $item['currency'];
-                    $nd->target_type = "car";
-                    $nd->min_days = $item['min_day'];
-                    $nd->max_days = $item['max_day'];
-                    $nd->car_id = $newCar->id;
-                    $nd->start_date = $validated['start_date'];
-                    $nd->end_date = $validated['end_date'];
-                    if ($now->between($validated['start_date'], $validated['end_date']))
-                        $nd->status = 'active';
-                    else
-                        $nd->status = 'inactive';
-                    $nd->save();
+            Log::info('car', ['car' => 'OLDU']);
+
+            $price = json_decode($validated['price'], true);
+            foreach ($price as $item => $day_price_array) {
+                foreach ($day_price_array as $day_range => $priceValue) {
+                    $minDayVal = 0;
+                    $maxDayVal = 0;
+                    if (str_contains($day_range, '+')) {
+                        $minDayVal = (int)str_replace('+', '', $day_range);
+                        $maxDayVal = 9999;
+                    } else {
+                        $rangeParts = explode('-', $day_range);
+                        if (count($rangeParts) === 2) {
+                            $minDayVal = (int)$rangeParts[0];
+                            $maxDayVal = (int)$rangeParts[1];
+                        } else
+                            continue;
+                    }
+                    Price::create([
+                            'car_id' => $newCar->id,
+                            'month' => $item,
+                            'min_days' => $minDayVal,
+                            'max_days' => $maxDayVal,
+                            'price_currency' => $validated['price_currency'],
+                            'price' => $priceValue,
+                            'is_active' => true,
+                        ]);
                 }
             }
-
+            Log::info('car', ['aşama 3' => 2]);
             foreach ($validated['photos'] as $index => $photo) {
                 $newPhoto = new Photo();
                 $path = $photo->store('carPhotos', 'public');
