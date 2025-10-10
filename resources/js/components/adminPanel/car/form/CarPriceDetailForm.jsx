@@ -26,6 +26,7 @@ export default function CarPriceDetailForm({ data, setData, errors, setErrors })
     const handleDayKeyChange=useCallback((oldKey,newKey,index)=>{const validation=validateDays(newKey,index);setErrors(prev=>({...prev,month:{...prev.month,[index]:validation.error}}));if(!validation.error&&oldKey!==newKey){updateDayKey(oldKey,newKey);}},[validateDays,updateDayKey]);
     const addColumn=useCallback(()=>{const newKey=`new_${Date.now()}`;setData(prev=>{const newPrice={...prev.price};for(let m=1;m<=12;m++){newPrice[m]={...newPrice[m],[newKey]:""};}return{...prev,price:newPrice};});},[setData]);
     const removeColumn=useCallback((dayKey)=>{if(dayKeys.length<=1){setErrors(p=>({...p,global:"En az bir sütun bulunmalıdır"}));return;}setData(prev=>{const newPrice={};for(let m=1;m<=12;m++){const{[dayKey]:_,...rest}=prev.price[m];newPrice[m]=rest;}return{...prev,price:newPrice};});},[dayKeys,setData,setErrors]);
+    const copyColumn = useCallback((dayKey) => setData(prev => ({ ...prev, price: Object.fromEntries(Object.entries(prev.price).map(([m, days]) => [m, { ...days, [dayKey]: days[dayKey] || prev.price[1][dayKey] }] )) })), [setData]);
     const validatePrice=(e,i,dayKey)=>{let err="";if(e.target.value.trim()&&!/^\d+(\.\d{1,2})?$/.test(e.target.value))err="Geçersiz fiyat";setErrors(prev=>({...prev,price:{...prev.price,[i+1]:{...(prev.price?.[i+1]||{}),[dayKey]:err}}}));};
     return(
         <div className="w-full shadow-lg overflow-x-auto bg-white rounded-lg">
@@ -33,9 +34,56 @@ export default function CarPriceDetailForm({ data, setData, errors, setErrors })
             <div className={`m-4 w-42 px-2 py-1 text-sm bg-green-500 rounded-md text-white text-center hover:bg-green-600`} onClick={() => {setData(prev => ({...prev, price: Object.fromEntries(Object.entries(prev.price).map(([month, days]) => [month, Object.fromEntries(Object.keys(days).map((dayKey) => [dayKey, 1]))]))}))}}>Tüm Günlere Kelime Ekle</div>
             <div className="h-full flex items-center justify-center p-4">
                 <table className="table-fixed border-separate border-spacing-4 rounded-md">
-                    <thead><tr className="h-auto"><th></th>{dayKeys.map((dayKey,index)=>{const error=errors.month?.[index];return(<th key={dayKey} className="p-0 m-0 relative min-w-32"><div className="relative"><button onClick={()=>removeColumn(dayKey)} className="absolute -top-3 -right-3 cursor-pointer bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-sm hover:bg-red-600" aria-label={`Remove ${dayKey} column`}>&times;</button><input defaultValue={dayKey} className={`outline-none bg-blue-200 rounded-md w-full text-center px-2 ${error?'border-2 border-red-500':''}`} onBlur={(e)=>handleDayKeyChange(dayKey,e.target.value,index)}/></div>{error&&(<div className="text-red-500 text-xs mt-1 text-center">{error}</div>)}</th>);})}<th><button type="button" onClick={addColumn} className="px-4 py-2 bg-green-500 rounded-md text-white hover:bg-green-600 cursor-pointer transition-colors" aria-label="Add new column">+</button></th></tr></thead>
-                    <tbody>{months.map((month,i)=>(<tr key={i}><th className="bg-blue-200 rounded-md px-4 py-2 font-semibold">{month}</th>{dayKeys.map((dayKey,j)=>(<td key={`${i}-${j}`} className="rounded-lg"><input value={data.price[i+1]?.[dayKey]||''} className={`w-full border-gray-300 px-2 rounded-lg outline-none border-2 transition-all ${errors?.price?.[i+1]?.[dayKey]?'border-red-500':'focus:border-blue-500'}`} onBlur={(e)=>validatePrice(e,i,dayKey)} onChange={(e)=>{setData(prev=>({...prev,price:{...prev.price,[i+1]:{...prev.price[i+1],[dayKey]:e.target.value}}}));}}/></td>))}<td></td></tr>))}</tbody>
+                    <thead>
+                    <tr className="h-auto">
+                        <th></th>
+                        {dayKeys.map((dayKey, index) => {
+                            const error = errors.month?.[index];
+                            return (
+                                <th key={dayKey} className="p-0 m-0 relative min-w-32">
+                                    <div className="relative group">
+                                        <div className="absolute -top-4 left-0 right-0 flex justify-between px-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                            <button type="button" onClick={() => copyColumn(dayKey)} className="bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-blue-600 shadow-md" title="Bu sütunu kopyala">C</button>
+                                            <button type="button" onClick={() => removeColumn(dayKey)} className="bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-sm hover:bg-red-600 shadow-md" aria-label={`Remove ${dayKey} column`} title="Bu sütunu sil">
+                                                &times;
+                                            </button>
+                                        </div>
+                                        <input defaultValue={dayKey} onBlur={(e) => handleDayKeyChange(dayKey, e.target.value, index)} className={`outline-none bg-blue-200 rounded-md w-full text-center px-2 py-1 mt-2 transition-all ${error ? 'border-2 border-red-500' : 'border border-transparent focus:border-blue-400'}`}/>
+                                    </div>
+                                    {error && (<div className="text-red-500 text-xs mt-1 text-center font-medium">{error}</div>)}
+                                </th>
+
+                            );
+                        })}
+                        <th>
+                            <button type="button" onClick={addColumn} className="px-4 py-2 bg-green-500 rounded-md text-white hover:bg-green-600 cursor-pointer transition-colors" aria-label="Add new column">+</button>
+                        </th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {months.map((month, i) => (
+                        <tr key={i}>
+                            <th className="bg-blue-200 rounded-md px-4 py-2 font-semibold">{month}</th>
+                            {dayKeys.map((dayKey, j) => (
+                                <td key={`${i}-${j}`} className="rounded-lg">
+                                    <input value={data.price[i + 1]?.[dayKey] || ''} className={`w-full border-gray-300 px-2 rounded-lg outline-none border-2 transition-all ${errors?.price?.[i + 1]?.[dayKey] ? 'border-red-500' : 'focus:border-blue-500'}`} onBlur={(e) => validatePrice(e, i, dayKey)}
+                                        onChange={(e) =>
+                                            setData((prev) => ({
+                                                ...prev,
+                                                price: {
+                                                    ...prev.price,
+                                                    [i + 1]: {
+                                                        ...prev.price[i + 1],
+                                                        [dayKey]: e.target.value,},},}))}/>
+                                </td>
+                            ))}
+                            <td></td>
+                        </tr>
+                    ))}
+                    </tbody>
                 </table>
+
             </div>
         </div>
     );
