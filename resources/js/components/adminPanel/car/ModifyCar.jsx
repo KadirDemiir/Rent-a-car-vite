@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import CarModify from "./CarModify.jsx";
 import CarPrize from "./CarPrize.jsx";
 import CarPhotoUpload from "./CarPhotoUpload.jsx";
@@ -50,7 +50,7 @@ export default function ModifyCar({ car }) {
 
       {openCarModify && (
         <ModalWrapper>
-          <CarModify closeModal={closeModalCM} car={car} />
+          <CarModify closeModal={closeModalCM} car={car}/>
         </ModalWrapper>
       )}
       {openCarPrice && (
@@ -71,7 +71,7 @@ export default function ModifyCar({ car }) {
     function ModalWrapper({ children }) {
     return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-        <div className="bg-white w-[50%] max-h-[90vh] overflow-y-auto rounded-xl shadow-lg p-12 relative">
+        <div className="bg-white w-[75%] max-h-[90vh] overflow-y-auto rounded-xl shadow-lg p-12 relative overflow-x-visible">
             {children}
         </div>
     </div>

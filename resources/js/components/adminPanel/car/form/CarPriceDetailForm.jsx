@@ -24,7 +24,7 @@ export default function CarPriceDetailForm({ data, setData, errors, setErrors })
     },[dayKeys,parseRange]);
     const updateDayKey=useCallback((oldKey,newKey)=>{setData(prev=>{const newPrice={};Object.entries(prev.price).forEach(([month,daysObj])=>{const updatedDays={};Object.entries(daysObj).forEach(([dayKey,value])=>{updatedDays[dayKey===oldKey?newKey:dayKey]=value;});newPrice[month]=updatedDays;});return{...prev,price:newPrice};});},[setData]);
     const handleDayKeyChange=useCallback((oldKey,newKey,index)=>{const validation=validateDays(newKey,index);setErrors(prev=>({...prev,month:{...prev.month,[index]:validation.error}}));if(!validation.error&&oldKey!==newKey){updateDayKey(oldKey,newKey);}},[validateDays,updateDayKey]);
-    const addColumn=useCallback(()=>{const newKey=`new_${Date.now()}`;setData(prev=>{const newPrice={...prev.price};for(let m=1;m<=12;m++){newPrice[m]={...newPrice[m],[newKey]:""};}return{...prev,price:newPrice};});},[setData]);
+    const addColumn=useCallback(()=>{const newKey=`new`;setData(prev=>{const newPrice={...prev.price};for(let m=1;m<=12;m++){newPrice[m]={...newPrice[m],[newKey]:""};}return{...prev,price:newPrice};});},[setData]);
     const removeColumn=useCallback((dayKey)=>{if(dayKeys.length<=1){setErrors(p=>({...p,global:"En az bir sütun bulunmalıdır"}));return;}setData(prev=>{const newPrice={};for(let m=1;m<=12;m++){const{[dayKey]:_,...rest}=prev.price[m];newPrice[m]=rest;}return{...prev,price:newPrice};});},[dayKeys,setData,setErrors]);
     const copyColumn = useCallback((dayKey) => setData(prev => ({ ...prev, price: Object.fromEntries(Object.entries(prev.price).map(([m, days]) => [m, { ...days, [dayKey]: days[dayKey] || prev.price[1][dayKey] }] )) })), [setData]);
     const validatePrice=(e,i,dayKey)=>{let err="";if(e.target.value.trim()&&!/^\d+(\.\d{1,2})?$/.test(e.target.value))err="Geçersiz fiyat";setErrors(prev=>({...prev,price:{...prev.price,[i+1]:{...(prev.price?.[i+1]||{}),[dayKey]:err}}}));};
@@ -32,8 +32,8 @@ export default function CarPriceDetailForm({ data, setData, errors, setErrors })
         <div className="w-full shadow-lg overflow-x-auto bg-white rounded-lg">
             {/*Deneme Verisi Ekleme*/}
             <div className={`m-4 w-42 px-2 py-1 text-sm bg-green-500 rounded-md text-white text-center hover:bg-green-600`} onClick={() => {setData(prev => ({...prev, price: Object.fromEntries(Object.entries(prev.price).map(([month, days]) => [month, Object.fromEntries(Object.keys(days).map((dayKey) => [dayKey, 1]))]))}))}}>Tüm Günlere Kelime Ekle</div>
-            <div className="h-full flex items-center justify-center p-4">
-                <table className="table-fixed border-separate border-spacing-4 rounded-md">
+            <div className="h-full w-full flex items-center justify-center p-4">
+                <table className="max-w-full overflow-x-auto table-fixed border-separate border-spacing-4 rounded-md">
                     <thead>
                     <tr className="h-auto">
                         <th></th>

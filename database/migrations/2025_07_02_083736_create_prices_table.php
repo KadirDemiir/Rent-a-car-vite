@@ -18,13 +18,11 @@ return new class extends Migration
             $table->unsignedSmallInteger('min_days');
             $table->unsignedSmallInteger('max_days');
             $table->char('price_currency', 3)
-                ->default('TRY')
+                ->default('try')
                 ->comment('ISO 4217 Para Birimi Kodu');
             $table->decimal('price', 10, 2);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-
-            $table->unique(['car_id', 'month', 'min_days', 'max_days'], 'unique_price_combination');
         });
     }
 

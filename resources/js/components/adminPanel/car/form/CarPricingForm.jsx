@@ -7,18 +7,32 @@ import FormInput from "./FormInput.jsx";
 const currencyTypeOptions = [{ label: "TL", value: "try" }, { label: "Euro", value: "eur" },];
 
 const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen=false}, ref) => {
+    console.log(car);
     const {t} = useTranslation();
     const days = ['1-3', '4-6', '7-13', '14-20', '21-27', '28+'];
 
     const [formData, setFormData] = useState(() => {
         const prices = {};
-        for (let month = 1; month <= 12; month++) {
+        for (let month = 1; month <= 12; month++)
             prices[month] = {};
-            days.forEach(day => {
-                prices[month][day] = "";
+        if(car?.price){
+            car.price.forEach(prc => {
+                const monthsToApply = prc.month ? [prc.month] : Array.from({length: 12}, (_, i) => i+1);
+                monthsToApply.forEach(month => {
+                    const key = `${prc.min_days}-${prc.max_days}`;
+                    prices[month][key] = prc.price;
+                });
             });
+        } else {
+            for(let month = 1; month <= 12; month++){
+                days.forEach(day => {
+                    prices[month][day] = "";
+                });
+            }
         }
-        return {deposit: "", deposit_currency: "try", price: prices, price_currency: "try", ...car,};});
+        return {deposit: car?.deposit ?? "", deposit_currency: car?.deposit_currency ?? "try", price: prices, price_currency: car?.price?.[0]?.price_currency ?? "try"};
+    });
+
 
     const [error, setError] = useState(() => {
         const prices = {};
@@ -28,7 +42,7 @@ const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen=false}, ref) => 
                 prices[month][day] = "";
             });
         }
-        return {deposit: "", deposit_currency: "", price: prices,   month: Object.fromEntries(Array.from({ length: 12 }, (_, i) => [i, ""])), price_currency: "", ...car,};});
+        return {deposit: "", deposit_currency: "", price: prices,   month: Object.fromEntries(Array.from({ length: 12 }, (_, i) => [i, ""])), price_currency: ""};});
 
     useImperativeHandle(ref, () => ({
         submit: () => {
@@ -75,10 +89,10 @@ const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen=false}, ref) => 
     }));
 
     return (
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form className="max-w-full grid grid-cols-1 md:grid-cols-2 gap-4">
             <SelectOptions options={currencyTypeOptions} options_name={t("adminpanel.car.car_modify.edit_price_information.deopsit_currency")} onChange={(e) => setFormData(prev => ({...prev, deposit_currency: e}))} value={formData.deposit_currency}/>
-            <FormInput name="deposit" label={t("adminpanel.car.car_modify.edit_price_information.deopsit_currency")} type="number" value={formData.deposit} onChange={(e) => {
-                setError(prev => ({...prev, deposit: /[^0-9]/.test(e.target.value) ? "Sadece sayı olmalı" : ""}))
+            <FormInput name="deposit" label={t("adminpanel.add_car.deposit")} type="number" value={formData.deposit} onChange={(e) => {
+                setError(prev => ({...prev, deposit: !/^\d+(\.\d{2})?$/.test(e.target.value) ? "Sadece istenen format: örn 1.50, 2" : ""}))
                 setFormData(prev => ({...prev, deposit: e.target.value}))
             }} error={error.deposit} />
             <div className={`col-span-2`}><SelectOptions options={currencyTypeOptions} options_name={t("adminpanel.car.car_modify.edit_price_information.daily_price_currency")} onChange={(e) => setFormData(prev => ({...prev, price_currency: e}))} value={formData.price_currency}/></div>

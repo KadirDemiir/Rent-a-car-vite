@@ -4,15 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Car;
 use App\Models\Photo;
+use App\Models\Price;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use function Laravel\Prompts\error;
 
 class AdminCarController extends Controller
 {
     public function showAll()
     {
-        $cars = Car::with(['brandKey', 'modelKey'])->get();
+        $cars = Car::with(['price', 'brandKey', 'modelKey'])->get();
 
         return Inertia::render('adminPanel/cars/Cars', [
             'cars' => $cars
@@ -21,7 +25,7 @@ class AdminCarController extends Controller
 
     public function showIndex($id)
     {
-        $car = Car::where('id', $id)->with('photos')->with('discount')->first();
+        $car = Car::where('id', $id)->with('photos')->with(['brandKey', 'modelKey', 'price' => fn($query) =>  $query->where('is_active', 1)])->first();
 
         return Inertia::render('adminPanel/cars/Car', ['car' => $car]);
     }
@@ -43,24 +47,62 @@ class AdminCarController extends Controller
     public function updatePrice(Request $request, int $id)
     {
         $validated = $request->validate([
-            'price' => 'required|numeric|min:0',
-            'price_currency' => 'required|string|',
+            'price' => 'required|json',
+            'price_currency' => 'required|string|size:3',
             'deposit' => 'required|numeric|min:0',
             'deposit_currency' => 'required|string|size:3',
         ]);
+        try {
+            DB::beginTransaction();
+            $car = Car::with(['photos', 'brandKey', 'modelKey', 'price' => fn($query) => $query->where('is_active', true)])->findOrFail($id);
 
-        $car = Car::with(['photos', 'discount'])->findOrFail($id);
-        $car->update([
-            'price' => $validated['price'],
-            'price_currency' => $validated['price_currency'],
-            'deposit' => $validated['deposit'],
-            'deposit_currency' => $validated['deposit_currency'],
-        ]);
+            $car->price()->update(['is_active' => false]);
+            $prices = json_decode($validated['price'], true);
+            foreach ($prices as $item => $day_price_array) {
+                foreach ($day_price_array as $day_range => $priceValue) {
+                    $minDayVal = 0;
+                    $maxDayVal = 0;
+                    if (str_contains($day_range, '+')) {
+                        $minDayVal = (int)str_replace('+', '', $day_range);
+                        $maxDayVal = 9999;
+                    } else {
+                        $rangeParts = explode('-', $day_range);
+                        if (count($rangeParts) === 2) {
+                            $minDayVal = (int)$rangeParts[0];
+                            $maxDayVal = (int)$rangeParts[1];
+                        } else
+                            continue;
+                    }
+                    $pricee = Price::create([
+                        'car_id' => $car->id,
+                        'month' => $item,
+                        'min_days' => $minDayVal,
+                        'max_days' => $maxDayVal,
+                        'price_currency' => $validated['price_currency'],
+                        'price' => $priceValue,
+                        'is_active' => true,
+                    ]);
 
-        return Inertia::render('adminPanel/cars/Car', [
-            'car' => $car,
-            'success' => 'Araç Fiyatı Başarıyla Güncellendi.'
-        ]);
+                    Log::info('Price-Control', ['price' => $pricee]);
+                }
+            }
+    /*        $car->update([
+                'price' => $validated['price'],
+                'price_currency' => $validated['price_currency'],
+                'deposit' => $validated['deposit'],
+                'deposit_currency' => $validated['deposit_currency'],
+            ]);*/
+            DB::commit();
+            Log::info('Araç Fİyat GÜncellemesi Olumlu', ['car' => $car]);
+            return Inertia::render('adminPanel/cars/Car', [
+                'car' => $car,
+                'success' => 'Araç Fiyatı Başarıyla Güncellendi.'
+            ]);
+        }catch (\Exception $exception){
+            DB::rollBack();
+            Log::info('Araç Fİyat GÜncellemesi Olumsuz', ['error' => $exception->getMessage()]);
+            return Inertia::render('adminPanel/cars/Car', ['error' => $exception->getMessage()]);
+        }
     }
 
     public function updateDetail(Request $request, int $id)

@@ -72,6 +72,7 @@ use App\Models\Discount;
             return response()->json($e);
         }
     });
+        Route::post('/adminpanel/cars/{id}', [AdminCarController::class, 'updateCar'])->name('adminUpdateCar');
 
     Route::group([
         'prefix' => LaravelLocalization::setLocale(),
@@ -100,7 +101,6 @@ use App\Models\Discount;
 
         Route::inertia(dbTransRoute('adminpanel'), 'adminPanel/Home')->name('adminHome');
         Route::get(dbTransRoute('adminpanel').'/'. dbTransRoute('cars'), [AdminCarController::class, 'showAll'])->name('adminCars');
-        Route::post('/adminpanel/cars/{id}', [AdminCarController::class, 'updateCar'])->name('adminUpdateCar');
         Route::inertia(dbTransRoute('adminpanel') .'/'. dbTransRoute('cars') .'/'. dbTransRoute('add'), 'adminPanel/cars/AddCar')->name('adminAddCar');
         Route::get(dbTransRoute('adminpanel').'/'. dbTransRoute('cars'). '/{id}', [AdminCarController::class, 'showIndex'])->name('adminShowCar');
 

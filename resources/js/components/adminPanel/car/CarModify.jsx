@@ -3,16 +3,19 @@ import CarForm from "./form/CarForm.jsx";
 import {router, usePage} from "@inertiajs/react";
 import {useTranslation} from "react-i18next";
 
-export default function CarModify({ closeModal = null, car = null, }) {
+export default function CarModify({ closeModal = null, car = null }) {
     const {t} = useTranslation();
     const {success, error} = usePage().props;
+    const [car1, setCar1] = useState(car);
     const handleSubmit = (data) => {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         router.post(`/adminpanel/cars/${car.id}`, data, {
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
             },
-            onSuccess: () => {
+            onSuccess: (res) => {
+                console.log(res.data);
+                setCar1(res.data);
                 closeModal();
             },
             onError: () => {
@@ -40,7 +43,7 @@ export default function CarModify({ closeModal = null, car = null, }) {
                     {error}
                 </div>
             )}
-            < CarForm mode="edit" onSubmit={handleSubmit} car={car}/>
+            < CarForm mode="edit" onSubmit={handleSubmit} car={car1}/>
 
 
         </>

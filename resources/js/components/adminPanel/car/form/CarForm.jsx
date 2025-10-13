@@ -18,7 +18,6 @@ export default function CarForm({ car = null, mode, onSubmit }) {
             const detailData = detailRef.current.submit();
             const pricingData = pricingRef.current.submit();
             const photoData = photoRef.current.submit();
-            console.log(detailData, pricingData, photoData);
             if (!detailData || !pricingData || !photoData) return;
             console.log(2);
             for (let pair of detailData.entries()) combined.append(pair[0], pair[1]);
@@ -43,7 +42,7 @@ export default function CarForm({ car = null, mode, onSubmit }) {
     };
 
     return (
-        <>
+        <div className={`w-full max-w-full`}>
             {mode === "create" && (
                 <>
                     <CarDetailForm car={car} ref={detailRef}/><br/>
@@ -68,6 +67,6 @@ export default function CarForm({ car = null, mode, onSubmit }) {
                     {t("adminpanel.car.car_modify.save")}
                 </button>
             </div>
-        </>
+        </div>
     );
 }
