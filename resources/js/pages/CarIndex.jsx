@@ -1,10 +1,9 @@
-import { usePage } from '@inertiajs/react';
 import { Link } from '@inertiajs/react';
 import Navbar from '../components/websites/Navbar.jsx';
 import CarIndexCard from '../components/websites/carIndex/CarIndexCard.jsx';
-import {useTranslation} from "react-i18next";
 
 export default function CarIndex({car}){
+    console.log('carIndex.jsx => ', car);
     return(
         <div>
             < Navbar />

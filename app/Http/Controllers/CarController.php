@@ -22,14 +22,14 @@ class  CarController extends Controller
     public function showAllCars(){
         session(['lang' => 'a']);
         App::setLocale(session('lang'));
-        $cars = Car::with('photos')->get();
+        $cars = Car::with(['photos', 'brandKey', 'modelKey'])->get();
         return Inertia::render('Cars', [
             'cars' => $cars
         ]);
     }
 
     public function showCar($id){
-        $car = Car::where('id', $id)->with('photos')->first();
+        $car = Car::where('id', $id)->with(['photos', 'modelKey', 'brandKey'])->first();
         return Inertia::render('CarIndex', [
             'car' => $car
         ]);

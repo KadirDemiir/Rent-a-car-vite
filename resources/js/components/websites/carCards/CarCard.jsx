@@ -19,9 +19,9 @@ console.log(car);
     return (
         <div className="grid grid-rows-9 h-140 w-110 rounded-xl shadow-md bg-white transition-transform duration-300 hover:scale-105 hover:outline-2 hover:outline-blue-500 hover:rounded-xl">
             < CarCardUpSide
-            brand={car.brand}
-            model={car.model}
-            segment={upperFirstLetter(t(`segment.${car.segment}`))}
+            brand={t(`${car.brand_key.key}`)}
+            model={t(`${car.model_key.key}`)}
+            segment={upperFirstLetter(t(`segment.${car.segment_id}`))}
             />
             < CarCardPhoto
             photo_path={`/storage/${carCoverPhotoPaths[0].photo_path}`}
@@ -29,11 +29,11 @@ console.log(car);
             <div className="row-span-5 flex p-2 gap-2">
                 < CarCardProperties
                     compName={upperFirstLetter(t('website.car_card.properties.properties_label'))}
-                    body_type={car.body_type}
+                    body_type={upperFirstLetter(t(`body_type.${car.body_type_id}`))}
                     seat_count={`${upperFirstLetter(t('website.car_card.properties.seat_count_{count}', {count : car.seat_count }))}`}
                     trunk_capacity={`${upperFirstLetter(t('website.car_card.properties.trunk_capacity_{trunk_capacity}', {trunk_capacity: car.trunk_capacity}))}`}
-                    fuel_type={car.fuel_type}
-                    transmission_type={car.transmission_type}
+                    fuel_id={car.fuel_id}
+                    transmission_id={car.transmission_id}
                 />
                 <div className="h-[90%] w-[1px] bg-gray-300"></div>
                 < CarCardRequirements

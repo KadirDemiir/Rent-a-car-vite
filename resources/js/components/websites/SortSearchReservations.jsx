@@ -7,7 +7,7 @@ const applyFilters = (cars, segment, fuelType, transmissionType) => {
   return cars.filter(car => {
     const segmentMatch = segment === '' || segment[0] === '' || segment.includes(car.segment);
     const fuelMatch = fuelType === '' || fuelType[0] === '' || fuelType.includes(car.fuel_type);
-    const transmissionMatch = transmissionType === '' || transmissionType[0] == '' || transmissionType.includes(car.transmission_type);
+    const transmissionMatch = transmissionType === '' || transmissionType[0] === '' || transmissionType.includes(car.transmission_type);
     return segmentMatch && fuelMatch && transmissionMatch;
   });
 };
@@ -28,13 +28,11 @@ const applySorting = (cars, sortBy) => {
 };
 
 export default function SortSearchReservations({ availableCars, sortBy, segment, fuelType, transmissionType }) {
-    const {t} = useTranslation();
-
+    console.log(availableCars);
+const {t} = useTranslation();
   const [filteredCars, setFilteredCars] = useState([]);
 
   useEffect(() => {
-    console.log(sortBy, transmissionType, fuelType, segment);
-    console.log(1);
     const filtered = applyFilters(availableCars, segment, fuelType, transmissionType);
     const sorted = applySorting(filtered, sortBy);
     setFilteredCars(sorted);
@@ -60,10 +58,10 @@ export default function SortSearchReservations({ availableCars, sortBy, segment,
           <div className="col-span-1 lg:col-span-5 flex flex-col items-center justify-between gap-4 p-2">
             <div className="flex items-center gap-4 flex-wrap justify-center text-center">
               <span className="text-blue-700 font-bold bg-blue-100 px-3 py-1 rounded-full text-sm">
-                {filteredCar.segment}
+                {t(`segment.${filteredCar.segment_id}`)}
               </span>
               <h2 className="text-lg font-semibold text-gray-800">
-                {filteredCar.brand} {filteredCar.model} • {filteredCar.fuel_type} • {filteredCar.transmission_type}
+                {t(filteredCar.brand_key.key)} {t(filteredCar.model_key.key)} • {t(`fuel.${filteredCar.fuel_id}`)} • {t(`transmission.${filteredCar.transmission_id}`)}
               </h2>
             </div>
 
@@ -71,15 +69,15 @@ export default function SortSearchReservations({ availableCars, sortBy, segment,
               {[
                 {
                   icon: "/storage/svg/carFeatures/gas_station.svg",
-                  label: filteredCar.fuel_type
+                  label: t(`fuel.${filteredCar.fuel_id}`)
                 },
                 {
                   icon: "/storage/svg/carFeatures/transmission.svg",
-                  label: filteredCar.transmission_type
+                  label: t(`transmission.${filteredCar.transmission_id}`)
                 },
                 {
                   icon: "/storage/svg/carFeatures/groups.svg",
-                  label: t("website.car_card.properties.seat_count_{count}")
+                  label: t("website.car_card.properties.seat_count_{count}", {count: filteredCar.seat_count})
                 }
               ].map((item, i) => (
                 <div key={i} className="flex flex-col items-center justify-center p-2 rounded-xl w-20 shadow-xl">
@@ -93,15 +91,15 @@ export default function SortSearchReservations({ availableCars, sortBy, segment,
               {[
                 {
                   icon: "/storage/svg/requirements/assurance.svg",
-                  label: t("website.car_card.requirement.{amount}_{currency}_deposit")
+                  label: t('website.car_card.requirement.{amount}_{currency}_deposit', {amount: filteredCar.deposit, currency :"try"})
                 },
                 {
                   icon: "/storage/svg/requirements/calendar.svg",
-                  label: t("website.car_card.requirements.required_min_{age}")
+                  label: t("website.car_card.requirements.required_min_{age}", {age: 22})
                 },
                 {
                   icon: "/storage/svg/requirements/steering-wheel.svg",
-                  label: t("website.car_card.requirements.{year}_year_experience")
+                  label: t("website.car_card.requirements.{year}_year_experience", {year : 2})
                 }
               ].map((item, i) => (
                 <div key={i} className="flex flex-col items-center justify-center p-2 rounded-xl w-24 shadow-2xl">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Car;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Carbon\Carbon;
 
@@ -12,6 +13,7 @@ class ReservationController extends Controller
 {
     public function searchReservations(Request $request)
     {
+        Log::info('coming reservation request', ['request => ', $request->all()]);
         if (!$request->has(['startDateTime', 'finishDateTime', 'selectedPULocation', 'selectedRLocation'])) {
             return Inertia::render('SearchReservations', ['availableCars' => []]);
         }
@@ -22,7 +24,7 @@ class ReservationController extends Controller
             'selectedPULocation' => 'required|string',
             'selectedRLocation' => 'required|string',
         ]);
-        $cars = Car::with('location', 'photos')->get();
+        $cars = Car::with('location', 'photos', 'brandKey', 'modelKey', 'price')->get();
         $availableCars = [];
 
         foreach ($cars as $car) {
