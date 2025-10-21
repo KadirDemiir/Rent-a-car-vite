@@ -13,7 +13,6 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit }, ref) => {
 
     useEffect(() => {
         axios.get("/adminpanel/get-all-cars-info").then(res => {
-            console.log(res.data);
             const langs = res.data.languages.map(l => ({ label: l.name, value: l.code }));
             const getIds = (arr, key) => car?.[key] ?? arr[0]?.id ?? "";
             const base = { segment: getIds(res.data.segments, "segment"), bodyType: getIds(res.data.bodyTypes, "bodyType"), fuelType: getIds(res.data.fuels, "fuelType"), transmissionType: getIds(res.data.transmissions, "transmissionType") };
@@ -57,7 +56,6 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit }, ref) => {
         const b = Object.values(formData.brand || {}), m = Object.values(formData.model || {}), total = b.length + m.length; if (!total) return 0;
         return Math.round(((b.filter(v => v.trim()).length + m.filter(v => v.trim()).length) / total) * 100);
     };
-    console.log(formData, formData.brand[i18n.language], i18n.language);
 
     if (loading) return <div>Yükleniyor...</div>;
     return (

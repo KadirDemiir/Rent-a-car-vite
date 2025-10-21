@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Car;
+use App\Models\Language;
 use App\Models\Photo;
 use App\Models\Price;
+use App\Models\Translation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -83,7 +85,7 @@ class AdminCarController extends Controller
                         'is_active' => true,
                     ]);
 
-                    Log::info('Price-Control', ['price' => $pricee]);
+                    /*Log::info('Price-Control', ['price' => $pricee]);*/
                 }
             }
     /*        $car->update([
@@ -93,60 +95,73 @@ class AdminCarController extends Controller
                 'deposit_currency' => $validated['deposit_currency'],
             ]);*/
             DB::commit();
-            Log::info('Araç Fİyat GÜncellemesi Olumlu', ['car' => $car]);
-            return Inertia::render('adminPanel/cars/Car', [
-                'car' => $car,
-                'success' => 'Araç Fiyatı Başarıyla Güncellendi.'
+            $updatedCar = Car::with(['photos', 'brandKey', 'modelKey', 'price' => fn($query) => $query->where('is_active', true)])->findOrFail($id);
+            Log::info('Araç Fİyat GÜncellemesi Olumlu', ['car' => $updatedCar]);
+            return response()->json([
+                'car' => $updatedCar,
+                'success' => 'Araç fiyatı başarıyla güncellendi.'
             ]);
         }catch (\Exception $exception){
             DB::rollBack();
             Log::info('Araç Fİyat GÜncellemesi Olumsuz', ['error' => $exception->getMessage()]);
-            return Inertia::render('adminPanel/cars/Car', ['error' => $exception->getMessage()]);
+            return response()->json([
+                'error' => $exception->getMessage()
+            ], 500);
         }
     }
 
     public function updateDetail(Request $request, int $id)
     {
+        Log::info('All Request', ['request' => $request->all()]);
         try {
             $validated = $request->validate([
                 'license_plate' => 'required|string|max:20',
-                'brand' => 'required|string|max:50',
-                'model' => 'required|string|max:50',
+                'brand' => 'required|json',
+                'model' => 'required|json',
                 'year' => 'required|integer|min:1900|max:' . (date('Y') + 1),
                 'seat_count' => 'required|integer|min:1|max:20',
                 'trunk_capacity' => 'required|integer|min:0|max:10000',
-                'segment' => 'required|string',
-                'body_type' => 'required|string',
-                'transmission_type' => 'required|string',
-                'fuel_type' => 'required|string',
+                'segment' => 'required|int|exists:segments,id',
+                'body_type' => 'required|int|exists:body_types,id',
+                'transmission_type' => 'required|int|exists:transmissions,id',
+                'fuel_type' => 'required|int|exists:fuels,id',
             ]);
-            $car = Car::with(['photos', 'discount'])->findOrFail($id);
+        Log::info('Kontrol Detay', ['car' => $validated]);
+            $car = Car::with(['brandKey', 'modelKey'])->findOrFail($id);
+
+            foreach (json_decode($validated['brand'], true) as $key => $value) {
+                Translation::where('translation_key_id', $car->brandKey->id)
+                    ->where('language_id', Language::where('code', $key)->first()->id)
+                    ->update(['value' => $value]);
+
+            }
+
+            foreach (json_decode($validated['model'], true) as $key => $value) {
+                Translation::where('translation_key_id', $car->modelKey->id)
+                    ->where('language_id', Language::where('code', $key)->first()->id)
+                    ->update(['value' => $value]);
+
+            }
             $car->update([
                 'license_plate' => $validated['license_plate'],
-                'brand' => $validated['brand'],
-                'model' => $validated['model'],
                 'year' => $validated['year'],
                 'seat_count' => $validated['seat_count'],
                 'trunk_capacity' => $validated['trunk_capacity'],
-                'segment' => $validated['segment'],
-                'body_type' => $validated['body_type'],
-                'transmission_type' => $validated['transmission_type'],
-                'fuel_type' => $validated['fuel_type'],
+                'segment_id' => $validated['segment'],
+                'body_type_id' => $validated['body_type'],
+                'transmission_id' => $validated['transmission_type'],
+                'fuel_id' => $validated['fuel_type'],
             ]);
-
-            return Inertia::render('adminPanel/cars/Car', [
-                'car' => $car,
+            $updatedCar = Car::with(['photos', 'brandKey', 'modelKey', 'price' => fn($query) => $query->where('is_active', true)])->findOrFail($id);
+            Log::info('Car Detail Control', ['car_brand' => Translation::where('translation_key_id', $updatedCar->brandKey->id)->get('value')]);
+            return response()->json([
+                'car' => $updatedCar,
                 'success' => 'Araç Detayları Başarıyla Güncellendi.'
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return Inertia::render('adminPanel/cars/Car', [
-                'car' => $car,
+            return response()->json([
+                'car' => $updatedCar ?? $car,
                 'errors' => $e->errors()
-            ]);
-        } catch (\Exception $e) {
-            return Inertia::render('adminPanel/cars/Car', [
-                'car' => $car,
-                'error' => 'Araç güncellenirken bir hata oluştu: ' . $e->getMessage()
             ]);
         }
     }

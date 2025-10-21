@@ -1,28 +1,30 @@
-import React, { useState } from "react";
+import React from "react";
 import CarForm from "./form/CarForm.jsx";
-import {router, usePage} from "@inertiajs/react";
+import {usePage} from "@inertiajs/react";
 import {useTranslation} from "react-i18next";
+import axios from "axios";
+import {reloadTranslations} from "../../../i18n.js";
 
-export default function CarModify({ closeModal = null, car = null }) {
-    const {t} = useTranslation();
+export default function CarModify({ closeModal = null, car = null, setCar}) {
+    const {t, i18n} = useTranslation();
     const {success, error} = usePage().props;
-    const [car1, setCar1] = useState(car);
-    const handleSubmit = (data) => {
+    const handleSubmit = async (data) => {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        router.post(`/adminpanel/cars/${car.id}`, data, {
-            headers: {
-                'X-CSRF-TOKEN': csrfToken,
-            },
-            onSuccess: (res) => {
-                console.log(res.data);
-                setCar1(res.data);
-                closeModal();
-            },
-            onError: () => {
-                closeModal();
-            },
-        });
+        try {
+            const res = await axios.post(`/adminpanel/cars/${car.id}`, data, {
+                headers: { 'X-CSRF-TOKEN': csrfToken },
+            });
+            await reloadTranslations(i18n.language);
+            console.log(t(res.data.car.brand_key.key));
+            setCar(res.data.car);
+            closeModal();
+        } catch (error) {
+            console.error(error);
+            closeModal();
+        }
     };
+
+
     return (
         <>
             <button
@@ -43,7 +45,7 @@ export default function CarModify({ closeModal = null, car = null }) {
                     {error}
                 </div>
             )}
-            < CarForm mode="edit" onSubmit={handleSubmit} car={car1}/>
+            < CarForm mode="edit" onSubmit={handleSubmit} car={car}/>
 
 
         </>

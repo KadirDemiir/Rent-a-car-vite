@@ -6,6 +6,7 @@ import CarModifyPhoto from "./CarModifyPhoto.jsx";
 import {useTranslation} from "react-i18next";
 
 export default function ModifyCar({ car }) {
+    const [car1, setCar1] = useState(car);
     const {t} = useTranslation();
     const [openCarModify, setOpenCarModify] = useState(false);
     const [openCarPrice, setOpenCarPrice] = useState(false);
@@ -22,7 +23,7 @@ export default function ModifyCar({ car }) {
           className="flex-1 min-w-[300px] h-60 border border-gray-300 rounded-lg overflow-hidden bg-gray-50 cursor-pointer hover:opacity-90 transition"
           onClick={() => setOpenUploadPhoto(true)}
         >
-          <CarModifyPhoto photos={car.photos}/>
+          <CarModifyPhoto photos={car1.photos}/>
         </div>
 
         <div className="w-full lg:w-1/3 flex flex-col justify-center gap-4 bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-200">
@@ -50,17 +51,17 @@ export default function ModifyCar({ car }) {
 
       {openCarModify && (
         <ModalWrapper>
-          <CarModify closeModal={closeModalCM} car={car}/>
+          <CarModify closeModal={closeModalCM} car={car1} setCar={setCar1}/>
         </ModalWrapper>
       )}
       {openCarPrice && (
         <ModalWrapper>
-          <CarPrize closeModal={closeModalCp} car={car} />
+          <CarPrize closeModal={closeModalCp} car={car1} setCar={setCar1}/>
         </ModalWrapper>
       )}
       {openUploadPhoto && (
         <ModalWrapper>
-          <CarPhotoUpload car={car} closeModal={closeModalUP} />
+          <CarPhotoUpload car={car1} closeModal={closeModalUP} />
         </ModalWrapper>
       )}
         <div className={`w-full flex items-center justify-end p-4`}><button className={`px-6 bg-red-500 rounded-lg hover:bg-red-600 text-white text-lg cursor-pointer`}>{t("adminpanel.car.car_modify.delete")}</button></div>

@@ -5,7 +5,7 @@ import axios from 'axios';
 const initI18n = async () => {
     let supportedLngs;
     let resources = {};
-    let current ;
+    let current;
 
     try {
         const currentRes = await axios.get('/get-current-language');
@@ -33,6 +33,17 @@ const initI18n = async () => {
         });
 
     return i18next;
+};
+
+export const reloadTranslations = async (language = i18next.language) => {
+    try {
+        const res = await axios.get(`/translations/${language}`);
+        i18next.addResourceBundle(language, 'translation', res.data, true, true);
+        await i18next.changeLanguage(language);
+        console.log(`✅ ${language} dili için çeviriler yenilendi.`);
+    } catch (e) {
+        console.error('❌ Çeviriler yeniden yüklenemedi:', e);
+    }
 };
 
 export default initI18n;

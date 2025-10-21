@@ -11,7 +11,6 @@ export default function CarForm({ car = null, mode, onSubmit }) {
     const photoRef = useRef();
 
     const handleSubmit = () => {
-        console.log("form kısmına geldi");
         let combined = new FormData();
         combined.append('mode', mode);
         if (mode === "create") {
@@ -19,7 +18,6 @@ export default function CarForm({ car = null, mode, onSubmit }) {
             const pricingData = pricingRef.current.submit();
             const photoData = photoRef.current.submit();
             if (!detailData || !pricingData || !photoData) return;
-            console.log(2);
             for (let pair of detailData.entries()) combined.append(pair[0], pair[1]);
             for (let pair of pricingData.entries()) combined.append(pair[0], pair[1]);
             for (let pair of photoData.entries()) combined.append(pair[0], pair[1]);
@@ -37,7 +35,6 @@ export default function CarForm({ car = null, mode, onSubmit }) {
                 for (let pair of photoData.entries()) combined.append(pair[0], pair[1]);
         }
         if (combined.entries().next().done) return;
-        console.log("gitti");
         onSubmit(combined);
     };
 
@@ -60,7 +57,7 @@ export default function CarForm({ car = null, mode, onSubmit }) {
             )}
 
             {mode === "photo" && (
-                <CarPhotoForm defPhotos={car?.photos} ref={photoRef} />
+                <CarPhotoForm defPhotos={car?.carPhotos} ref={photoRef} />
             )}
             <div className="pt-4">
                 <button type="submit" onClick={handleSubmit} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl cursor-pointer">

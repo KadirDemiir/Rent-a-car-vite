@@ -7,7 +7,6 @@ import FormInput from "./FormInput.jsx";
 const currencyTypeOptions = [{ label: "TL", value: "try" }, { label: "Euro", value: "eur" },];
 
 const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen=false}, ref) => {
-    console.log(car);
     const {t} = useTranslation();
     const days = ['1-3', '4-6', '7-13', '14-20', '21-27', '28+'];
 

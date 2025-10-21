@@ -25,7 +25,7 @@ class Car extends Model
         'brand_translation_key_id',
         'model_translation_key_id',
         'year',
-        'segment',
+        'segment_id',
         'body_type_id',
         'seat_count',
         'deposit_currency',
