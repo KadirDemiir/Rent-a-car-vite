@@ -1,23 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 
-export default function LocationSelector({ selectedLocation, isOpen, setSelectedLocation, setIsOpen }) {
-    const dropdownRef = useRef(null); 
-    const inputRef = useRef(null);    
+export default function LocationSelector({ locations, selectedLocation, isOpen, setSelectedLocation, setIsOpen }) {
+    const dropdownRef = useRef(null);
+    const inputRef = useRef(null);
     const [inputValue, setInputValue] = useState('');
-    const [locations, setLocations] = useState([]);
-    const [filteredLocations, setFilteredLocations] = useState([]);
+    const [filteredLocations, setFilteredLocations] = useState(locations);
 
-    useEffect(() => {
-        fetch("/location")
-            .then((response) => response.json())
-            .then((data) => {
-                setLocations(data);
-                setFilteredLocations(data);
-            })
-            .catch((error) => {
-                console.error('Veri alınırken hata oluştu:', error);
-            });
-    }, []);
 
     const handleChangeInput = (e) => {
         const value = e.target.value;
@@ -27,14 +15,14 @@ export default function LocationSelector({ selectedLocation, isOpen, setSelected
             setFilteredLocations(locations);
         } else {
             const filtered = locations.filter((location) =>
-                location.toLocaleLowerCase('tr').includes(value.toLocaleLowerCase('tr'))
+                location.name.toLocaleLowerCase('tr').includes(value.toLocaleLowerCase('tr'))
             );
             setFilteredLocations(filtered);
         }
     };
 
     useEffect(() => {
-        const handleClickOutside = (event) => { 
+        const handleClickOutside = (event) => {
             if (
                 dropdownRef.current &&
                 !dropdownRef.current.contains(event.target) &&
@@ -50,15 +38,10 @@ export default function LocationSelector({ selectedLocation, isOpen, setSelected
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
-
     return (
         <div className="relative">
-            <button
-                type="button"
-                onClick={() => setIsOpen(!isOpen)}
-                className="border w-full h-12 text-xl font-semibold flex items-center justify-start pl-4 rounded-md"
-            >
-                {selectedLocation}
+            <button type="button" onClick={() => setIsOpen(!isOpen)} className="border w-full h-12 text-xl font-semibold flex items-center justify-start pl-4 rounded-md">
+                {selectedLocation.name}
             </button>
             {isOpen && (
                 <div ref={dropdownRef} className="absolute z-10 mt-2 w-full bg-white shadow-lg rounded-md p-4">
@@ -81,7 +64,7 @@ export default function LocationSelector({ selectedLocation, isOpen, setSelected
                                         setIsOpen(false);
                                     }}
                                 >
-                                    {location}
+                                    {location.name}
                                 </button>
                                 <hr className="border-gray-300" />
                             </div>

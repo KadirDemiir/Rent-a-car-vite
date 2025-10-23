@@ -6,7 +6,7 @@ import SortSearchReservations from '../components/websites/SortSearchReservation
 import FilterReservations from "../components/websites/FilterReservations.jsx"
 
 export default function SearchReservations(){
-    const { availableCars, reservation } = usePage().props;
+    const { availableCars, reservation, locations } = usePage().props;
     const [sortBy, setSortBy] = useState("increase");
     const [fuelType, setFuelType] = useState("");
     const [transmissionType, setTransmissionType] = useState("");
@@ -18,7 +18,7 @@ export default function SearchReservations(){
         setTransmissionType(transmission);
         setSegment(segment);
     };
-
+    console.log(locations[0]);
     return(
         <div>
             <Navbar />
@@ -33,6 +33,7 @@ export default function SearchReservations(){
                         defPickupClock ={reservation.startTime}
                         defReturnDate={reservation.finishDate}
                         defReturnClock={reservation.finishTime}
+                        locations={locations}
                     />
                 )}
 
@@ -44,7 +45,8 @@ export default function SearchReservations(){
 
                         {availableCars.length > 0 ?
                         (
-                            < SortSearchReservations availableCars={availableCars}
+                            < SortSearchReservations
+                                availableCars={availableCars}
                                 sortBy={sortBy}
                                 fuelType={fuelType}
                                 transmissionType={transmissionType}

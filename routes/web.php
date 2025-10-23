@@ -17,7 +17,8 @@ use App\Models\Car;
 use App\Models\Discount;
     use App\Models\Fuel;
     use App\Models\Language;
-    use App\Models\Segment;
+use App\Models\Locations;
+use App\Models\Segment;
     use App\Models\Translation;
     use App\Models\TranslationKey;
     use App\Models\Transmission;
@@ -84,7 +85,9 @@ use App\Models\Discount;
         ]
     ], function() {
 
-        Route::inertia('/', 'Home')->name('home');
+        Route::get('/', function (){
+            return Inertia::render('Home', ['locations' => Locations::all()]);
+        })->name('home');
         Route::get(dbTransRoute('cars'), [CarController::class, 'showAllCars'])->name('showCars');
         Route::get(dbTransRoute('cars').'/{id}', [CarController::class, 'showCar'])->name('showIndexCar');
         Route::inertia(dbTransRoute('locations'), 'Locations')->name('locations');
