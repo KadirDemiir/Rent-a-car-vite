@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Car;
+use App\Models\Currency;
 use App\Models\Discount;
 use App\Models\Language;
 use App\Models\Photo;
@@ -98,9 +99,8 @@ class  CarController extends Controller
             $newCar->fuel_id = (int)$validated['fuel_type'];
             $newCar->transmission_id = $validated['transmission_type'];
             $newCar->deposit = $validated['deposit'];
-            $newCar->deposit_currency  = $validated['deposit_currency'];
+            $newCar->currency_id  = Currency::where('code', $validated['deposit_currency'])->first()->id;
             $newCar->save();
-            Log::info('car', ['car' => 'OLDU']);
 
             $price = json_decode($validated['price'], true);
             foreach ($price as $item => $day_price_array) {
@@ -123,7 +123,7 @@ class  CarController extends Controller
                             'month' => $item,
                             'min_days' => $minDayVal,
                             'max_days' => $maxDayVal,
-                            'price_currency' => $validated['price_currency'],
+                            'currency_id' => Currency::where('code', $validated['price_currency'])->first()->id,
                             'price' => $priceValue,
                             'is_active' => true,
                         ]);
@@ -157,7 +157,5 @@ class  CarController extends Controller
 
 
     }
-
-
 
 }

@@ -28,7 +28,7 @@ class Car extends Model
         'segment_id',
         'body_type_id',
         'seat_count',
-        'deposit_currency',
+        'currency_id',
         'deposit',
         'trunk_capacity',
         'fuel_type',
@@ -70,6 +70,10 @@ class Car extends Model
 
     public function price() {
         return $this->hasMany(Price::class, 'car_id');
+    }
+
+    public function currency(){
+        return $this->belongsTo(Currency::class, 'currency_id');
     }
 
 

@@ -18,7 +18,6 @@ export default function SearchReservations(){
         setTransmissionType(transmission);
         setSegment(segment);
     };
-    console.log(locations[0]);
     return(
         <div>
             <Navbar />

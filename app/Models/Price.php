@@ -11,7 +11,7 @@ class Price extends Model
         'month',
         'min_days',
         'max_days',
-        'price_currency',
+        'currency_id',
         'price',
         'is_active',
     ];
@@ -38,5 +38,9 @@ class Price extends Model
                 }
             }
         });
+    }
+
+    public function currency(){
+        return $this->belongsTo(Currency::class);
     }
 }

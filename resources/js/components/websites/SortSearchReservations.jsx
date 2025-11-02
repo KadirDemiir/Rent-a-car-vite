@@ -1,6 +1,7 @@
 
-import { useState, useEffect } from "react";
+import {useState, useEffect} from "react";
 import {useTranslation} from "react-i18next";
+import {useCurrency} from "../../providers/CurrencyContext.jsx";
 
 
 const applyFilters = (cars, segment, fuelType, transmissionType) => {
@@ -29,9 +30,10 @@ const applySorting = (cars, sortBy) => {
 
 export default function SortSearchReservations({ availableCars, sortBy, segment, fuelType, transmissionType }) {
     console.log(availableCars);
-const {t} = useTranslation();
+    const {t} = useTranslation();
   const [filteredCars, setFilteredCars] = useState([]);
-
+    const { currencies, current, calculateTotal } = useCurrency();
+    console.log(currencies, current);
   useEffect(() => {
     const filtered = applyFilters(availableCars, segment, fuelType, transmissionType);
     const sorted = applySorting(filtered, sortBy);
@@ -114,11 +116,11 @@ const {t} = useTranslation();
             <div className="w-full space-y-2">
               <div className="flex justify-between px-2 text-sm text-gray-700">
                 <span className="font-medium">Günlük:</span>
-                <span>{filteredCar.daily_price}</span>
+                <span>{calculateTotal(filteredCar.daily_price)} {current?.symbol}</span>
               </div>
               <div className="flex justify-between px-2 text-sm text-gray-700">
                 <span className="font-medium">Drop Ücreti:</span>
-                <span>{filteredCar.drop_price ?? 0}</span>
+                <span>{calculateTotal(filteredCar.drop_price) ?? 0} {current?.symbol}</span>
               </div>
 
               <div className="flex justify-between px-2 text-sm text-gray-700">
@@ -127,7 +129,7 @@ const {t} = useTranslation();
               </div>
               <div className="flex justify-between px-2 text-base text-gray-800 font-semibold border-t pt-2">
                 <span>Toplam:</span>
-                <span>{Number(filteredCar.drop_price ?? 0) + Number(filteredCar.daily_price)*Number(filteredCar.total_days)} {filteredCar.daily_price_currency}</span>
+                <span>{calculateTotal(Number(filteredCar.drop_price ?? 0) + Number(filteredCar.daily_price)*Number(filteredCar.total_days))} {current?.symbol}</span>
               </div>
             </div>
             <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition duration-300">

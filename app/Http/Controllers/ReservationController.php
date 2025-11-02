@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Car;
+use App\Models\Currency;
 use App\Models\DropPrice;
 use App\Models\Locations;
 use App\Models\Price;
@@ -49,12 +50,12 @@ class ReservationController extends Controller
                     $dayCount += 1;
                 $car->total_days = $dayCount;
                 $drop = DropPrice::select('price', 'currency')->where('from_location_id', $request->PULocation)->where('to_location_id', $request->RLocation)->first();
-                $dailyPrice = Price::select('price', 'price_currency', 'min_days', 'max_days')->where('car_id', $car->id)->where('is_active', 1)->where('month', $month)->orderByDesc('min_days')->get()->first(function ($price) use ($dayCount) {
+                $dailyPrice = Price::select('price', 'currency_id', 'min_days', 'max_days')->where('car_id', $car->id)->where('is_active', 1)->where('month', $month)->orderByDesc('min_days')->with('currency')->get()->first(function ($price) use ($dayCount) {
                         return $dayCount >= $price->min_days && $dayCount <= $price->max_days;
                     });
                 if($dailyPrice) {
                     $car->daily_price = $dailyPrice->price;
-                    $car->daily_price_currency = $dailyPrice->price_currency;
+                    $car->daily_price_currency = $dailyPrice->currency;
                 }
                 else{
                     $car->daily_price = null;

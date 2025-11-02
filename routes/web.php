@@ -14,6 +14,7 @@
     use App\Models\BodyType;
     use App\Models\Campaigns;
 use App\Models\Car;
+use App\Models\Currency;
 use App\Models\Discount;
     use App\Models\Fuel;
     use App\Models\Language;
@@ -22,7 +23,10 @@ use App\Models\Segment;
     use App\Models\Translation;
     use App\Models\TranslationKey;
     use App\Models\Transmission;
-    use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
     use App\Http\Controllers\CarController;
     use App\Http\Controllers\LocationsController;
     use App\Http\Controllers\ReservationController;
@@ -36,11 +40,12 @@ use App\Models\Segment;
         return response()->json($languages);
     });
     Route::get('/translations/{lang}', function($lang) {
+        Log::info('web.php translation dili => ', ['language' => $lang]);
         $translations = Translation::with('translationKey')
             ->whereHas('language', fn($q) => $q->where('code', $lang))
             ->get()
             ->mapWithKeys(fn($t) => [$t->translationKey->key => $t->value]);
-
+        Log::info('web.php translation değerleri => ', ['language' => $translations]);
         return response()->json($translations);
     });
 
@@ -51,8 +56,81 @@ use App\Models\Segment;
 
     Route::get('/test-lang', function () {
         session()->put('deneme', true);
-        $locale = LaravelLocalization::getCurrentLocale();
        return redirect('get-session');
+    });
+
+    Route::get('/deneme-curr', function () {
+        $def = Currency::where('is_active', 1)->where('is_default', 1)->first();
+        if (!$def)
+            return response()->json(['error' => 'Default currency not found'], 404);
+        $response = Http::get('https://www.tcmb.gov.tr/kurlar/today.xml');
+        $xml = simplexml_load_string($response->body());
+        $tcmbRates = collect();
+        foreach ($xml->Currency as $c) {
+            $tcmbRates->push([
+                'code' => (string) $c['CurrencyCode'],
+                'name' => (string) $c->Isim,
+                'forexBuying' => (float) str_replace(',', '.', $c->ForexBuying),
+                'forexSelling' => (float) str_replace(',', '.', $c->ForexSelling),
+            ]);
+        }
+        if(strtolower($def->code) != "try")
+            $base = $tcmbRates->firstWhere('code', strtoupper($def->code));
+        else
+            $base = ['code' => strtoupper($def->code), 'forexBuying' => 1];
+        if (!$base || empty($base['forexBuying']))
+            return response()->json(['error' => 'Base currency rate not found in TCMB data'], 400);
+        $baseRate = $base['forexBuying'];
+        $myCurr = Currency::where('is_active', 1)->get();
+        $result = $myCurr->map(function ($curr) use ($tcmbRates, $baseRate, $base) {
+            if (strtoupper($curr->code) == "TRY")
+                $tcmb['forexBuying'] = 1;
+            else
+                $tcmb = $tcmbRates->firstWhere('code', strtoupper($curr->code));
+            $rate = $tcmb ? $baseRate / $tcmb['forexBuying']  : 1;
+            return ['code' => $curr->code, 'symbol' => $curr->symbol, 'exchange_rate' => $rate,];
+        });
+        return response()->json($result);
+    });
+
+
+
+
+    Route::get('/get-currencies', function() {
+        $currencies = Cache::remember('active_currencies', 60*60*24, function() {
+            $def = Currency::where('is_active', 1)->where('is_default', 1)->first();
+            if (!$def)
+                return response()->json(['error' => 'Default currency not found'], 404);
+            $response = Http::get('https://www.tcmb.gov.tr/kurlar/today.xml');
+            $xml = simplexml_load_string($response->body());
+            $tcmbRates = collect();
+            foreach ($xml->Currency as $c) {
+                $tcmbRates->push([
+                    'code' => (string) $c['CurrencyCode'],
+                    'name' => (string) $c->Isim,
+                    'forexBuying' => (float) str_replace(',', '.', $c->ForexBuying),
+                    'forexSelling' => (float) str_replace(',', '.', $c->ForexSelling),
+                ]);
+            }
+            if(strtolower($def->code) != "try")
+                $base = $tcmbRates->firstWhere('code', strtoupper($def->code));
+            else
+                $base = ['code' => strtoupper($def->code), 'forexBuying' => 1];
+            if (!$base || empty($base['forexBuying']))
+                return response()->json(['error' => 'Base currency rate not found in TCMB data'], 400);
+            $baseRate = $base['forexBuying'];
+            $myCurrs = Currency::where('is_active', 1)->get();
+            $myCurrs->map(function ($curr) use ($tcmbRates, $baseRate, $base) {
+                if (strtoupper($curr->code) == "TRY")
+                    $tcmb['forexBuying'] = 1;
+                else
+                    $tcmb = $tcmbRates->firstWhere('code', strtoupper($curr->code));
+                $rate = $tcmb ? $baseRate / $tcmb['forexBuying']  : 1;
+                Currency::where('id', $curr->id)->update(['exchange_rate' => $rate]);
+            });
+            return Currency::where('is_active', true)->get();
+        });
+        return response()->json($currencies);
     });
 
     Route::get('get-session', function () {
@@ -73,7 +151,7 @@ use App\Models\Segment;
             return response()->json($e);
         }
     });
-        Route::post('/adminpanel/cars/{id}', [AdminCarController::class, 'updateCar'])->name('adminUpdateCar');
+    Route::post('/adminpanel/cars/{id}', [AdminCarController::class, 'updateCar'])->name('adminUpdateCar');
 
     Route::group([
         'prefix' => LaravelLocalization::setLocale(),

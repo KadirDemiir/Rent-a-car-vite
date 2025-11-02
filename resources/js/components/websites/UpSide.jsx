@@ -2,6 +2,7 @@ import { Link, useForm } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import LanguageDropdown from './LanguageDropdown.jsx';
+import CurrencyDropDown from "../CurrencyDropDown.jsx";
 
 export default function UpSide() {
     const { auth } = usePage().props;
@@ -42,6 +43,9 @@ export default function UpSide() {
                             </li>
                             <li className="h-10 pl-2 flex items-center justify-center">
                                 < LanguageDropdown />
+                            </li>
+                            <li>
+                                < CurrencyDropDown />
                             </li>
                         </ul>
                     </nav>

@@ -1,102 +1,146 @@
-import React, { useState, forwardRef, useImperativeHandle } from "react";
+import React, { useState, forwardRef, useImperativeHandle, useEffect } from "react";
 import SelectOptions from "../../../websites/filterSelectors/SelectOptions.jsx";
-import {useTranslation} from "react-i18next";
+import { useTranslation } from "react-i18next";
 import CarPriceDetailForm from "./CarPriceDetailForm.jsx";
 import FormInput from "./FormInput.jsx";
+import axios from "axios";
 
-const currencyTypeOptions = [{ label: "TL", value: "try" }, { label: "Euro", value: "eur" },];
-
-const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen=false}, ref) => {
-    const {t} = useTranslation();
-    const days = ['1-3', '4-6', '7-13', '14-20', '21-27', '28+'];
-
+const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen = false }, ref) => {
+    const { t } = useTranslation();
+    const days = ["1-3", "4-6", "7-13", "14-20", "21-27", "28+"];
+    const [loading, setLoading] = useState(true);
+    const [currencyTypeOptions, setCurrencyTypeOptions] = useState([]);
     const [formData, setFormData] = useState(() => {
         const prices = {};
-        for (let month = 1; month <= 12; month++)
-            prices[month] = {};
-        if(car?.price){
+        for (let m = 1; m <= 12; m++) prices[m] = {};
+
+        if (car?.price) {
             car.price.forEach(prc => {
-                const monthsToApply = prc.month ? [prc.month] : Array.from({length: 12}, (_, i) => i+1);
-                monthsToApply.forEach(month => {
+                const months = prc.month ? [prc.month] : Array.from({ length: 12 }, (_, i) => i + 1);
+                months.forEach(m => {
                     const key = `${prc.min_days}-${prc.max_days}`;
-                    prices[month][key] = prc.price;
+                    prices[m][key] = prc.price;
                 });
             });
         } else {
-            for(let month = 1; month <= 12; month++){
-                days.forEach(day => {
-                    prices[month][day] = "";
-                });
-            }
+            for (let m = 1; m <= 12; m++) days.forEach(d => (prices[m][d] = ""));
         }
-        return {deposit: car?.deposit ?? "", deposit_currency: car?.deposit_currency ?? "try", price: prices, price_currency: car?.price?.[0]?.price_currency ?? "try"};
-    });
 
+        return {
+            deposit: car?.deposit ?? "",
+            deposit_currency: car?.deposit_currency,
+            price: prices,
+            price_currency: car?.price?.[0]?.price_currency,
+        };
+    });
 
     const [error, setError] = useState(() => {
         const prices = {};
-        for (let month = 1; month <= 12; month++) {
-            prices[month] = {};
-            days.forEach(day => {
-                prices[month][day] = "";
-            });
+        for (let m = 1; m <= 12; m++) {
+            prices[m] = {};
+            days.forEach(d => (prices[m][d] = ""));
         }
-        return {deposit: "", deposit_currency: "", price: prices,   month: Object.fromEntries(Array.from({ length: 12 }, (_, i) => [i, ""])), price_currency: ""};});
+        return { deposit: "", deposit_currency: "", price: prices, price_currency: "" };
+    });
+
+    useEffect(() => {
+        let mounted = true;
+
+        const fetchCurrencies = async () => {
+            try {
+                const res = await axios.get("/get-currencies");
+                if (!mounted) return;
+
+                const currs = res.data.map(c => ({
+                    label: c.code.toUpperCase(),
+                    symbol: c.symbol,
+                    value: c.code.toLowerCase(),
+                }));
+
+                setCurrencyTypeOptions(currs)
+                setFormData(prevState => ({
+                    ...prevState,
+                        deposit_currency: currs[0].value,
+                        price_currency: currs[0].value
+                }))
+            } catch (err) {
+                console.error("Para birimleri alınamadı:", err);
+            } finally {
+                if (mounted) setLoading(false);
+            }
+        };
+        fetchCurrencies();
+        return () => {
+            mounted = false;
+        };
+    }, []);
 
     useImperativeHandle(ref, () => ({
         submit: () => {
-            const errors = {};
+            console.log(formData);
+            const errs = {};
 
-            if (!formData.deposit)
-                errors.deposit = "Depozito gerekli";
-            else if(error.deposit)
-                errors.deposit = error.deposit;
+            if (!formData.deposit) errs.deposit = "Depozito gerekli";
 
-            if (Object.values(formData.price).some(price => Object.values(price).some(prc => !prc.toString().trim()))) {
-                const newPriceErrors = {};
-
+            if (
+                Object.values(formData.price).some(p =>
+                    Object.values(p).some(v => !v.toString().trim())
+                )
+            ) {
+                const newPriceErrs = {};
                 Object.entries(formData.price).forEach(([monthKey, monthPrices]) => {
-                    newPriceErrors[monthKey] = {};
+                    newPriceErrs[monthKey] = {};
                     Object.entries(monthPrices).forEach(([dayKey, priceValue]) => {
                         if (!priceValue.toString().trim())
-                            newPriceErrors[monthKey][dayKey] = "Boş olamaz";
-                        else
-                            newPriceErrors[monthKey][dayKey] = error.price[monthKey][dayKey] ?? "";
+                            newPriceErrs[monthKey][dayKey] = "Boş olamaz";
                     });
-                    if (Object.keys(newPriceErrors[monthKey]).length === 0)
-                        delete newPriceErrors[monthKey];
                 });
-
-                errors.price = newPriceErrors;
+                errs.price = newPriceErrs;
             }
 
-            setError(prev => ({...prev, ...errors, price: errors.price || prev.price}));
+            setError(prev => ({ ...prev, ...errs, price: errs.price || prev.price }));
 
-            if (Object.keys(errors).length > 0) {
-                console.log(1);
+            if (Object.keys(errs).length > 0) {
                 window.scrollTo({ top: 0, behavior: "smooth" });
                 return null;
             }
 
-            const data = new FormData();
-            data.append('deposit', formData.deposit);
-            data.append("deposit_currency", formData.deposit_currency);
-            data.append("price", JSON.stringify(formData.price));
-            data.append("price_currency", formData.price_currency);
-            return data;
-        }
+            const fd = new FormData();
+            fd.append("deposit", formData.deposit);
+            fd.append("deposit_currency", formData.deposit_currency);
+            fd.append("price", JSON.stringify(formData.price));
+            fd.append("price_currency", formData.price_currency);
+            return fd;
+        },
     }));
 
+    if (loading) return <div>Yükleniyor...</div>;
     return (
         <form className="max-w-full grid grid-cols-1 md:grid-cols-2 gap-4">
-            <SelectOptions options={currencyTypeOptions} options_name={t("adminpanel.car.car_modify.edit_price_information.deopsit_currency")} onChange={(e) => setFormData(prev => ({...prev, deposit_currency: e}))} value={formData.deposit_currency}/>
-            <FormInput name="deposit" label={t("adminpanel.add_car.deposit")} type="number" value={formData.deposit} onChange={(e) => {
-                setError(prev => ({...prev, deposit: !/^\d+(\.\d{2})?$/.test(e.target.value) ? "Sadece istenen format: örn 1.50, 2" : ""}))
-                setFormData(prev => ({...prev, deposit: e.target.value}))
-            }} error={error.deposit} />
-            <div className={`col-span-2`}><SelectOptions options={currencyTypeOptions} options_name={t("adminpanel.car.car_modify.edit_price_information.daily_price_currency")} onChange={(e) => setFormData(prev => ({...prev, price_currency: e}))} value={formData.price_currency}/></div>
-            {error?.price && Object.values(error.price).some(err => Object.values(err).some(er => er.trim())) && (<p className="p-2 col-span-2 border-l-12 border-red-500 bg-red-200 text-red-600 font-semibold">*Değerler sadece sayı içermelidir örn: 1, 1.50</p>)}
-            <div className={`col-span-2`}><CarPriceDetailForm data={formData} setData={setFormData} errors={error} setErrors={setError}/></div>
+            <SelectOptions options={currencyTypeOptions} options_name={t("adminpanel.car.car_modify.edit_price_information.deopsit_currency")} onChange={e => setFormData(p => ({ ...p, deposit_currency: e }))} value={formData.deposit_currency ?? currencyTypeOptions?.[0]?.value ?? ""}/>
+            <FormInput name="deposit" label={t("adminpanel.add_car.deposit")} type="number" value={formData.deposit}
+                onChange={e => {
+                    setError(p => ({...p, deposit: !/^\d+(\.\d{2})?$/.test(e.target.value) ? "Sadece istenen format: örn 1.50, 2" : "",}));
+                    setFormData(p => ({ ...p, deposit: e.target.value }));
+                }}
+                error={error.deposit}
+            />
+            <div className="col-span-2">
+                <SelectOptions options={currencyTypeOptions} options_name={t("adminpanel.car.car_modify.edit_price_information.daily_price_currency")} onChange={e => setFormData(p => ({ ...p, price_currency: e }))} value={formData.price_currency ?? currencyTypeOptions?.[0]?.value ?? ""}/>
+            </div>
+
+            {error?.price &&
+                Object.values(error.price).some(err =>
+                    Object.values(err).some(er => er.trim())
+                ) && (
+                    <p className="p-2 col-span-2 border-l-12 border-red-500 bg-red-200 text-red-600 font-semibold">
+                        *Değerler sadece sayı içermelidir örn: 1, 1.50
+                    </p>
+                )}
+
+            <div className="col-span-2">
+                <CarPriceDetailForm data={formData} setData={setFormData} errors={error} setErrors={setError}/>
+            </div>
         </form>
     );
 });

@@ -24,12 +24,13 @@ export default function LanguageDropdown() {
 
     const current = i18n.language.split('-')[0];
 
-    const handleChangeLang = (lng) => {
-        const currLang = i18n.language.split('-')[0];
+    const handleChangeLang = async (lng) => {
+        const currLang = i18n.language.split('?');
         const url = window.location.pathname.split('/').filter(Boolean);
         let newUrl = '/' + lng;
+
         for (let i = 1; i < url.length; i++) {
-            const currTranslations = i18n.store.data[currLang]?.translation || {};
+            const currTranslations = i18n.store.data[currLang[0].split('/')[0]]?.translation || {};
             const newTranslations = i18n.store.data[lng]?.translation || {};
             const key = Object.keys(currTranslations).find(k => currTranslations[k] === url[i]);
             if (key) {
@@ -39,8 +40,41 @@ export default function LanguageDropdown() {
                 newUrl += '/' + url[i];
             }
         }
+
+        const searchParams = window.location.search;
+        const hash = window.location.hash;
+        newUrl += searchParams + hash;
+
+        try {
+            const cached = JSON.parse(localStorage.getItem('i18n_config_cache'));
+            if (cached?.config) {
+                const updatedConfig = {
+                    ...cached.config,
+                    lng: lng,
+                    resources: {
+                        ...(cached.config.resources || {}),
+                    }
+                };
+                localStorage.setItem('i18n_config_cache', JSON.stringify({
+                    version: cached.version,
+                    config: updatedConfig
+                }));
+                console.log(`🌐 Cache dili ${lng} olarak güncellendi.`);
+            }
+        } catch (e) {
+            console.error('Cache güncellenemedi:', e);
+        }
+
+        if (!i18n.store.data[lng]) {
+            await reloadTranslations(lng);
+        } else {
+            await i18n.changeLanguage(lng);
+        }
+
         router.visit(newUrl, { method: 'get', preserveState: true, preserveScroll: true });
     };
+
+
 
     return (
         <div ref={ref} className="w-24 relative flex items-center justify-center">
@@ -48,7 +82,7 @@ export default function LanguageDropdown() {
                 <img src={languages[current]?.flag} alt="" className="h-6 w-6 rounded-2xl" />
                 <span>{current.toUpperCase()}</span>
                 <div className="h-6 w-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`h-6 w-6 ${open ? "rotate-180" : ""} transition-transform `}>
                         <path d="M6 9l6 6 6-6" />
                     </svg>
                 </div>
@@ -58,7 +92,7 @@ export default function LanguageDropdown() {
                     {langs.map(lng => (
                         <li key={lng}>
                             <button
-                                onClick={() => handleChangeLang(lng)}
+                                onClick={() => {handleChangeLang(lng); setOpen(false)}}
                                 className={`flex items-center justify-between w-full px-4 py-2 ${current === lng ? 'bg-blue-800 text-white' : ''}`}
                             >
                                 <img src={languages[lng]?.flag} alt="" className="h-6 w-6 rounded-2xl" />

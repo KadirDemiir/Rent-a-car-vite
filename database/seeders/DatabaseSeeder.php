@@ -2,6 +2,7 @@
 
     namespace Database\Seeders;
 
+    use App\Models\Currency;
     use App\Models\Language;
     use App\Models\Translation;
     use App\Models\TranslationKey;
@@ -829,6 +830,18 @@
         public function run(): void
         {
             try {
+                $currencies = [
+                    ['code' => 'EUR', 'symbol' => '€', 'exchange_rate' => 1, 'is_default' => false, 'is_active' => true],
+                    ['code' => 'USD', 'symbol' => '$', 'exchange_rate' => 1/1.16, 'is_default' => false, 'is_active' => true],
+                    ['code' => 'TRY', 'symbol' => '₺', 'exchange_rate' => 1/48, 'is_default' => true, 'is_active' => true],
+                ];
+
+                foreach ($currencies as $currency) {
+                    Currency::updateOrCreate(
+                        ['code' => $currency['code']],
+                        $currency
+                    );
+                }
                 $tr = Language::firstOrCreate(['code' => 'tr'], [
                     'name' => 'Türkçe',
                     'flag_photo_path' => 'svg/flags/tr.svg',

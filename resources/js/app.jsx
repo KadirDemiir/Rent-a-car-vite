@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { InertiaProgress } from '@inertiajs/progress';
 import { I18nextProvider } from 'react-i18next';
 import initI18n from './i18n';
-import {StrictMode} from "react";
+import {CurrencyProvider} from "./providers/CurrencyContext.jsx";
 
 InertiaProgress.init();
 
@@ -21,9 +21,9 @@ initI18n().then(i18nInstance => {
         setup({ el, App, props }) {
             createRoot(el).render(
                 <I18nextProvider i18n={i18nInstance}>
-                    {/*<StrictMode>*/}
+                    <CurrencyProvider>
                         <App {...props} />
-                    {/*</StrictMode>*/}
+                    </CurrencyProvider>
                 </I18nextProvider>
             );
         },
