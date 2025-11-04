@@ -1,5 +1,4 @@
 import React, { useState, forwardRef, useImperativeHandle, useEffect } from "react";
-import SelectOptions from "../../../websites/filterSelectors/SelectOptions.jsx";
 import { useTranslation } from "react-i18next";
 import CarPriceDetailForm from "./CarPriceDetailForm.jsx";
 import FormInput from "./FormInput.jsx";
@@ -9,7 +8,7 @@ const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen = false }, ref) 
     const { t } = useTranslation();
     const days = ["1-3", "4-6", "7-13", "14-20", "21-27", "28+"];
     const [loading, setLoading] = useState(true);
-    const [currencyTypeOptions, setCurrencyTypeOptions] = useState([]);
+    /*const [currencyTypeOptions, setCurrencyTypeOptions] = useState([]);*/
     const [formData, setFormData] = useState(() => {
         const prices = {};
         for (let m = 1; m <= 12; m++) prices[m] = {};
@@ -57,7 +56,7 @@ const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen = false }, ref) 
                     value: c.code.toLowerCase(),
                 }));
 
-                setCurrencyTypeOptions(currs)
+                /*setCurrencyTypeOptions(currs)*/
                 setFormData(prevState => ({
                     ...prevState,
                         deposit_currency: currs[0].value,
@@ -107,9 +106,9 @@ const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen = false }, ref) 
 
             const fd = new FormData();
             fd.append("deposit", formData.deposit);
-            fd.append("deposit_currency", formData.deposit_currency);
+            /*fd.append("deposit_currency", formData.deposit_currency);*/
             fd.append("price", JSON.stringify(formData.price));
-            fd.append("price_currency", formData.price_currency);
+            /*fd.append("price_currency", formData.price_currency);*/
             return fd;
         },
     }));
@@ -117,7 +116,7 @@ const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen = false }, ref) 
     if (loading) return <div>Yükleniyor...</div>;
     return (
         <form className="max-w-full grid grid-cols-1 md:grid-cols-2 gap-4">
-            <SelectOptions options={currencyTypeOptions} options_name={t("adminpanel.car.car_modify.edit_price_information.deopsit_currency")} onChange={e => setFormData(p => ({ ...p, deposit_currency: e }))} value={formData.deposit_currency ?? currencyTypeOptions?.[0]?.value ?? ""}/>
+            {/*<SelectOptions options={currencyTypeOptions} options_name={t("adminpanel.car.car_modify.edit_price_information.deopsit_currency")} onChange={e => setFormData(p => ({ ...p, deposit_currency: e }))} value={formData.deposit_currency ?? currencyTypeOptions?.[0]?.value ?? ""}/>*/}
             <FormInput name="deposit" label={t("adminpanel.add_car.deposit")} type="number" value={formData.deposit}
                 onChange={e => {
                     setError(p => ({...p, deposit: !/^\d+(\.\d{2})?$/.test(e.target.value) ? "Sadece istenen format: örn 1.50, 2" : "",}));
@@ -125,9 +124,9 @@ const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen = false }, ref) 
                 }}
                 error={error.deposit}
             />
-            <div className="col-span-2">
+{/*            <div className="col-span-2">
                 <SelectOptions options={currencyTypeOptions} options_name={t("adminpanel.car.car_modify.edit_price_information.daily_price_currency")} onChange={e => setFormData(p => ({ ...p, price_currency: e }))} value={formData.price_currency ?? currencyTypeOptions?.[0]?.value ?? ""}/>
-            </div>
+            </div>*/}
 
             {error?.price &&
                 Object.values(error.price).some(err =>
