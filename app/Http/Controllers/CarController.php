@@ -37,7 +37,7 @@ class  CarController extends Controller
     }
     public function addCar(Request $request){
         Log::info('car', ['car' => $request->all()]);
-        $validated = $request->validate([
+        $validated = $request->validateWithBag('err',[
             'license_plate' => 'required|unique:cars|max:255',
             'brand' => 'required|json',
             'model' => 'required|json',
@@ -53,7 +53,7 @@ class  CarController extends Controller
             'deposit' => 'required|int',
             'price' => 'required|json|',
             'photos' => 'required|array|min:1|max:4',
-            'photos.*' => 'mimes:jpeg,jpg,png,gif|max:10240',
+            'photos.*' => 'mimes:jpeg,jpg,png,gif,bmp,webp|max:10240',
             'coverIndex' => 'required|int',
         ]);
         Log::info('car', ['aşama 1' => 1]);
