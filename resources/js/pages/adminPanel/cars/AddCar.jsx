@@ -3,9 +3,10 @@ import CarForm from "../../../components/adminPanel/car/form/CarForm.jsx";
 import {useTranslation} from "react-i18next";
 import axios from "axios";
 import {useState} from "react";
+import {reloadTranslations} from "../../../i18n.js";
 
 export default function AddCars() {
-    const {t} = useTranslation();
+    const {t, i18n} = useTranslation();
     const [success, setSuccess] = useState();
     const [error, setError] = useState();
     const onSubmit = (data) => {
@@ -18,7 +19,6 @@ export default function AddCars() {
             })
                 .then(res => {
                     window.scrollTo({ top: 0, behavior: "smooth" });
-
                     if (res.data.success) {
                         setSuccess("Added Succesfully");
                         setError(null);
@@ -26,6 +26,9 @@ export default function AddCars() {
                         setError(res.data.error);
                         setSuccess(null);
                     }
+                    localStorage.removeItem('i18n_config_cache');
+                    reloadTranslations(i18n.language)
+
                 })
                 .catch(err => {
                     if (err.response?.status === 422) {
@@ -63,3 +66,4 @@ export default function AddCars() {
         </div>
     );
 }
+

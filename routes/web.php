@@ -48,17 +48,14 @@ use Illuminate\Support\Facades\Route;
         Log::info('web.php translation değerleri => ', ['language' => $translations]);
         return response()->json($translations);
     });
-
     Route::get('/get-current-language', function() {
         $lng = Session::get('locale');
        return response()->json($lng);
     });
-
     Route::get('/test-lang', function () {
         session()->put('deneme', true);
        return redirect('get-session');
     });
-
     Route::get('/deneme-curr', function () {
         $def = Currency::where('is_active', 1)->where('is_default', 1)->first();
         if (!$def)
@@ -92,10 +89,6 @@ use Illuminate\Support\Facades\Route;
         });
         return response()->json($result);
     });
-
-
-
-
     Route::get('/get-currencies', function() {
         $currencies = Cache::remember('active_currencies', 60*60*24, function() {
             $def = Currency::where('is_active', 1)->where('is_default', 1)->first();
@@ -132,7 +125,6 @@ use Illuminate\Support\Facades\Route;
         });
         return response()->json($currencies);
     });
-
     Route::get('get-session', function () {
        dd(session()->all());
     });

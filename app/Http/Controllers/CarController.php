@@ -142,6 +142,7 @@ class  CarController extends Controller
                 $newPhoto->save();
             }
             DB::commit();
+
             return response()->json([
                 'success' => true,
                 'car' => $newCar
