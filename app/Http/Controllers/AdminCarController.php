@@ -214,10 +214,8 @@ class AdminCarController extends Controller
                 $first->save();
             }
         }
+        $updatedCar = Car::with(['photos'])->findOrFail($id);
 
-        return Inertia::render('adminPanel/cars/Car', [
-            'car' => $car,
-            'success' => 'Fotoğraflar başarıyla güncellendi.'
-        ]);
+        return response()->json( ['car' => $updatedCar,]);
     }
 }

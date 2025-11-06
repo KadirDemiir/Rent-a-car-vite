@@ -13,7 +13,6 @@
     use App\Http\Controllers\TransmissionController;
     use App\Models\BodyType;
     use App\Models\Campaigns;
-use App\Models\Car;
 use App\Models\Currency;
 use App\Models\Discount;
     use App\Models\Fuel;
@@ -126,11 +125,9 @@ use Illuminate\Support\Facades\Route;
         return response()->json($currencies);
     });
     Route::get('get-session', function () {
-       dd(session()->all());
+        dd(session()->all());
     });
-
     Route::post('/adminpanel/car/add', [CarController::class, 'addCar'])->name('adminAddCar');
-
     Route::get('/adminpanel/get-all-cars-info', function() {
         try {
             $segments = Segment::with('translationKey')->get();

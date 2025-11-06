@@ -57,7 +57,7 @@ export default function CarForm({ car = null, mode, onSubmit }) {
             )}
 
             {mode === "photo" && (
-                <CarPhotoForm defPhotos={car?.carPhotos} ref={photoRef} />
+                <CarPhotoForm defPhotos={car?.photos} ref={photoRef} />
             )}
             <div className="pt-4">
                 <button type="submit" onClick={handleSubmit} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl cursor-pointer">

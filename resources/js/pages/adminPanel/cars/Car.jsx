@@ -2,10 +2,11 @@ import Navbar from "../../../components/adminPanel/navbar/Navbar.jsx";
 import ModifyCar from "../../../components/adminPanel/car/ModifyCar.jsx";
 import CarReservations from "../../../components/adminPanel/car/CarReservations.jsx";
 import IncomingGraph from "../../../components/adminPanel/car/IncomingGraph.jsx";
-import {usePage} from "@inertiajs/react";
+import {useState} from "react";
 
 
-export default function Car({success, car}){
+export default function Car({car}){
+    const [success, setSuccess] = useState("");
     return(
       <div className="w-full">
           < Navbar>
@@ -19,7 +20,7 @@ export default function Car({success, car}){
                   </div>
               )}
               <div className="w-full flex flex-col gap-16">
-                  < ModifyCar car={car}/>
+                  < ModifyCar car={car} setSuccess={setSuccess}/>
                 <div className="max-h-[40vh] overflow-y-hidden">
                     <span className="font-bold ">Araca Ait Rezervasyonalar </span><span className="text-[14px]">(Detayar İçin Tıklayınız)</span>
                     < CarReservations res={true}/>

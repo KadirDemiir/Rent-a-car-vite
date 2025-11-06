@@ -97,69 +97,29 @@ const CarPhotoForm = forwardRef(({ defPhotos, maxFiles = 4, onSubmit }, ref) => 
 
     return (
         <form onSubmit={handleSubmit} className="space-y-3 bg-white">
-            {error && (
-                <div className={`border-l-8 border-red-500 bg-red-300 text-white p-2 text-sm`}>{error}</div>
-            )}
-            <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept="image/*"
-                className="hidden"
-                onChange={handleFileChange}
-                disabled={photos.length >= maxFiles}
-            />
+            {error && (<div className={`border-l-8 border-red-500 bg-red-300 text-white p-2 text-sm`}>{error}</div>)}
+            <input ref={fileInputRef} type="file" multiple accept="image/*" className="hidden" onChange={handleFileChange} disabled={photos.length >= maxFiles}/>
 
             <div
                 onClick={triggerPicker}
-                className={`flex items-center justify-center h-40 border-2 border-dashed rounded-lg cursor-pointer text-sm ${
-                    photos.length >= maxFiles
-                        ? "border-gray-300 text-gray-400 bg-gray-100"
-                        : "border-blue-400 text-blue-600 hover:bg-blue-50"
-                }`}
-            >
-                {photos.length >= maxFiles
-                    ? t("adminpanel.car.car_modify.edit_photos.max_{count}_photos_added", { count: maxFiles })
-                    : t("adminpanel.car.car_modify.edit_photos.click_for_add_photo")}
+                className={`flex items-center justify-center h-40 border-2 border-dashed rounded-lg cursor-pointer text-sm ${photos.length >= maxFiles ? "border-gray-300 text-gray-400 bg-gray-100" : "border-blue-400 text-blue-600 hover:bg-blue-50"}`}>
+                {photos.length >= maxFiles ? t("adminpanel.car.car_modify.edit_photos.max_{count}_photos_added", { count: maxFiles }) : t("adminpanel.car.car_modify.edit_photos.click_for_add_photo")}
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {Array.from({ length: maxFiles }).map((_, i) => {
                     const p = photos[i];
                     return p ? (
-                        <div
-                            key={i}
-                            className={`relative rounded overflow-hidden border ${
-                                coverIndex === i ? "ring-2 ring-blue-500" : ""
-                            }`}
-                        >
-                            <img
-                                src={p.url}
-                                alt={`preview-${i}`}
-                                className="object-cover w-full h-24 cursor-pointer"
-                                onClick={() => selectCover(i)}
-                                title="Kapak olarak ayarla"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => handleDelete(i)}
-                                className="absolute top-0 right-0 text-white bg-black bg-opacity-60 px-1 text-xs"
-                            >
-                                ×
-                            </button>
+                        <div key={i} className={`relative rounded overflow-hidden border ${coverIndex === i ? "ring-2 ring-blue-500" : ""}`}>
+                            <img src={p.url} alt={`preview-${i}`} className="object-cover w-full h-24 cursor-pointer" onClick={() => selectCover(i)} title="Kapak olarak ayarla"/>
+                            <button type="button" onClick={() => handleDelete(i)} className="absolute top-0 right-0 text-white bg-black bg-opacity-60 px-1 text-xs">×</button>
                             {coverIndex === i && (
                                 <div className="absolute bottom-0 left-0 bg-blue-600 text-white text-[10px] px-1 w-full text-center">
                                     {t("adminpanel.car.car_modify.edit_photos.cover")}
                                 </div>
                             )}
                         </div>
-                    ) : (
-                        <div
-                            key={`empty-${i}`}
-                            className="flex items-center justify-center h-24 text-gray-300 border border-dashed rounded"
-                        >
-                            {t("adminpanel.car.car_modify.edit_photos.empty")}
-                        </div>
+                    ) : (<div key={`empty-${i}`} className="flex items-center justify-center h-24 text-gray-300 border border-dashed rounded">{t("adminpanel.car.car_modify.edit_photos.empty")}</div>
                     );
                 })}
             </div>

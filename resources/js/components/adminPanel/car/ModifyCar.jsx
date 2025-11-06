@@ -5,7 +5,7 @@ import CarPhotoUpload from "./CarPhotoUpload.jsx";
 import CarModifyPhoto from "./CarModifyPhoto.jsx";
 import {useTranslation} from "react-i18next";
 
-export default function ModifyCar({ car }) {
+export default function ModifyCar({ car, setSuccess}) {
     const [car1, setCar1] = useState(car);
     const {t} = useTranslation();
     const [openCarModify, setOpenCarModify] = useState(false);
@@ -61,7 +61,7 @@ export default function ModifyCar({ car }) {
       )}
       {openUploadPhoto && (
         <ModalWrapper>
-          <CarPhotoUpload car={car1} closeModal={closeModalUP} />
+          <CarPhotoUpload car={car1} closeModal={closeModalUP} setCar={setCar1} setSuccess={setSuccess}/>
         </ModalWrapper>
       )}
         <div className={`w-full flex items-center justify-end p-4`}><button className={`px-6 bg-red-500 rounded-lg hover:bg-red-600 text-white text-lg cursor-pointer`}>{t("adminpanel.car.car_modify.delete")}</button></div>
