@@ -32,51 +32,55 @@ const setCachedConfig = (config) => {
     }
 };
 
+const setConfig = async () => {
+    let config;
+    console.log('⌛ Önbellek boş. Sunucudan çekiliyor... (Cache Miss)');
+    try {
+        const [currentRes, langsRes] = await Promise.all([
+            axios.get('/get-current-language'),
+            axios.get('/supported-languages')
+        ]);
+
+        const current = currentRes.data;
+        const supportedLngs = langsRes.data.length ? langsRes.data : ['tr'];
+
+        const translationPromises = supportedLngs.map(lng =>
+            axios.get(`/translations/${lng}`)
+                .then(res => ({[lng]: {translation: res.data}}))
+        );
+
+        const translationResults = await Promise.all(translationPromises);
+
+        const resources = translationResults.reduce((acc, res) => ({...acc, ...res}), {});
+
+        config = {
+            lng: current,
+            supportedLngs,
+            resources,
+            fallbackLng: 'tr',
+            interpolation: {escapeValue: false},
+        };
+    } catch (e) {
+        console.error('Diller veya çeviriler alınamadı, default kullanılıyor.', e);
+        config = {
+            lng: 'tr',
+            supportedLngs: ['tr'],
+            resources: {tr: {translation: {}}},
+            fallbackLng: 'tr',
+            interpolation: {escapeValue: false},
+        };
+    }
+    return config;
+}
+
 const initI18n = async () => {
     let config = getCachedConfig();
 
     if (config) {
         console.log('✅ Çeviriler önbellekten yüklendi (Cache Hit)');
     } else {
-        console.log('⌛ Önbellek boş. Sunucudan çekiliyor... (Cache Miss)');
-        try {
-            const [currentRes, langsRes] = await Promise.all([
-                axios.get('/get-current-language'),
-                axios.get('/supported-languages')
-            ]);
-
-            const current = currentRes.data;
-            const supportedLngs = langsRes.data.length ? langsRes.data : ['tr'];
-
-            const translationPromises = supportedLngs.map(lng =>
-                axios.get(`/translations/${lng}`)
-                    .then(res => ({ [lng]: { translation: res.data } }))
-            );
-
-            const translationResults = await Promise.all(translationPromises);
-
-            const resources = translationResults.reduce((acc, res) => ({ ...acc, ...res }), {});
-
-            config = {
-                lng: current,
-                supportedLngs,
-                resources,
-                fallbackLng: 'tr',
-                interpolation: { escapeValue: false },
-            };
-
-            setCachedConfig(config);
-
-        } catch (e) {
-            console.error('Diller veya çeviriler alınamadı, default kullanılıyor.', e);
-            config = {
-                lng: 'tr',
-                supportedLngs: ['tr'],
-                resources: { tr: { translation: {} } }, // Boş çeviri objesi
-                fallbackLng: 'tr',
-                interpolation: { escapeValue: false },
-            };
-        }
+        const config = setConfig();
+        setCachedConfig(config);
     }
 
     await i18next

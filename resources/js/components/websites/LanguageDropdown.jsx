@@ -93,8 +93,7 @@ export default function LanguageDropdown() {
                         <li key={lng}>
                             <button
                                 onClick={() => {handleChangeLang(lng); setOpen(false)}}
-                                className={`flex items-center justify-between w-full px-4 py-2 ${current === lng ? 'bg-blue-800 text-white' : ''}`}
-                            >
+                                className={`flex items-center justify-between w-full px-4 py-2 ${current === lng ? 'bg-blue-800 text-white' : ''}`}>
                                 <img src={languages[lng]?.flag} alt="" className="h-6 w-6 rounded-2xl" />
                                 {lng.toUpperCase()}
                             </button>
