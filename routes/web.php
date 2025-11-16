@@ -1,6 +1,5 @@
 <?php
-
-    use App\Http\Controllers\AdminCarController;
+use App\Http\Controllers\AdminCarController;
     use App\Http\Controllers\AuthController;
     use App\Http\Controllers\BodyTypeController;
     use App\Http\Controllers\CampaignsController;
@@ -13,25 +12,25 @@
     use App\Http\Controllers\TransmissionController;
     use App\Models\BodyType;
     use App\Models\Campaigns;
-use App\Models\Currency;
-use App\Models\Discount;
+    use App\Models\Currency;
+    use App\Models\Discount;
     use App\Models\Fuel;
     use App\Models\Language;
-use App\Models\Locations;
-use App\Models\Segment;
+    use App\Models\Locations;
+    use App\Models\Segment;
     use App\Models\Translation;
     use App\Models\TranslationKey;
     use App\Models\Transmission;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Route;
+    use Illuminate\Support\Facades\Cache;
+    use Illuminate\Support\Facades\Http;
+    use Illuminate\Support\Facades\Log;
+    use Illuminate\Support\Facades\Route;
     use App\Http\Controllers\CarController;
     use App\Http\Controllers\LocationsController;
     use App\Http\Controllers\ReservationController;
     use Illuminate\Support\Facades\Session;
     use Inertia\Inertia;
-    use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
+use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
     Route::inertia("/test", 'Test');
     Route::get('/supported-languages', function() {
@@ -39,12 +38,12 @@ use Illuminate\Support\Facades\Route;
         return response()->json($languages);
     });
     Route::get('/translations/{lang}', function($lang) {
-        Log::info('web.php translation dili => ', ['language' => $lang]);
+        /*Log::info('web.php translation dili => ', ['language' => $lang]);*/
         $translations = Translation::with('translationKey')
             ->whereHas('language', fn($q) => $q->where('code', $lang))
             ->get()
             ->mapWithKeys(fn($t) => [$t->translationKey->key => $t->value]);
-        Log::info('web.php translation değerleri => ', ['language' => $translations]);
+        /*Log::info('web.php translation değerleri => ', ['language' => $translations]);*/
         return response()->json($translations);
     });
     Route::get('/get-current-language', function() {
@@ -93,11 +92,12 @@ use Illuminate\Support\Facades\Route;
             $def = Currency::where('is_active', 1)->where('is_default', 1)->first();
             if (!$def)
                 return response()->json(['error' => 'Default currency not found'], 404);
-            $response = Http::get('https://www.tcmb.gov.tr/kurlar/today.xml');
-            $xml = simplexml_load_string($response->body());
-            $tcmbRates = collect();
-            foreach ($xml->Currency as $c) {
-                $tcmbRates->push([
+                    $response = Http::get('https://www.tcmb.gov.tr/kurlar/today.xml');
+                    $xml = simplexml_load_string($response->body());
+                    Log::info('get-currencies xml => ', ['xml' => $xml]);
+                    $tcmbRates = collect();
+                    foreach ($xml->Currency as $c) {
+                        $tcmbRates->push([
                     'code' => (string) $c['CurrencyCode'],
                     'name' => (string) $c->Isim,
                     'forexBuying' => (float) str_replace(',', '.', $c->ForexBuying),
@@ -136,6 +136,17 @@ use Illuminate\Support\Facades\Route;
             $transmissions = Transmission::with('translationKey')->get();
             $languages = Language::where('status', 'active')->get();
             return response()->json(['segments' => $segments, 'bodyTypes' => $bodyTypes, 'fuels' => $fuels, 'transmissions' => $transmissions, 'languages' => $languages]);
+        }catch (Exception $e){
+            return response()->json($e);
+        }
+    });
+    Route::get('/get-all-cars-info', function() {
+        try {
+            $segments = Segment::with('translationKey')->get();
+            $bodyTypes = BodyType::with('translationKey')->get();
+            $fuels = Fuel::with('translationKey')->get();
+            $transmissions = Transmission::with('translationKey')->get();
+            return response()->json(['segments' => $segments, 'bodyTypes' => $bodyTypes, 'fuels' => $fuels, 'transmissions' => $transmissions]);
         }catch (Exception $e){
             return response()->json($e);
         }

@@ -1,8 +1,10 @@
 import {useState} from "react";
 import SiteVariable from "./SiteVariable.jsx";
 import axios from "axios";
+import {reloadTranslations} from "../../../i18n.js";
+import { useTranslation } from "react-i18next";
 
-export default function SiteVariableForm({keys, language, setLang}){
+export default function SiteVariableForm({keys, language}){
     const [success, setSuccess] = useState();
     const [error, setError] = useState();
     const [formData, setFormData] = useState(() =>
@@ -15,9 +17,10 @@ export default function SiteVariableForm({keys, language, setLang}){
             return acc;
         }, {})
     );
+    const {i18n} = useTranslation();
 
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         const hasError = Object.entries(formData).some(([, value]) => value.value.trim() === "" || value.error !== "");
 
         if (hasError) {
@@ -25,23 +28,27 @@ export default function SiteVariableForm({keys, language, setLang}){
             return;
         }
 
-        try {
-            setError(null);
-            setSuccess(null);
+        setError(null);
+        setSuccess(null);
 
-            const payload = Object.entries(formData).map(([key, value]) => ({
-                key,
-                value: value.value
-            }));
-            const res = await axios.put(`/adminpanel/languages/${language.id}/update-site-variable`, {
-                language_id: language.id,
-                translations: payload
-            });
+        const payload = Object.entries(formData).map(([key, value]) => ({
+            key,
+            value: value.value
+        }));
 
-            setSuccess("Kayıt başarıyla tamamlandı.");
-        } catch (err) {
-            setError("Kaydetme sırasında bir hata oluştu.");
-        }
+        axios.put(`/adminpanel/languages/${language.id}/update-site-variable`, {
+            language_id: language.id,
+            translations: payload
+        })
+        .then(response => {
+            setSuccess(response.data.success);
+            localStorage.removeItem('i18n_config_cache');
+            reloadTranslations(i18n.language);
+        })
+        .catch(err => {
+            console.log(err);
+            setError(err.response?.data?.error || "Kaydetme sırasında bir hata oluştu.");
+        });
     };
 
     return(

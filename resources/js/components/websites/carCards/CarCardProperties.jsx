@@ -3,13 +3,13 @@ import {useTranslation} from "react-i18next";
 
 
 export default function CarCardProperties({fuel_id, transmission_id, seat_count, body_type, trunk_capacity, compName}){
+
     const {t} = useTranslation();
     return(
         <div className="flex-1 w-full">
             <div className="w-full flex justify-center font-bold">
                 {compName}
             </div>
-
             < CarCardsProp
             photo_path = "/storage/svg/carFeatures/gas_station.svg"
             context = {t(`fuel.${fuel_id}`)}
@@ -20,7 +20,7 @@ export default function CarCardProperties({fuel_id, transmission_id, seat_count,
             />
             < CarCardsProp
             photo_path = "/storage/svg/carFeatures/groups.svg"
-            context = {`${seat_count}`}
+            context = {seat_count}
             />
             < CarCardsProp
             photo_path = "/storage/svg/carFeatures/car.svg"

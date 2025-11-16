@@ -2,7 +2,7 @@ import CarPropertiesGenericInfo from "./CarPropertiesGenericInfo.jsx";
 import {useState} from "react";
 import axios from "axios";
 import {useTranslation} from "react-i18next";
-import i18next from "i18next";
+import i18next, {reloadResources} from "i18next";
 
 export default function TransmissionTypeForm({mode="create", lngs, transmission=null}){
     const {t} = useTranslation();
@@ -46,12 +46,14 @@ export default function TransmissionTypeForm({mode="create", lngs, transmission=
                 if (response.data.success) {
                     if(response.data.translations){
                         Object.entries(response.data.translations).forEach(([langId, tVal]) => {
-                            const code = lngs.find(l => l.id == langId)?.code;
+                            const code = lngs.find(l => l.id === langId)?.code;
                             console.log(code);
                             if(code) i18next.addResource(code, 'translation', `transmission.${response.data.transmission_id}`, tVal.value);
                         });
                     }
                     setSuccess(mode === "create" ? "Added Successfully!" : "Updated Successfully!");
+                    localStorage.removeItem('i18n_config_cache');
+                    reloadResources();
                 } else
                     setError(mode === "create" ? "Failed to add BodyType" : "Failed to update BodyType");
             })
@@ -70,6 +72,7 @@ export default function TransmissionTypeForm({mode="create", lngs, transmission=
     return(
         <div className={`shadow-lg p-8`}>
             {success && <p className={`w-full border-l-12 border-green-700 bg-green-300 text-green-700 font-semibold p-2`}>{success}</p>}
+            {error && <p className={`w-full border-l-12 border-red-700 bg-red-300 text-red-700 font-semibold p-2`}>{error}</p>}
             <CarPropertiesGenericInfo title={t("adminpanel.add_fuel.select_language")} name={t("adminpanel.add_fuel.fuel_name")} formData={formData} currentLang={currentLang} langOptions={langOptions} setCurrentLang={setCurrentLang} setFormData={setFormData}/>
             <br/>
             <div className={`w-full flex justify-end pr-4`}><button onClick={handleSubmit} className={`bg-blue-500 rounded-lg py-1 px-4 text-white`}>{t("adminpanel.add_transmission.button.save")}</button></div>

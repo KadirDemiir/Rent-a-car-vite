@@ -18,7 +18,7 @@ class ReservationController extends Controller
 {
     public function searchReservations(Request $request)
     {
-        Log::info('coming reservation request', ['request => ', $request->all()]);
+        /*Log::info('coming reservation request', ['request => ', $request->all()]);*/
         if (!$request->has(['startDateTime', 'finishDateTime', 'PULocation', 'RLocation'])) {
             return Inertia::render('SearchReservations', ['availableCars' => []]);
         }
@@ -73,7 +73,7 @@ class ReservationController extends Controller
             }
         }
 
-        Log::info('coming reservation request', ['request22 => ', $request->all()]);
+        /*Log::info('coming reservation request', ['request22 => ', $request->all()]);*/
         return Inertia::render('SearchReservations', [
             'availableCars' => $availableCars,
             'reservation' => [
