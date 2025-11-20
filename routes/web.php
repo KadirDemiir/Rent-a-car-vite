@@ -208,7 +208,11 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
             $discounts = Discount::with('car')->get();
             return Inertia::render('adminPanel/price/Discounts', ['data' => $discounts]);
         })->name('adminAddDropPrice');
-        Route::inertia(dbTransRoute('adminpanel').'/'. dbTransRoute('discounts').'/'. dbTransRoute('add'), 'adminPanel/price/AddDiscount')->name('adminAddDiscount ');
+        Route::get(dbTransRoute('adminpanel').'/'. dbTransRoute('discounts').'/'. dbTransRoute('add'), function () {
+            $segments = Segment::with('translationKey')->get();
+            $currencies = Currency::where('is_active', 1)->get();
+            return Inertia::render('adminPanel/price/AddDiscount', ['segments' => $segments, 'currencies' => $currencies]);
+        })->name('adminAddDiscount ');
         Route::post('/adminpanel/discount/add', [DiscountController::class, 'addDiscount'])->name('adminAddDiscount ');
 
         Route::get(dbTransRoute('adminpanel').'/'. dbTransRoute('internal-services'), [\App\Http\Controllers\InternalServiceController::class, 'showAll'])->name('adminShowInternalServices');

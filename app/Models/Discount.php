@@ -16,7 +16,7 @@ class Discount extends Model
         "campaign_id",
         "min_days",
         "max_days",
-        "segment_name",
+        "segment_id ",
         "start_date",
         "end_date",
         "status",

@@ -21,10 +21,11 @@ class DiscountController extends Controller
         $discounts = json_decode($validated['dayDiscount'], true);
 
         if (!is_array($discounts)) {
-            return Inertia::render('adminPanel/price/AddDiscount', [
+            return $this->respond($request, [
                 'error' => 'İndirim verileri hatalı veya boş.'
-            ]);
+            ], 422);
         }
+
         try {
             foreach ($discounts as $discount) {
                 if (!$discount['min_day'] && !$discount['max_day'] && !$discount['discount_amount']) {
@@ -48,14 +49,23 @@ class DiscountController extends Controller
                 $newDiscount->end_date = $validated['endDate'];
                 $newDiscount->save();
             }
-            return Inertia::render('adminPanel/price/AddDiscount', [
+            return $this->respond($request, [
                 'success' => 'İndirim başarıyla kaydedildi.'
             ]);
         } catch (\Exception $e) {
-            return Inertia::render('adminPanel/price/AddDiscount', [
+            return $this->respond($request, [
                 'error' => 'İndirimler kaydedilirken bir hata oluştu. Lütfen tekrar deneyin. ' . $e->getMessage()
-            ]);
+            ], 500);
         }
     }
 
+    private function respond(Request $request, array $payload, int $status = 200)
+    {
+        if ($request->expectsJson()) {
+            return response()->json($payload, $status);
+        }
+
+        return Inertia::render('adminPanel/price/AddDiscount', $payload);
+    }
 }
+

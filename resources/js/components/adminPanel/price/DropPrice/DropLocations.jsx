@@ -1,10 +1,10 @@
 import SelectOptions from "../../../websites/filterSelectors/SelectOptions.jsx";
 import DropForm from "./DropForm.jsx";
 import {useEffect, useState} from "react";
-import {router} from "@inertiajs/react";
 import {useTranslation} from "react-i18next";
+import axios from "axios";
 
-export default function DropLocations({locations: locationObjects, dropPrice}) {
+export default function DropLocations({locations: locationObjects, dropPrice, onSuccess, onError}) {
     const {t} = useTranslation();
     const [formattedLocations, setFormattedLocations] = useState([]);
     const [pickUpLocation, setPickUpLocation] = useState("");
@@ -20,14 +20,13 @@ export default function DropLocations({locations: locationObjects, dropPrice}) {
             const formatted = locationObjects.map(location => ({
                 label: location.name,
                 id: location.id,
-                value: location.name.toLowerCase()
+                value: location.name.toLowerCase(),
             }));
 
             setFormattedLocations(formatted);
             setPickUpLocation(formatted[0].value);
         }
     }, [locationObjects]);
-
 
     useEffect(() => {
         if (formattedLocations.length === 0 || !pickUpLocation) return;
@@ -37,13 +36,12 @@ export default function DropLocations({locations: locationObjects, dropPrice}) {
 
         locationObjects.forEach(loc => {
             const val = dropPrice.find(dp => dp.from_location_id === selectedLocation.id && dp.to_location_id === loc.id);
-            initialLocationData[loc.name] = { id: loc.id, value: val?.price || "" };
+            initialLocationData[loc.name] = {id: loc.id, value: val?.price || ""};
         });
 
         setLocationData(initialLocationData);
         setLoading(false);
-    }, [pickUpLocation, formattedLocations]);
-
+    }, [pickUpLocation, formattedLocations, locationObjects, dropPrice]);
 
     const handleCityPricesSubmit = (e) => {
         e.preventDefault();
@@ -59,23 +57,28 @@ export default function DropLocations({locations: locationObjects, dropPrice}) {
             setFormError("Lütfen tüm alanları doldurunuz.");
             return;
         }
-        console.log(formattedLocations);
-            const selectedLocation = formattedLocations.find(l => l.value === pickUpLocation);
+        const selectedLocation = formattedLocations.find(l => l.value === pickUpLocation);
         const data = new FormData();
         data.append("locations", JSON.stringify(locationData));
         data.append("pickup_location_id", selectedLocation.id);
         data.append("currency", currency);
         data.append("type", "locations_price");
 
-        router.post('/adminpanel/drop-price', data, {
-            onError: (errors) => {
-                console.error("Sunucu hatası:", errors);
-            },
-            onSuccess: () => {
+        axios.post("/adminpanel/drop-price", data)
+            .then((res) => {
                 setLocationError({});
                 window.scrollTo({top: 0, behavior: "smooth"});
-            },
-        });
+                if (res.data?.success) {
+                    onSuccess?.(res.data.success);
+                }
+            })
+            .catch((errors) => {
+                console.error("Sunucu hatası:", errors);
+                const message = errors.response?.data?.error || errors.message;
+                if (message) {
+                    onError?.(message);
+                }
+            });
     };
 
     if (loading) {
@@ -83,39 +86,49 @@ export default function DropLocations({locations: locationObjects, dropPrice}) {
     }
 
     return (
-        <div className="grid grid-cols-4 gap-4 bg-gray-50 shadow-md rounded-xl p-6 ">
-            <h3 className="col-span-4 flex items-center justify-center font-semibold">Lokasyonlar Arası Ücretler</h3>
-            <p className="col-span-4 text-sm font-semibold">*{t("adminpanel.pricing.drop_price.locations_price.your_purchase_history_is_reset_every_time_you_renew")}</p>
-            <div className="col-span-4">
-                {formError && <div className="p-2 border-l-12 border-red-600 bg-red-400 text-white">{formError}</div>}
+        <section className="space-y-4">
+            <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm space-y-6">
+                <div className="space-y-1 text-center">
+                    <h3 className="text-lg font-semibold text-gray-900">Lokasyonlar Arası Ücretler</h3>
+                    <p className="text-xs font-semibold text-gray-500">
+                        *{t("adminpanel.pricing.drop_price.locations_price.your_purchase_history_is_reset_every_time_you_renew")}
+                    </p>
+                </div>
+                {formError && (
+                    <div className="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                        {formError}
+                    </div>
+                )}
+                <div className="grid gap-4 md:grid-cols-2">
+                    <SelectOptions
+                        value={pickUpLocation}
+                        options={formattedLocations}
+                        onChange={(e) => {
+                            setPickUpLocation(e);
+                            setLocationData({});
+                            setLocationError({});
+                        }}
+                        options_name={t("adminpanel.pricing.drop_price.locations_price.pick_up_location")}
+                    />
+                    <SelectOptions
+                        options={currencyOptions}
+                        value={currency}
+                        onChange={setCurrency}
+                        options_name={t("adminpanel.pricing.drop_price.locations_price.pick_up_location")}
+                    />
+                </div>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <DropForm
+                        handleSubmit={handleCityPricesSubmit}
+                        opt={locationObjects.map(loc => loc.name)}
+                        data={locationData}
+                        setData={setLocationData}
+                        error={locationError}
+                        setError={setLocationError}
+                        pickup={pickUpLocation}
+                    />
+                </div>
             </div>
-            <div className="col-span-4 flex gap-8">
-                <SelectOptions
-                    value={pickUpLocation}
-                    options={formattedLocations}
-                    onChange={(e) => {
-                        setPickUpLocation(e);
-                        setLocationData({});
-                        setLocationError({});
-                    }}
-                    options_name={t("adminpanel.pricing.drop_price.locations_price.pick_up_location")}
-                />
-                <SelectOptions
-                    options={currencyOptions}
-                    value={currency}
-                    onChange={(e) => setCurrency(e)}
-                    options_name={t("adminpanel.pricing.drop_price.locations_price.pick_up_location")}
-                />
-            </div>
-            <DropForm
-                handleSubmit={handleCityPricesSubmit}
-                opt={locationObjects.map(loc => loc.name)}
-                data={locationData}
-                setData={setLocationData}
-                error={locationError}
-                setError={setLocationError}
-                pickup={pickUpLocation}
-            />
-        </div>
+        </section>
     );
 }

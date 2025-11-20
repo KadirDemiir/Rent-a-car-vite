@@ -88,7 +88,6 @@ export default function CampaignForm({languages, mode = "add", campaign = null, 
     };
 
     const validateAndSubmit = () => {
-        const {t} = useTranslation();
         setFormErrors(null);
         if (supportedLangs.some(sl => !title[sl.value])) {
             setFormErrors("Lütfen her dil için kampanya başlığı oluşturun.");
@@ -195,12 +194,14 @@ export default function CampaignForm({languages, mode = "add", campaign = null, 
 
             {isDiscountOpen && (
                 <DiscountForm
+                    currencies={campaign?.currencies ?? []}
+                    segments={campaign?.segments ?? []}
                     selectedDiscount={selectedDiscount}
                     setSelectedDiscount={setSelectedDiscount}
                     dayDiscount={dayDiscount}
                     setDayDiscount={setDayDiscount}
-                    discountTarget={discountTarget}
-                    setDiscountTarget={setDiscountTarget}
+                    segmentId={discountTarget}
+                    setSegmentId={setDiscountTarget}
                 />
             )}
 

@@ -1,17 +1,9 @@
 import SelectOptions from "../../websites/filterSelectors/SelectOptions.jsx";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {useTranslation} from "react-i18next";
 
-export default function SegmentBasedDiscount({ selectedSegment, onChange }) {
+export default function SegmentBasedDiscount({ selectedSegment, onChange, segments }) {
     const {t} = useTranslation();
-    const options = [
-        { label: "--Seçiniz--", value: "" },
-        { label: "Economy", value: "economy" },
-        { label: "Compact", value: "compact" },
-        { label: "Orta Sınıf", value: "midrange" },
-        { label: "Premium", value: "premium" },
-    ];
-
     const [value, setValue] = useState(selectedSegment || "");
 
     useEffect(() => {
@@ -23,11 +15,21 @@ export default function SegmentBasedDiscount({ selectedSegment, onChange }) {
         onChange(e);
     };
 
+    const segmentOptions = useMemo(() => {
+        if (!segments || !Array.isArray(segments)) {
+            return [];
+        }
+        return segments.map(segment => ({
+            label: t(`segment.${segment.id}`),
+            value: segment.id
+        }));
+    }, [segments, t]);
+
     return (
         <div className="w-full">
             <SelectOptions
-                value={value}
-                options={options}
+                value={value ? [value] : []}
+                options={segmentOptions}
                 onChange={handleChange}
                 options_name={t("adminpanel.pricing.add_discount.choose_a_segment")}
             />

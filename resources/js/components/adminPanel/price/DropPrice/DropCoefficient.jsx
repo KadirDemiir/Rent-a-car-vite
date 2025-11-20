@@ -1,10 +1,9 @@
 import DropForm from "./DropForm.jsx";
 import {useEffect, useState} from "react";
-import {router} from "@inertiajs/react";
-import {use} from "i18next";
 import {useTranslation} from "react-i18next";
+import axios from "axios";
 
-export default function DropCoefficient({segments}){
+export default function DropCoefficient({segments, onSuccess, onError}) {
     const {t} = useTranslation();
     const name = segments.map(s => s.name);
     const [coeffiData, setCoeffiData] = useState({});
@@ -12,49 +11,71 @@ export default function DropCoefficient({segments}){
     const [formError, setFormError] = useState();
 
     useEffect(() => {
-        segments.map((s) => {
+        segments.forEach((s) => {
             setCoeffiData(prev => ({
                 ...prev,
                 [s.name]: {value: s.coefficient},
-            }))
-        })
-    }, []);
+            }));
+        });
+    }, [segments]);
+
     const handleSubmitSegmentCoefficient = (e) => {
         e.preventDefault();
         setFormError("");
-        if(Object.keys(coeffiError).length > 0){
+        if (Object.keys(coeffiError).length > 0) {
             setFormError("Lütfen Hataları Çözünüz");
             return;
         }
         const emptyFields = Object.entries(coeffiData).filter(([_, val]) => !val);
         if (emptyFields.length > 0) {
             setFormError("Lütfen tüm alanları doldurunuz.");
-        return;
+            return;
         }
-            const data = new FormData();
-            data.append("coefficients", JSON.stringify(coeffiData));
-            data.append("type", "segment_coefficient");
-            router.post('/adminpanel/drop-price', data, {
-                onError: (errors) => {
-                    console.error("Sunucu hatası:", errors);
-                },
-                onSuccess: () => {
-                    setCoeffiError({});
-                },
+        const data = new FormData();
+        data.append("coefficients", JSON.stringify(coeffiData));
+        data.append("type", "segment_coefficient");
+
+        axios.post("/adminpanel/drop-price", data)
+            .then((res) => {
+                setCoeffiError({});
+                if (res.data?.success) {
+                    onSuccess?.(res.data.success);
+                }
+            })
+            .catch((errors) => {
+                console.error("Sunucu hatası:", errors);
+                const message = errors.response?.data?.error || errors.message;
+                if (message) {
+                    onError?.(message);
+                }
             });
     };
-    return(
-        <>
-            <h3 className="font-semibold">{t("adminpanel.pricing.drop_price.drop_price")}</h3>
-            <hr/><br/>
-            <br/><br/>
-            <div className="grid grid-cols-4 gap-4 bg-gray-50 shadow-md rounded-xl p-6 ">
-                <h3 className="col-span-4 flex items-center justify-center font-semibold">{t("adminpanel.pricing.drop_price.vehicle_segment_coefficient.vehicle_segment_coefficient")}</h3>
-                <div className={`col-span-4`}>
-                    {formError && <div className={`p-2 border-l-12 border-red-600 bg-red-400 text-white`}>{formError}</div>}
+
+    return (
+        <section className="space-y-4">
+            <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm space-y-6">
+                <div className="space-y-2 text-center">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                        {t("adminpanel.pricing.drop_price.vehicle_segment_coefficient.vehicle_segment_coefficient")}
+                    </h3>
                 </div>
-                <DropForm handleSubmit={handleSubmitSegmentCoefficient} opt={name} data={coeffiData} setData={setCoeffiData} error={coeffiError} setError={setCoeffiError} minZero={false}/>
+                {formError && (
+                    <div className="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                        {formError}
+                    </div>
+                )}
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <DropForm
+                        handleSubmit={handleSubmitSegmentCoefficient}
+                        opt={name}
+                        data={coeffiData}
+                        setData={setCoeffiData}
+                        error={coeffiError}
+                        setError={setCoeffiError}
+                        minZero={false}
+                    />
+                </div>
             </div>
-        </>
+        </section>
     );
 }
