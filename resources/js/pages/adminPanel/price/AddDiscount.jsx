@@ -13,7 +13,7 @@ export default function AddDiscounts({success, errors, segments, currencies}) {
     const [dayDiscount, setDayDiscount] = useState(() => [createEmptyDiscount(defaultCurrencyId)]);
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date(new Date().setDate(new Date().getDate() + 1)));
-    const [segmentId, setSegmentId] = useState(segments[0].id || "");
+    const [segmentId, setSegmentId] = useState(segments[0]?.id || "");
     const [error, setError] = useState("");
     const [serverSuccess, setServerSuccess] = useState(success || "");
     const [serverError, setServerError] = useState(errors ? Object.values(errors).join("\n") : "");
@@ -87,24 +87,40 @@ export default function AddDiscounts({success, errors, segments, currencies}) {
                     Accept: "application/json"
                 }
             });
-            setServerSuccess(response.data?.success || t("adminpanel.pricing.add_discount.messages.success"));
-            setDayDiscount([createEmptyDiscount(defaultCurrencyId)]);
-            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (response.data?.success === true) {
+                setServerSuccess(
+                    response.data?.success ||
+                    t("adminpanel.pricing.add_discount.messages.success")
+                );
+
+                setDayDiscount([createEmptyDiscount(defaultCurrencyId)]);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+
         } catch (err) {
+
             const message =
                 err.response?.data?.error ||
                 err.response?.data?.message ||
                 t("adminpanel.pricing.add_discount.messages.generic_error");
 
             if (err.response?.status === 422 && err.response.data?.errors) {
-                setServerError(Object.values(err.response.data.errors).flat().join("\n"));
+                const validationMessage = Object.values(err.response.data.errors)
+                    .flat()
+                    .join("\n");
+
+                setServerError(validationMessage);
             } else {
                 setServerError(message);
             }
+
             window.scrollTo({ top: 0, behavior: "smooth" });
+
         } finally {
             setIsSubmitting(false);
         }
+
     };
 
     const FeedbackMessage = ({ type, children }) => (

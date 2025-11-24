@@ -2,7 +2,7 @@ import CarPropertiesGenericInfo from "./CarPropertiesGenericInfo.jsx";
 import {useState} from "react";
 import axios from "axios";
 import {useTranslation} from "react-i18next";
-import i18next from "i18next";
+import {reloadTranslations} from "../../../i18n.js";
 
 export default function BodyTypeForm({mode="create", lngs, bt=null}){
     const {t} = useTranslation();
@@ -43,12 +43,7 @@ export default function BodyTypeForm({mode="create", lngs, bt=null}){
         request
             .then((response) => {
                 if (response.data.success) {
-                    if(response.data.translations){
-                        Object.entries(response.data.translations).forEach(([langId, tVal]) => {
-                            const code = lngs.find(l => l.id == langId)?.code;
-                            if(code) i18next.addResource(code, 'translation', `body_type.${response.data.body_type_id}`, tVal.value);
-                        });
-                    }
+                    reloadTranslations();
                     setSuccess(mode === "create" ? "Added Successfully!" : "Updated Successfully!");
                 } else
                     setError(mode === "create" ? "Failed to add BodyType" : "Failed to update BodyType");

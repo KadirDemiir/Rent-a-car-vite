@@ -49,12 +49,12 @@ class ExtraServicesController extends Controller
             );
 
             if ($extraService->wasRecentlyCreated) {
-                return redirect()->route('adminShowExternalServices')->with('success', 'Yeni Servis Eklendi.');
+                return response()->json(['success' => true]);
             } else {
-                return redirect()->route('adminShowExternalServices')->with('success', 'Servis Güncellendi.');
+                return response()->json(['update' => true]);
             }
         } catch (\Exception $exception) {
-            return redirect()->route('adminShowExternalServices')->with('error', $exception->getMessage());
+            return response()->json([$exception]);
         }
     }
 

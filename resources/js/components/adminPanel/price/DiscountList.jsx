@@ -18,10 +18,10 @@ export default function DiscountList({data = []}) {
     const formatTarget = (discount) => {
         if (!discount) return t("adminpanel.general.not_available");
         if (discount.target_type === "car") {
-            return discount.car?.brand || t("adminpanel.pricing.discounts.target.car_fallback");
+            return `${discount.car?.brand} ${discount.car?.model}` || t("adminpanel.pricing.discounts.target.car_fallback");
         }
         if (discount.target_type === "segment") {
-            return discount.segment_name || t("adminpanel.pricing.discounts.target.segment_fallback");
+            return t(`segment.${discount.segment_id}`) || t("adminpanel.pricing.discounts.target.segment_fallback");
         }
         return t("adminpanel.pricing.discounts.target.all_vehicles");
     };

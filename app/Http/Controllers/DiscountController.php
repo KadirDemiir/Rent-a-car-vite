@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Discount;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use function Laravel\Prompts\error;
 
 class DiscountController extends Controller
 {
@@ -19,53 +21,67 @@ class DiscountController extends Controller
         ]);
 
         $discounts = json_decode($validated['dayDiscount'], true);
-
+        Log::info($discounts);
         if (!is_array($discounts)) {
-            return $this->respond($request, [
-                'error' => 'İndirim verileri hatalı veya boş.'
+            return response()->json([
+                'success' => false,
+                'error' => 'Invalid or empty discount data.'
             ], 422);
         }
 
+        $start = $validated['startDate'];
+        $end = $validated['endDate'];
+
+        $overlap = Discount::where(function ($q) use ($start, $end) {
+            $q->where('start_date', '<=', $end)
+                ->where('end_date', '>=', $start);
+        })->exists();
+
+        if ($overlap) {
+            return response()->json([
+                'success' => false,
+                'error' => 'There is an overlap in the selected date range.'
+            ]);
+        }
+        Log::info(1);
         try {
             foreach ($discounts as $discount) {
                 if (!$discount['min_day'] && !$discount['max_day'] && !$discount['discount_amount']) {
                     continue;
                 }
+
                 $newDiscount = new Discount();
                 $newDiscount->discount_type = $discount['discount_type'];
-                $newDiscount->discount_value = $discount['discount_amount'];
+
                 if ($discount['discount_type'] === "fixed") {
-                    $newDiscount->currency = $discount['currency'];
+                    $newDiscount->currency_id = $discount['currency'];
+                    $newDiscount->discount_value = $discount['discount_amount'];
                 }
+                else
+                    $newDiscount->discount_value = (float) ($discount['discount_amount'] / 100);
+
                 $newDiscount->target_type = $validated['selectedDiscount'];
                 $newDiscount->min_days = $discount['min_day'];
                 $newDiscount->max_days = $discount['max_day'];
 
                 if ($validated['selectedDiscount'] === "segment") {
-                    $newDiscount->segment_name = $validated['discountTarget'];
+                    $newDiscount->segment_id = $validated['discountTarget'];
                 }
 
-                $newDiscount->start_date = $validated['startDate'];
-                $newDiscount->end_date = $validated['endDate'];
+                $newDiscount->start_date = $start;
+                $newDiscount->end_date = $end;
                 $newDiscount->save();
             }
-            return $this->respond($request, [
-                'success' => 'İndirim başarıyla kaydedildi.'
-            ]);
+
+            return response()->json(['success' => true]);
+
         } catch (\Exception $e) {
-            return $this->respond($request, [
-                'error' => 'İndirimler kaydedilirken bir hata oluştu. Lütfen tekrar deneyin. ' . $e->getMessage()
-            ], 500);
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ]);
         }
     }
 
-    private function respond(Request $request, array $payload, int $status = 200)
-    {
-        if ($request->expectsJson()) {
-            return response()->json($payload, $status);
-        }
-
-        return Inertia::render('adminPanel/price/AddDiscount', $payload);
-    }
 }
 

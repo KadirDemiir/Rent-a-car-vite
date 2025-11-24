@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage');
             $table->decimal('discount_value', 15, 2)->default(0);
-            $table->foreignId('currency_id', 3)->nullable()->constrained('currencies')->cascadeOnDelete();
+            $table->foreignId('currency_id')->nullable()->constrained('currencies')->cascadeOnDelete();
             $table->enum('target_type', ['segment', 'car', 'all']);
             $table->integer('min_days');
             $table->integer('max_days');

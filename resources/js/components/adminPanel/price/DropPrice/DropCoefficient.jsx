@@ -4,8 +4,10 @@ import {useTranslation} from "react-i18next";
 import axios from "axios";
 
 export default function DropCoefficient({segments, onSuccess, onError}) {
+    console.log(segments);
     const {t} = useTranslation();
-    const name = segments.map(s => s.name);
+    const name = segments.map(s => s.id);
+    console.log(name);
     const [coeffiData, setCoeffiData] = useState({});
     const [coeffiError, setCoeffiError] = useState({});
     const [formError, setFormError] = useState();
@@ -14,7 +16,7 @@ export default function DropCoefficient({segments, onSuccess, onError}) {
         segments.forEach((s) => {
             setCoeffiData(prev => ({
                 ...prev,
-                [s.name]: {value: s.coefficient},
+                [s.id]: {value: s.coefficient},
             }));
         });
     }, [segments]);

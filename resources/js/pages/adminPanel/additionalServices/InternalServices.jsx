@@ -2,13 +2,15 @@ import Navbar from "../../../components/adminPanel/navbar/Navbar.jsx";
 import Td from "../../../components/adminPanel/table/Td.jsx";
 import Confirm from "../../../components/Confirm.jsx";
 import { useState } from "react";
-import {use} from "i18next";
 import SelectedOptions from "../../../components/websites/filterSelectors/SelectOptions.jsx";
-import {router} from "@inertiajs/react";
 import {useTranslation} from "react-i18next";
+import axios from "axios";
 
 const langOpt = [{label: "Türkçe", value: "tr"}, {label: "İngilizce", value: "en"}];
-export default function InternalServices({services, success, error}) {
+export default function InternalServices({services}) {
+    const [updatedServices, setUpdatedServices] = useState(services);
+    const [success, setSuccess] = useState();
+    const [error, setError] = useState();
     const {t} = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedService, setSelectedService] = useState();
@@ -23,16 +25,27 @@ export default function InternalServices({services, success, error}) {
     const TDclass = "border border-gray-500 px-4 py-2";
 
     const onConfirmAction = (confirm) => {
-        if(!confirm)
+        if (!confirm)
             setIsModalOpen(false);
-        else{
+        else {
             const id = selectedService.id;
-            router.post("/adminpanel/internal-services", {
-                id,
-                _method: "delete",
-            });
-            setIsModalOpen(false);
-            setSelectedService("");
+            axios.delete(`/adminpanel/internal-services`, {
+                data: {
+                    id: id
+                }
+            })
+                .then(response => {
+                    setIsModalOpen(false);
+                    setSelectedService("");
+                    if (response.data.success) {
+                        setSuccess("Deleted Succesfully");
+                        setUpdatedServices(response.data.services);
+                    }
+                    else serError("Something Went Wrong");
+                })
+                .catch(error => {
+                    console.error('Hata:', error.res.error);
+                });
         }
     }
     const handleAddNew = () => {
@@ -43,10 +56,16 @@ export default function InternalServices({services, success, error}) {
         const data = new FormData();
         data.append('name', JSON.stringify(name));
         data.append('description', JSON.stringify(description));
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        router.post('/adminpanel/internal-services', data, {
-            'X-CSRF-TOKEN': csrfToken,
-        })
+        axios.post('/adminpanel/internal-services', data)
+            .then(response => {
+                if(response.data.success) setSuccess("added succesfully");
+                else setError("something went wrong");
+                setUpdatedServices(response.data.services);
+
+            })
+            .catch(error => {
+                console.error(error);
+            })
 
     }
 
@@ -63,11 +82,11 @@ export default function InternalServices({services, success, error}) {
                     <table className="w-full table-auto">
                         <thead>
                         <tr>
-                            <Td contents={[t("adminpanel.pricing.adding_services.internal_services.internal_services"), t("adminpanel.pricing.adding_services.internal_services.operations")]} cls={TDclass} as={"th"} />
+                            <Td contents={[t("adminpanel.pricing.adding_services.internal_services.internal_services"), t("adminpanel.pricing.adding_services.external_services.description"), t("adminpanel.pricing.adding_services.internal_services.operations")]} cls={TDclass} as={"th"} />
                         </tr>
                         </thead>
                         <tbody>
-                        {services?.map((im, index) => {
+                        {updatedServices?.map((im, index) => {
                             const name = JSON.parse(im.name);
                             const description = JSON.parse(im.description);
                             return(

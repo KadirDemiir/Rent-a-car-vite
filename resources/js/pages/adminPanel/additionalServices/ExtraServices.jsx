@@ -33,8 +33,8 @@ export default function ExtraServices({ extraServices, success, error }) {
             <Navbar >
                 <h3 className="text-2xl font-extrabold">{t("adminpanel.pricing.adding_services.external_services.external_services")}</h3>
                 <hr className="my-4" />
-                {error && <div className={`border-l-12 border-red-600 bg-red-400 text-white`}>{error}</div>}
-                {success && <div className={`border-l-12 border-green-600 bg-green-400 text-white`}>{success}</div>}
+                {error && <div className={`border-l-12 border-red-600 bg-red-400 text-white p-2`}>{error}</div>}
+                {success && <div className={`border-l-12 border-green-600 bg-green-400 text-white p-2`}>{success}</div>}
                 <div className="w-full">
                     <h2 className="text-xl font-bold p-2">{t("adminpanel.pricing.adding_services.external_services.external_services")}</h2>
                     <table className="w-full">

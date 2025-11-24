@@ -37,6 +37,10 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
         $languages = Language::where('status', 'active')->pluck('code');
         return response()->json($languages);
     });
+    Route::get('/get-supported-languages', function() {
+        $languages = Language::where('status', 'active')->get();
+        return response()->json(['languages' => $languages]);
+    });
     Route::get('/translations/{lang}', function($lang) {
         /*Log::info('web.php translation dili => ', ['language' => $lang]);*/
         $translations = Translation::with('translationKey')
@@ -86,6 +90,9 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
             return ['code' => $curr->code, 'symbol' => $curr->symbol, 'exchange_rate' => $rate,];
         });
         return response()->json($result);
+    });
+    Route::get('/get-supported-currencies', function() {
+       return response()->json(['currencies' => Currency::where('is_active', true)->get()]);
     });
     Route::get('/get-currencies', function() {
         $currencies = Cache::remember('active_currencies', 60*60*24, function() {

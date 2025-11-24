@@ -433,7 +433,7 @@
             "website.navigator.about_us" => "Hakkımızda",
 
             "website.car_card.properties.properties_label" => "Özellikler",
-            "website.car_card.properties.seat_count_{count}" => "{count} koltuk",
+            "website.car_card.properties.seat_count_{count}" => "{{count}} koltuk",
             "website.car_card.properties.trunk_capacity_{trunk_capacity}" => "{{trunk_capacity}} bagaj hacmi",
             "website.car_card.requirements.requirements_label" => "Gereksinimler",
             "website.car_card.requirements.required_min_{age}" => "Minimum {{age}} yaş",

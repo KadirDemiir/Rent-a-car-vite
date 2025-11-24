@@ -60,18 +60,8 @@ export default function Discounts({data = []}) {
                     </div>
 
                     <div className="p-4 grid gap-4 md:flex md:items-center">
-                        <SelectOptions
-                            value={sortOrder}
-                            options={sortOptions}
-                            onChange={setSortOrder}
-                            options_name={t("adminpanel.pricing.discounts.filter.sort.sort")}
-                        />
-                        <SelectOptions
-                            value={statusFilter}
-                            options={statusOptions}
-                            onChange={setStatusFilter}
-                            options_name={t("adminpanel.pricing.discounts.filter.status.status")}
-                        />
+                        <SelectOptions value={sortOrder} options={sortOptions} onChange={setSortOrder} options_name={t("adminpanel.pricing.discounts.filter.sort.sort")}/>
+                        <SelectOptions value={statusFilter} options={statusOptions} onChange={setStatusFilter} options_name={t("adminpanel.pricing.discounts.filter.status.status")}/>
                     </div>
 
                     {hasDiscounts ? (

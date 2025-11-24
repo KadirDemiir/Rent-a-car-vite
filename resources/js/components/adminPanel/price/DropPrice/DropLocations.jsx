@@ -4,15 +4,15 @@ import {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import axios from "axios";
 
-export default function DropLocations({locations: locationObjects, dropPrice, onSuccess, onError}) {
+export default function DropLocations({locations: locationObjects, dropPrice, onSuccess, onError, currencies}) {
     const {t} = useTranslation();
     const [formattedLocations, setFormattedLocations] = useState([]);
     const [pickUpLocation, setPickUpLocation] = useState("");
     const [loading, setLoading] = useState(true);
     const [locationData, setLocationData] = useState({});
     const [locationError, setLocationError] = useState({});
-    const currencyOptions = [{label: "TL", value: "try"}, {label: "Euro", value: "eur"}];
-    const [currency, setCurrency] = useState(currencyOptions[0].value);
+    const currencyOptions = currencies.map(c => ({label: `${c.code.toUpperCase()} (${c.symbol})`, value: c.id,}));
+    const [currency, setCurrency] = useState(currencyOptions[0]?.value);
     const [formError, setFormError] = useState();
 
     useEffect(() => {
@@ -100,19 +100,15 @@ export default function DropLocations({locations: locationObjects, dropPrice, on
                     </div>
                 )}
                 <div className="grid gap-4 md:grid-cols-2">
-                    <SelectOptions
-                        value={pickUpLocation}
-                        options={formattedLocations}
+                    <SelectOptions value={pickUpLocation} options={formattedLocations}
                         onChange={(e) => {
                             setPickUpLocation(e);
                             setLocationData({});
                             setLocationError({});
-                        }}
-                        options_name={t("adminpanel.pricing.drop_price.locations_price.pick_up_location")}
-                    />
+                        }} options_name={t("adminpanel.pricing.drop_price.locations_price.pick_up_location")}/>
                     <SelectOptions
                         options={currencyOptions}
-                        value={currency}
+                        value={[currency]}
                         onChange={setCurrency}
                         options_name={t("adminpanel.pricing.drop_price.locations_price.pick_up_location")}
                     />

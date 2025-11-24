@@ -34,12 +34,12 @@ class InternalServiceController extends Controller
             ]
             );
             if ($internalServices->wasRecentlyCreated) {
-                return redirect()->route('adminShowInternalServices')->with('success', 'Yeni Servis Eklendi.');
+                return response()->json(['success' => 1, 'services' => InternalService::all()]);
             } else {
-                return redirect()->route('adminShowInternalServices')->with('success', 'Servis Güncellendi.');
+                return response()->json(['update' => 1, 'services' => InternalService::all()]);
             }
         } catch (\Exception $exception) {
-            return redirect()->route('adminShowInternalServices')->with('error', $exception->getMessage());
+            return response()->json('error', $exception->getMessage());
         }
     }
 
@@ -50,9 +50,9 @@ class InternalServiceController extends Controller
         ]);
         try {
             InternalService::findOrFail($validated['id'])->delete();
-            return redirect()->route('adminShowInternalServices')->with('success', 'Servis Silindi.');
+            return response()->json(['success' => 1, 'services' => InternalService::all()->fresh()]);
         }catch (\Exception $exception){
-            return redirect()->route('adminShowInternalServices')->with('error', $exception->getMessage());
+            return response()->json(['error' => $exception->getMessage()]);
         }
     }
 }

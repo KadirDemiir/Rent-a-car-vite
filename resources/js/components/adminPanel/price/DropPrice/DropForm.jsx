@@ -1,6 +1,7 @@
 import {useTranslation} from "react-i18next";
 
 export default function DropForm({handleSubmit, opt, data, setData, error, setError, minZero = true, pickup = null}) {
+    console.log(data)
     const {t} = useTranslation();
     const handleInputOnchange = (e) => {
         const {name, value} = e.target;
@@ -40,7 +41,7 @@ export default function DropForm({handleSubmit, opt, data, setData, error, setEr
         <>
             {opt.map((s, index) => (
                 <div key={index} className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700 text-center">{s}</label>
+                    <label className="block text-sm font-medium text-gray-700 text-center">{t(`segment.${s}`)}</label>
                     <input
                         name={s}
                         value={data[s]?.value || ""}

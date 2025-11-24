@@ -11,7 +11,7 @@ class Discount extends Model
         "discount_type",
         "discount_value",
         "target_type",
-        "currency",
+        "currency_id",
         "car_id",
         "campaign_id",
         "min_days",
@@ -22,6 +22,14 @@ class Discount extends Model
         "status",
     ];
 
+    public function scopeActive($query)
+    {
+        return $query
+            ->where('status', 'active')
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now());
+    }
+
     public function car(): BelongsTo{
         return $this->belongsTo(Car::class);
     }
@@ -29,5 +37,7 @@ class Discount extends Model
     public function campaigns(): BelongsTo{
         return $this->belongsTo(Campaigns::class);
     }
+
+
 
 }

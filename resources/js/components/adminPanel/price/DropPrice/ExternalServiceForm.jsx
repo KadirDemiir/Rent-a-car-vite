@@ -1,15 +1,15 @@
 import Input from "../Input.jsx";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import SelectOptions from "../../../websites/filterSelectors/SelectOptions.jsx";
 import Confirm from "../../../Confirm.jsx";
 import {router} from "@inertiajs/react";
 import {useTranslation} from "react-i18next";
-const langOpt = [{ label: "Türkçe", value: "tr" }, { label: "İngilizce", value: "en" }];
-export default function ExternalServiceForm({service, close, onSubmit}){
+export default function ExternalServiceForm({service, close, onSubmit, languages = [], currencies = []}){
+    console.log(currencies);
     const {t} = useTranslation();
-    const [lang, setLang] = useState("tr");
+    const [lang, setLang] = useState(languages[0]?.value ?? '');
+    const [currency, setCurrency] = useState(currencies[0]?.value ?? '');
     const [inputErrors, setInputErrors] = useState({});
-    const [currency, setCurrency] = useState("eur");
     const [formError, setFormError] = useState();
     const [name, setName] = useState(service?.name ? JSON.parse(service.name) :  {});
     const [description, setDescription] = useState(service?.description ? JSON.parse(service.description) : {})
@@ -21,17 +21,22 @@ export default function ExternalServiceForm({service, close, onSubmit}){
     const [maxLimit, setMaxLimit] = useState(service?.max_limit || "");
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
-    useEffect(() => {
-        if (!service?.name) {
-            setName(Object.fromEntries(langOpt.map(l => [l.value, ""])));
-            setDescription(Object.fromEntries(langOpt.map(l => [l.value, ""])));
+/*    useEffect(() => {
+        if (languages.length > 0) {
+            if (!languages.find(l => l.value === lang)) {
+                setLang(languages[0].value);
+            }
+            if (!service?.name) {
+                setName(Object.fromEntries(languages.map(l => [l.value, ""])));
+                setDescription(Object.fromEntries(languages.map(l => [l.value, ""])));
+            }
         }
-    }, []);
+    }, [languages, service]);*/
 
     const deleteService = (confirm) => {
         if(!confirm){
             setConfirmModalOpen(false);
-            return;
+            return 0;
         }else{
             const id = service.id;
             router.post("/admin/extra-services", {
@@ -74,7 +79,7 @@ export default function ExternalServiceForm({service, close, onSubmit}){
     return(
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {formError && <div className={`border-l-12 border-red-600 bg-red-400 text-white col-span-2 p-2 text-sm`}>{formError}</div>}
-            <div className={`col-span-2`}><SelectOptions options={langOpt} options_name={t("adminpanel.pricing.adding_services.external_services.add_new_service_modal.select_language")} value={lang} onChange={(e) => setLang(e)}/></div>
+            <div className={`col-span-2`}><SelectOptions options={languages} options_name={t("adminpanel.pricing.adding_services.external_services.add_new_service_modal.select_language")} value={[lang]} onChange={(e) => setLang(e)}/></div>
             <Input label={t("adminpanel.pricing.adding_services.external_services.add_new_service_modal.service_name")} value={name[lang] ?? ""} onChange={(e) => {
                 setName(prev => ({
                     ...prev,
@@ -87,7 +92,7 @@ export default function ExternalServiceForm({service, close, onSubmit}){
                     [lang]: e.target.value,
                 }))
             }} />
-            <div className={`col-span-2`}><SelectOptions options={[{label:"TL",value:"try"},{label:"Euro",value:"eur"}]} value={currency|| "try"} onChange={(e)=>setCurrency(e)} options_name={t("adminpanel.pricing.adding_services.external_services.add_new_service_modal.currency")}/></div>
+            <div className={`col-span-2`}><SelectOptions options={currencies} value={[currency]} onChange={(e)=>setCurrency(e)} options_name={t("adminpanel.pricing.adding_services.external_services.add_new_service_modal.currency")}/></div>
             <Input name="on-three" label={t("adminpanel.pricing.adding_services.external_services.add_new_service_modal.1-3_days_price")} type="number" value={oneThreeDayPrice || ""} onChange={(e) => setOneThreeDayPrice(e.target.value)} error={inputErrors} setError={setInputErrors}/>
             <Input name="four-seven" label={t("adminpanel.pricing.adding_services.external_services.add_new_service_modal.4-7_days_price")} type="number" value={fourSevenDayPrice || ""} onChange= {(e) => setFourSevenDayPrice(e.target.value)}  error={inputErrors} setError={setInputErrors}/>
             <Input name="eight-fifteen" label={t("adminpanel.pricing.adding_services.external_services.add_new_service_modal.8-15_days_price")} type="number" value={eightFifteenDayPrice || ""} onChange={(e) => setEightFifteenDayPrice(e.target.value)}  error={inputErrors} setError={setInputErrors}/>
@@ -101,7 +106,7 @@ export default function ExternalServiceForm({service, close, onSubmit}){
                 </div>
                 <div className={`flex gap-4`}>
                     <button type="button" onClick={close} className={`rounded-lg bg-gray-500 text-white hover:bg-gray-600 py-2 px-4 cursor-pointer`}>{t("adminpanel.pricing.adding_services.external_services.add_new_service_modal.cancel")}</button>
-                    <button type="button" onClick={handleSubmit} className={`rounded-lg bg-blue-500 text-white hover:bg-blue-600 py-2 px-4 cursor-pointer`}>{service ? t("adminpanel.pricing.adding_services.external_services.update_service_modal.save") : t("adminpanel.pricing.adding_services.external_services.add_new_service_modal.cancel")}</button>
+                    <button type="button" onClick={handleSubmit} className={`rounded-lg bg-blue-500 text-white hover:bg-blue-600 py-2 px-4 cursor-pointer`}>{service ? t("adminpanel.pricing.adding_services.external_services.update_service_modal.save") : t("adminpanel.pricing.adding_services.external_services.add_new_service_modal.save")}</button>
                 </div>
             </div>
             {confirmModalOpen && <Confirm message="Servisi Silmek İStediğinize Emin Misiniz?" confirm={deleteService} />}
