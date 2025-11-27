@@ -422,6 +422,7 @@
             "address.fuels" => "Fuels url",
             "address.transmissions" => "Transmissions url",
             "address.add" => "label for Add in url",
+            "address.reservation-create" => "Reservation Create URL",
 
         ];
         protected $values = [
@@ -825,7 +826,8 @@
             "address.body_types" => "arac-tipleri",
             "address.fuels" => "yakitlar",
             "address.transmissions" => "vites-tipleri",
-            "address.add" => "ekle"
+            "address.add" => "ekle",
+            "address.reservation-create" => "rezervasyon-ekle",
         ];
         public function run(): void
         {

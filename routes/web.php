@@ -17,11 +17,13 @@ use App\Http\Controllers\AdminCarController;
     use App\Models\Fuel;
     use App\Models\Language;
     use App\Models\Locations;
-    use App\Models\Segment;
+use App\Models\Reservation;
+use App\Models\Segment;
     use App\Models\Translation;
     use App\Models\TranslationKey;
     use App\Models\Transmission;
-    use Illuminate\Support\Facades\Cache;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
     use Illuminate\Support\Facades\Http;
     use Illuminate\Support\Facades\Log;
     use Illuminate\Support\Facades\Route;
@@ -97,37 +99,48 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
     Route::get('/get-currencies', function() {
         $currencies = Cache::remember('active_currencies', 60*60*24, function() {
             $def = Currency::where('is_active', 1)->where('is_default', 1)->first();
-            if (!$def)
-                return response()->json(['error' => 'Default currency not found'], 404);
-                    $response = Http::get('https://www.tcmb.gov.tr/kurlar/today.xml');
-                    $xml = simplexml_load_string($response->body());
-                    Log::info('get-currencies xml => ', ['xml' => $xml]);
-                    $tcmbRates = collect();
-                    foreach ($xml->Currency as $c) {
-                        $tcmbRates->push([
+            if (!$def) {
+                throw new \Exception('Default currency not found');
+            }
+            try {
+                $response = Http::timeout(5)->get('https://www.tcmb.gov.tr/kurlar/today.xml');
+                if($response->failed()) throw new \Exception('TCMB Unreachable');
+                $xml = simplexml_load_string($response->body());
+                if ($xml === false) throw new \Exception('Invalid XML');
+            } catch (\Exception $e) {
+                Log::error('Currency fetch error: ' . $e->getMessage());
+                return Currency::where('is_active', true)->get();
+            }
+            $tcmbRates = collect();
+            foreach ($xml->Currency as $c) {
+                $tcmbRates->push([
                     'code' => (string) $c['CurrencyCode'],
-                    'name' => (string) $c->Isim,
                     'forexBuying' => (float) str_replace(',', '.', $c->ForexBuying),
-                    'forexSelling' => (float) str_replace(',', '.', $c->ForexSelling),
                 ]);
             }
-            if(strtolower($def->code) != "try")
-                $base = $tcmbRates->firstWhere('code', strtoupper($def->code));
-            else
-                $base = ['code' => strtoupper($def->code), 'forexBuying' => 1];
-            if (!$base || empty($base['forexBuying']))
-                return response()->json(['error' => 'Base currency rate not found in TCMB data'], 400);
-            $baseRate = $base['forexBuying'];
+            $defCode = strtoupper($def->code);
+            if ($defCode === 'TRY') {
+                $baseRate = 1;
+            } else {
+                $baseCurrencyData = $tcmbRates->firstWhere('code', $defCode);
+                $baseRate = ($baseCurrencyData && !empty($baseCurrencyData['forexBuying']))
+                    ? $baseCurrencyData['forexBuying']
+                    : 1;
+            }
+            Log::info($baseRate);
             $myCurrs = Currency::where('is_active', 1)->get();
-            $myCurrs->map(function ($curr) use ($tcmbRates, $baseRate, $base) {
-                if (strtoupper($curr->code) == "TRY")
-                    $tcmb['forexBuying'] = 1;
-                else
-                    $tcmb = $tcmbRates->firstWhere('code', strtoupper($curr->code));
-                $rate = $tcmb ? $baseRate / $tcmb['forexBuying']  : 1;
-                Currency::where('id', $curr->id)->update(['exchange_rate' => $rate]);
-            });
-            return Currency::where('is_active', true)->get();
+            foreach ($myCurrs as $curr) {
+                $currCode = strtoupper($curr->code);
+                if ($currCode === 'TRY') {
+                    $targetRateTRY = 1;
+                } else {
+                    $tcmbData = $tcmbRates->firstWhere('code', $currCode);
+                    $targetRateTRY = $tcmbData ? $tcmbData['forexBuying'] : 1;
+                }
+                $exchangeRate = $baseRate / ($targetRateTRY ?: 1);
+                $curr->update(['exchange_rate' => $exchangeRate]);
+            }
+            return $myCurrs;
         });
         return response()->json($currencies);
     });
@@ -159,6 +172,9 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
         }
     });
     Route::post('/adminpanel/cars/{id}', [AdminCarController::class, 'updateCar'])->name('adminUpdateCar');
+    Route::get('/get-extras', function() {
+        return response()->json(['extras' => \App\Models\ExtraServices::where('stock', '>', 0)->get()]);
+    });
 
     Route::group([
         'prefix' => LaravelLocalization::setLocale(),
@@ -183,6 +199,7 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
         Route::inertia(dbTransRoute('blog'), 'Blog')->name('blog');
         Route::inertia(dbTransRoute('auth'), 'auth/Auth')->name('auth');
         Route::get(dbTransRoute('searchReservations'), [ReservationController::class, 'searchReservations'])->name('searchReservations');
+        Route::get(dbTransRoute('reservation-create'), [ReservationController::class, 'showDetailPage'])->name('reservation-create');
         Route::post('/auth', [AuthController::class, 'auth'])->name('auth');
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
         Route::get('/location', [LocationsController::class, 'index']);

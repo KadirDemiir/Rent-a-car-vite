@@ -142,18 +142,19 @@ class AdminCarController extends Controller
                     ->update(['value' => $value]);
 
             }
+            Log::info('Kontrol Detay', ['car fuel   ' => $validated['transmission_type']]);
             $car->update([
                 'license_plate' => $validated['license_plate'],
-                'year' => $validated['year'],
-                'seat_count' => $validated['seat_count'],
+                'year' => (int) $validated['year'],
+                'seat_count' => (int) $validated['seat_count'],
                 'trunk_capacity' => $validated['trunk_capacity'],
-                'segment_id' => $validated['segment'],
-                'body_type_id' => $validated['body_type'],
-                'transmission_id' => $validated['transmission_type'],
-                'fuel_id' => $validated['fuel_type'],
+                'segment_id' => (int) $validated['segment'],
+                'body_type_id' => (int) $validated['body_type'],
+                'transmission_id' => (int) $validated['transmission_type'],
+                'fuel_id' => (int) $validated['fuel_type'],
             ]);
             $updatedCar = Car::with(['photos', 'brandKey', 'modelKey', 'price' => fn($query) => $query->where('is_active', true)])->findOrFail($id);
-            Log::info('Car Detail Control', ['car_brand' => Translation::where('translation_key_id', $updatedCar->brandKey->id)->get('value')]);
+            Log::info('Car Detail Control', ['car_fuel' => $car->transmission_id]);
             return response()->json([
                 'car' => $updatedCar,
                 'success' => 'Araç Detayları Başarıyla Güncellendi.'

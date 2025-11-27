@@ -7,6 +7,7 @@ import FilterReservations from "../components/websites/FilterReservations.jsx"
 
 export default function SearchReservations(){
     const { availableCars, reservation, locations } = usePage().props;
+    console.log(availableCars, reservation, locations);
     const [sortBy, setSortBy] = useState("increase");
     const [fuelType, setFuelType] = useState("");
     const [transmissionType, setTransmissionType] = useState("");
@@ -42,6 +43,7 @@ export default function SearchReservations(){
                                 fuelType={fuelType}
                                 transmissionType={transmissionType}
                                 segment={segment}
+                                reservation={reservation}
                             />
                         ) :
                         (<div className=" flex items-center justify-center">Seçilen Tarih Ve Konum İçin Uygun Arabamız Bulunmamaktadr.</div>)

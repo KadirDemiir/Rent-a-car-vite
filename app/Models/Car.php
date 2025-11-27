@@ -31,8 +31,8 @@ class Car extends Model
         'currency_id',
         'deposit',
         'trunk_capacity',
-        'fuel_type',
-        'transmission_type',
+        'fuel_id',
+        'transmission_id',
         'license_plate'
     ];
 
@@ -76,5 +76,8 @@ class Car extends Model
         return $this->belongsTo(Currency::class, 'currency_id');
     }
 
+    public function segment(){
+        return $this->belongsTo(Segment::class, 'segment_id');
+    }
 
 }

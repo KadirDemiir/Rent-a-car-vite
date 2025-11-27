@@ -13,18 +13,12 @@ return new class extends Migration
     {
         Schema::create('extra_services', function (Blueprint $table) {
             $table->id();
-            $table->json('name');
-            $table->decimal('one_three_day_price', 8, 2);
-            $table->decimal('four_seven_day_price', 8, 2);
-            $table->decimal('eight_fifteen_day_price', 8, 2);
-            $table->decimal('more_than_fifteen_day_price', 8, 2);
-            $table->string('currency');
-            $table->integer('stock');
-            $table->integer('max_limit');
-            $table->json('description');
+            $table->json('name');         // İsim (TR/EN)
+            $table->json('description');  // Açıklama (TR/EN)
+            $table->integer('stock')->default(0);     // Elimizde kaç tane var?
+            $table->integer('max_limit')->default(1); // Bir müşteri en fazla kaç tane kiralayabilir?
             $table->timestamps();
         });
-
     }
 
     /**

@@ -71,7 +71,7 @@ export default function Cars({cars}) {
                                         <td className="px-6 py-3">{t(car.brand_key.key)}</td>
                                         <td className="px-6 py-3">{t(car.model_key.key)}</td>
                                         <td className="px-6 py-3">{car.year}</td>
-                                        <td className="px-6 py-3">{t(`fuel.${car.transmission_id}`)}</td>
+                                        <td className="px-6 py-3">{t(`transmission.${car.transmission_id}`)}</td>
                                         <td className="px-6 py-3">{t(`segment.${car.segment_id}`)}</td>
                                         <td className="px-6 py-3">{t(`body_type.${car.body_type_id}`)}</td>
                                         <td className="px-6 py-3">{t(`fuel.${car.fuel_id}`)}</td>

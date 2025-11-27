@@ -48,8 +48,7 @@ class  CarController extends Controller
             'body_type' => 'required|exists:body_types,id',
             'fuel_type' => 'required|int',
             'transmission_type' => 'required|int',
-            /*'deposit_currency' => 'required|string|max:3',*/
-            /*'price_currency' => 'required|string|max:3',*/
+            'currency' => 'required|string|max:3',
             'deposit' => 'required|int',
             'price' => 'required|json|',
             'photos' => 'required|array|min:1|max:4',
@@ -99,7 +98,7 @@ class  CarController extends Controller
             $newCar->fuel_id = (int)$validated['fuel_type'];
             $newCar->transmission_id = $validated['transmission_type'];
             $newCar->deposit = $validated['deposit'];
-            $newCar->currency_id  = Currency::where('is_default', true)->first()->id;
+            $newCar->currency_id  = $validated['currency'];
             $newCar->save();
 
             $price = json_decode($validated['price'], true);
@@ -123,7 +122,7 @@ class  CarController extends Controller
                             'month' => $item,
                             'min_days' => $minDayVal,
                             'max_days' => $maxDayVal,
-                            'currency_id' => Currency::where('is_default', true)->first()->id,
+                            'currency_id' => $validated['currency'],
                             'price' => $priceValue,
                             'is_active' => true,
                         ]);
