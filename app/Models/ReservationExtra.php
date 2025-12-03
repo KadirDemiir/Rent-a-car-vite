@@ -8,8 +8,9 @@ class ReservationExtra extends Model
 {
     protected $fillable = [
         'reservation_id',
-        'extra_name',
-        'extra_price',
+        'extra_service_id',
+        'price',
+        'quantity',
     ];
 
     public function reservation()

@@ -5,7 +5,8 @@ import ExternalServiceModal from "../../../components/adminPanel/price/ExternalS
 import {useTranslation} from "react-i18next";
 
 export default function ExtraServices({ extraServices, success, error }) {
-    const {t} = useTranslation();
+    console.log(extraServices);
+    const {t, i18n} = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [instantService, setInstantService] = useState(null);
 
@@ -51,15 +52,15 @@ export default function ExtraServices({ extraServices, success, error }) {
                                 <tr key={index} onClick={() => handleService(es.id)} className="cursor-pointer">
                                     <Td
                                         contents={[
-                                            name["tr"],
-                                            es.one_three_day_price,
-                                            es.four_seven_day_price,
-                                            es.eight_fifteen_day_price,
-                                            es.more_than_fifteen_day_price,
+                                            name[i18n.language],
+                                            es.extra_service_prices.find(e => e.min_days === 1 && e.max_days === 3).price,
+                                            es.extra_service_prices.find(e => e.min_days === 4 && e.max_days === 7).price,
+                                            es.extra_service_prices.find(e => e.min_days === 8 && e.max_days === 15).price,
+                                            es.extra_service_prices.find(e => e.min_days === 16 && e.max_days === 999).price,
                                             es.stock,
                                             es.max_limit,
                                             es.current_count ?? "-",
-                                            description['tr']
+                                            description[i18n.language]
                                         ]}
                                         cls={TDclass}
                                     />

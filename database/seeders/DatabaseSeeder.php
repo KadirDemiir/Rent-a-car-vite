@@ -833,9 +833,9 @@
         {
             try {
                 $currencies = [
-                    ['code' => 'EUR', 'symbol' => '€', 'exchange_rate' => 1, 'is_default' => false, 'is_active' => true],
+                    ['code' => 'EUR', 'symbol' => '€', 'exchange_rate' => 1, 'is_default' => true, 'is_active' => true],
                     ['code' => 'USD', 'symbol' => '$', 'exchange_rate' => 1/1.16, 'is_default' => false, 'is_active' => true],
-                    ['code' => 'TRY', 'symbol' => '₺', 'exchange_rate' => 1/48, 'is_default' => true, 'is_active' => true],
+                    ['code' => 'TRY', 'symbol' => '₺', 'exchange_rate' => 1/48, 'is_default' => false, 'is_active' => true],
                 ];
 
                 foreach ($currencies as $currency) {

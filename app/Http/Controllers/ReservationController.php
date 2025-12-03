@@ -7,8 +7,10 @@ use App\Models\DropPrice;
 use App\Models\Locations;
 use App\Models\Price;
 use App\Models\Reservation;
+use App\Models\ReservationExtra;
 use DateTime;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Carbon\Carbon;
@@ -17,6 +19,7 @@ class ReservationController extends Controller
 {
     public function searchReservations(Request $request)
     {
+        Log::info('request', [$request->all()]);
         if (!$request->has(['startDateTime', 'finishDateTime', 'PULocation', 'RLocation'])) {
             return Inertia::render('SearchReservations', ['availableCars' => []]);
         }
@@ -29,24 +32,22 @@ class ReservationController extends Controller
         ]);
 
         if($request->startDateTime >= $request->finishDateTime || $request->startDateTime < Carbon::now() || $request->finishDateTime < Carbon::now())
-        {
-            Log::info(3);
             return to_route('home');
-        }
 
         $cars = Car::with('location', 'photos', 'brandKey', 'modelKey', 'price')->get();
         $availableCars = [];
 
         $reqStart = Carbon::parse($request->startDateTime);
         $reqEnd = Carbon::parse($request->finishDateTime);
-
+        Log::info('requestDate', [$reqStart, $reqEnd]);
         foreach ($cars as $car) {
             $isAvailable = true;
             $eachReservations = Reservation::where('car_id', $car->id)->get();
-
+            Log::info('eachReservations', [$car->id, $eachReservations]);
             foreach($eachReservations as $eachRes){
-                $resStart = Carbon::parse($eachRes->pickup_dateTime);
-                $resEnd = Carbon::parse($eachRes->return_dateTime);
+                $resStart = Carbon::parse($eachRes->pickup_datetime)->format('Y-m-d');
+                $resEnd = Carbon::parse($eachRes->return_datetime)->format('Y-m-d');
+            Log::info('resDate', [$resStart, $resEnd]);
 
                 if ($resStart < $reqEnd && $resEnd > $reqStart) {
                     $isAvailable = false;
@@ -167,5 +168,116 @@ class ReservationController extends Controller
             $car->drop_price = null;
             $car->drop_currency = null;
         }
+    }
+
+    public function createReservation(Request $request){
+        try {
+            $validated = $request->validate([
+                'car_id' => 'required|exists:cars,id',
+                'start_date_time' => 'required|date',
+                'finish_date_time' => 'required|date|after:start_date_time',
+                'pick_up_location_id' => 'required|exists:locations,id',
+                'return_location_id' => 'required|exists:locations,id',
+                'total_days' => 'required|numeric|min:1',
+                'daily_price' => 'required|numeric|min:1',
+                'drop_price' => 'required|numeric|min:1',
+                'currency_id' => 'required|exists:currencies,id',
+                'user_info.name' => 'required|string',
+                'user_info.surname' => 'required|string',
+                'user_info.email' => 'required|email',
+                'user_info.phone' => 'required|string',
+                'user_info.address' => 'required|string',
+                'user_info.id' => 'required',
+                'user_info.birthday' => 'required|date|before:' . Carbon::now()->subYears(18)->format('Y-m-d'),
+                'user_info.arrival_flight_no' => 'nullable|string',
+                'user_info.return_flight_no' => 'nullable|string',
+                'extras' => 'nullable|json',
+            ]);
+
+            DB::beginTransaction();
+
+            $eachReservations = Reservation::where('car_id', $validated['car_id'])->get();
+            $start = Carbon::parse($validated['start_date_time']);
+            $end = Carbon::parse($validated['finish_date_time']);
+
+            $conflict = $this->hasConflict($eachReservations, $start, $end);
+
+            if($conflict) {
+                return response()->json(['error' => 'Conflict on reservation'], 409);
+            }
+
+            $extrasArray = json_decode($validated['extras'] ?? '[]', true);
+            $extras_total_price = collect($extrasArray)->sum(function ($extra) {
+                return $extra['price'] * $extra['count'];
+            });
+
+            $rental_cost = $validated['total_days'] * $validated['daily_price'];
+            $drop_cost = $validated['drop_price'];
+            $total_price = $rental_cost + $drop_cost + $extras_total_price;
+
+            $reservation = Reservation::create([
+                'car_id' => $validated['car_id'],
+                'pickup_datetime' => $validated['start_date_time'],
+                'return_datetime' => $validated['finish_date_time'],
+                'currency_id' => $validated['currency_id'],
+                'pickup_location_id' => $validated['pick_up_location_id'],
+                'return_location_id' => $validated['return_location_id'],
+                'rental_days' => $validated['total_days'],
+                'daily_price' => $validated['daily_price'],
+                'drop_price' => $validated['drop_price'],
+                'extras_total_price' => $extras_total_price,
+                'total_price' => $total_price,
+                'name' => $validated['user_info']['name'],
+                'surname' => $validated['user_info']['surname'],
+                'email' => $validated['user_info']['email'],
+                'phone_number' => $validated['user_info']['phone'],
+                'address' => $validated['user_info']['address'],
+                'birthday' => $validated['user_info']['birthday'],
+                'arrival_flight_no' => $validated['user_info']['arrival_flight_no'] ?? null,
+                'return_flight_no' => $validated['user_info']['return_flight_no'] ?? null,
+                'tc_number' => $validated['user_info']['id'],
+            ]);
+
+            foreach($extrasArray as $extraId => $e){
+                ReservationExtra::create([
+                    'reservation_id' => $reservation->id,
+                    'extra_service_id' => $extraId,
+                    'price' => $e['price'],
+                    'quantity' => $e['count'],
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'reservation' => $reservation
+            ], 201);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (\Exception $exception){
+            DB::rollBack();
+            return response()->json([
+                'error' => 'Reservation creation failed',
+                'message' => $exception->getMessage()
+            ], 500);
+        }
+    }
+
+
+    public function hasConflict($eachReservations, $start, $end){
+        foreach($eachReservations as $eachRes){
+            $resStart = Carbon::parse($eachRes->pickup_dateTime);
+            $resEnd = Carbon::parse($eachRes->return_dateTime);
+
+            if ($resStart < $end && $resEnd > $start) {
+                return true;
+            }
+        }
+        if($start >= $end || $start < Carbon::now() || $end < Carbon::now())
+            return true;
+
+        return false;
     }
 }

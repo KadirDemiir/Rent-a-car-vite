@@ -10,11 +10,17 @@ class ExtraServices extends Model
         'name',
         'stock',
         'max_limit',
+        'current_stock',
+        'type',
         'description',
     ];
 
     protected $casts = [
-        'name' => 'array', // veya 'json'
-        'description' => 'array'
+        'name' => 'json', // veya 'json'
+        'description' => 'json'
     ];
+
+    public function extraServicePrices(){
+        return $this->hasMany(ExtraServicePrice::class, 'extra_service_id');
+    }
 }

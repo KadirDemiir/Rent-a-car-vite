@@ -33,7 +33,7 @@ const Input = ({type, elementName, labelName, validate, onChange, maxV, prefix})
                 errorMessage = validate(newValue);
                 setError(errorMessage);
             }
-
+            console.log(newValue, errorMessage);
             onChange(newValue, errorMessage);
 
         };

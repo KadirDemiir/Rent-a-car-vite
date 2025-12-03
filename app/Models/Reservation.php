@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Reservation extends Model
 {
-    /** @use HasFactory<\Database\Factories\ReservationFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -16,14 +15,21 @@ class Reservation extends Model
         'surname',
         'tc_number',
         'phone_number',
-        'pickup_location',
-        'return_location',
+        'pickup_location_id',
+        'return_location_id',
         'pickup_datetime',
+        'drop_price',
         'return_datetime',
         'rental_days',
         'daily_price',
         'extras_total',
         'total_price',
+        'currency_id',
+        'email',
+        'address',
+        'birthday',
+        'arrival_flight_no',
+        'return_flight_no',
         'payment_type',
         'payment_status',
         'status',

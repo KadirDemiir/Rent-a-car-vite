@@ -6,6 +6,7 @@ import SelectOptions from "../../../websites/filterSelectors/SelectOptions.jsx";
 import axios from "axios";
 
 const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen = false }, ref) => {
+    console.log(car);
     const { t } = useTranslation();
     const days = ["1-3", "4-6", "7-13", "14-20", "21-27", "28+"];
     const [loading, setLoading] = useState(true);
@@ -29,7 +30,7 @@ const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen = false }, ref) 
         return {
             deposit: car?.deposit ?? "",
             price: prices,
-            currency: car?.price?.[0]?.currency ?? "",
+            currency: car?.currency_id ?? "",
         };
     });
 
@@ -58,8 +59,7 @@ const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen = false }, ref) 
                 setCurrencyTypeOptions(currs)
                 setFormData(prevState => ({
                     ...prevState,
-                    deposit_currency: prevState.deposit_currency || currs[0]?.value,
-                    price_currency: prevState.price_currency || currs[0]?.value
+                    currency: prevState.currency || currs[0]?.value
                 }))
             } catch (err) {
                 console.error("Para birimleri alınamadı:", err);

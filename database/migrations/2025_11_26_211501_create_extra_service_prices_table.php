@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('min_days')->unsigned(); // Örn: 1
             $table->integer('max_days')->unsigned(); // Örn: 3
             $table->decimal('price', 10, 2);         // Örn: 150.00
-            $table->string('currency', 3)->default('TRY');
+            $table->foreignId('currency_id')->constrained('currencies')->onDelete('cascade');
 
             $table->timestamps();
         });

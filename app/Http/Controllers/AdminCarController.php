@@ -50,10 +50,10 @@ class AdminCarController extends Controller
     {
         $validated = $request->validate([
             'price' => 'required|json',
-            'price_currency' => 'required|string|size:3',
+            'currency' => 'required|int|exists:currencies,id',
             'deposit' => 'required|numeric|min:0',
-            'deposit_currency' => 'required|string|size:3',
         ]);
+        Log::info(2);
         try {
             DB::beginTransaction();
             $car = Car::with(['photos', 'brandKey', 'modelKey', 'price' => fn($query) => $query->where('is_active', true)])->findOrFail($id);
@@ -80,7 +80,7 @@ class AdminCarController extends Controller
                         'month' => $item,
                         'min_days' => $minDayVal,
                         'max_days' => $maxDayVal,
-                        'price_currency' => $validated['price_currency'],
+                        'currency_id' => $validated['currency'],
                         'price' => $priceValue,
                         'is_active' => true,
                     ]);
@@ -88,12 +88,9 @@ class AdminCarController extends Controller
                     /*Log::info('Price-Control', ['price' => $pricee]);*/
                 }
             }
-    /*        $car->update([
-                'price' => $validated['price'],
-                'price_currency' => $validated['price_currency'],
-                'deposit' => $validated['deposit'],
-                'deposit_currency' => $validated['deposit_currency'],
-            ]);*/
+            $car->update([
+                'currency_id' => $validated['currency'],
+            ]);
             DB::commit();
             $updatedCar = Car::with(['photos', 'brandKey', 'modelKey', 'price' => fn($query) => $query->where('is_active', true)])->findOrFail($id);
             Log::info('Araç Fİyat GÜncellemesi Olumlu', ['car' => $updatedCar]);

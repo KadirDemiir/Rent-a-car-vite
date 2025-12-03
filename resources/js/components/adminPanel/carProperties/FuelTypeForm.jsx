@@ -44,6 +44,7 @@ export default function FuelTypeForm({mode="create", lngs, fuel=null}){
         request
             .then((response) => {
                 if (response.data.success) {
+                    localStorage.removeItem('i18n_config_cache');
                     reloadTranslations();
                     setSuccess(mode === "create" ? "Added Successfully!" : "Updated Successfully!");
                 } else

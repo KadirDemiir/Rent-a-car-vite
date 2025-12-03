@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('extra_services', function (Blueprint $table) {
             $table->id();
-            $table->json('name');         // İsim (TR/EN)
-            $table->json('description');  // Açıklama (TR/EN)
-            $table->integer('stock')->default(0);     // Elimizde kaç tane var?
-            $table->integer('max_limit')->default(1); // Bir müşteri en fazla kaç tane kiralayabilir?
+            $table->json('name');
+            $table->json('description');
+            $table->integer('stock')->default(0);
+            $table->integer('current_stock');
+            $table->integer('max_limit')->default(1);
+            $table->enum('type', ['daily', 'per_rent'])->default('daily');
             $table->timestamps();
         });
     }

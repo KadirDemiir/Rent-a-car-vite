@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Language;
+use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;

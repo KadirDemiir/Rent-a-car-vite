@@ -97,7 +97,7 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
        return response()->json(['currencies' => Currency::where('is_active', true)->get()]);
     });
     Route::get('/get-currencies', function() {
-        $currencies = Cache::remember('active_currencies', 60*60*24, function() {
+        $currencies = Cache::remember('active_currencies', 0, function() {
             $def = Currency::where('is_active', 1)->where('is_default', 1)->first();
             if (!$def) {
                 throw new \Exception('Default currency not found');
@@ -127,7 +127,6 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
                     ? $baseCurrencyData['forexBuying']
                     : 1;
             }
-            Log::info($baseRate);
             $myCurrs = Currency::where('is_active', 1)->get();
             foreach ($myCurrs as $curr) {
                 $currCode = strtoupper($curr->code);
@@ -173,8 +172,9 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
     });
     Route::post('/adminpanel/cars/{id}', [AdminCarController::class, 'updateCar'])->name('adminUpdateCar');
     Route::get('/get-extras', function() {
-        return response()->json(['extras' => \App\Models\ExtraServices::where('stock', '>', 0)->get()]);
+        return response()->json(['extras' => \App\Models\ExtraServices::where('stock', '>', 0)->with('extraServicePrices')->get()]);
     });
+    Route::post('/create-reservation', [ReservationController::class, 'createReservation'])->name('createReservation');
 
     Route::group([
         'prefix' => LaravelLocalization::setLocale(),
