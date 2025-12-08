@@ -31,6 +31,7 @@ class Reservation extends Model
         'arrival_flight_no',
         'return_flight_no',
         'payment_type',
+        'notes',
         'payment_status',
         'status',
     ];
@@ -54,5 +55,20 @@ class Reservation extends Model
     public function extras()
     {
         return $this->hasMany(ReservationExtra::class);
+    }
+
+    public function reservation_extras()
+    {
+        return $this->hasMany(ReservationExtra::class);
+    }
+
+    public function pickupLocation()
+    {
+        return $this->belongsTo(Locations::class, 'pickup_location_id');
+    }
+
+    public function returnLocation()
+    {
+        return $this->belongsTo(Locations::class, 'return_location_id');
     }
 }

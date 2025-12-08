@@ -95,7 +95,7 @@ export default function UserInfo({setUser}){
                 />
                 <div className="col-span-1 md:col-span-2">
                     <span>Not:</span>
-                    <textarea className={`w-full outline-none border-1 border-gray-700 rounded-lg pl-2`}/>
+                    <textarea onChange={(e) => handleUserChange('notes', e.target.value, "")} className={`w-full outline-none border-1 border-gray-700 rounded-lg pl-2`}/>
                 </div>
             </div>
         </div>

@@ -9,9 +9,9 @@ import {router} from "@inertiajs/react";
 
 const applyFilters = (cars, segment, fuelType, transmissionType) => {
     return cars.filter(car => {
-        const segmentMatch = segment === "" || segment[0] === "" || segment.includes(car.segment_id);
-        const fuelMatch = fuelType === "" || fuelType[0] === "" || fuelType.includes(car.fuel_id);
-        const transmissionMatch = transmissionType === "" || transmissionType[0] === "" || transmissionType.includes(car.transmission_id);
+        const segmentMatch = segment === "" || segment[0] === "" || segment.includes(`${car.segment_id}`);
+        const fuelMatch = fuelType === "" || fuelType[0] === "" || fuelType.includes(`${car.fuel_id}`);
+        const transmissionMatch = transmissionType === "" || transmissionType[0] === "" || transmissionType.includes(`${car.transmission_id}`);
         return segmentMatch && fuelMatch && transmissionMatch;
     });
 };

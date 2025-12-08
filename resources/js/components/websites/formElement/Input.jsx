@@ -14,7 +14,6 @@ const Input = ({type, elementName, labelName, validate, onChange, maxV, prefix})
 
         const handleChange = (e) => {
             let newValue = e.target.value;
-
             if(maxV)
             {
                 newValue = newValue.slice(0, maxV);

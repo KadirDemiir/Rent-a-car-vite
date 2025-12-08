@@ -20,4 +20,9 @@ class Locations extends Model
     {
         return $this->hasMany(Car::class);
     }
+
+    /*public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+     }*/
 }

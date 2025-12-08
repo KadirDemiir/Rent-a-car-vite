@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\Currency;
 use App\Models\DropPrice;
 use App\Models\Locations;
 use App\Models\Segment;
@@ -15,10 +16,12 @@ class DropPriceController extends Controller
         $dropPrice = DropPrice::all();
         $locations = Locations::all();
             $segments = Segment::all();
+            $currencies = Currency::where('is_active', 1)->get();
         return Inertia::render('adminPanel/price/DropPrice', [
             'dropPrice' => $dropPrice,
             'locations' => $locations,
             'segments' => $segments,
+            'currencies' => $currencies,
             'success' => session('success')
         ]);
     }

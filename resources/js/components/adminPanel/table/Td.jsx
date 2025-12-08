@@ -10,7 +10,7 @@ export default function Td({ contents, as = "td", cls = "border border-gray-500 
             );
         } else {
             return (
-                <Tag key={index} className={cls} onClick={() => onClick(item)}>
+                <Tag key={index} className={cls} onClick={() => onClick ? onClick(item) : ""}>
                     {item}
                 </Tag>
             );

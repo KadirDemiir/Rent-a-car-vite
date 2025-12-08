@@ -4,118 +4,19 @@ import ShowResCard from "../reservations/ShowResCard.jsx";
 import ChevronNavigation from "../reservations/ChevronNavigation.jsx";
 import {useTranslation} from "react-i18next";
 
-export default function CarReservations({ res }) {
-    const {t} = useTranslation();
+export default function CarReservations({ reservations, res=true }) {
+    console.log(reservations)
+  const {t} = useTranslation();
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [startIndex, setStartIndex] = useState(0);
-  const perPage = 3;
+  const perPage = 10;
 
   const TDclass = "border border-gray-500 px-4 py-2";
-  const headers = [
-    t("adminpanel.reservation.name_and_surname"), t("adminpanel.reservation.pick_up_date"), t("adminpanel.reservation.return_date"), t("adminpanel.reservation.payment_status"), t("adminpanel.reservation.status")
-  ];
-
-  const handleRowClick = (reservation) => {
-    setSelectedReservation(reservation);
-  };
+  const headers = [t("adminpanel.reservation.name_and_surname"), t("adminpanel.reservation.pick_up_date"), t("adminpanel.reservation.return_date"), t("adminpanel.reservation.payment_status"), t("adminpanel.reservation.status")];
 
   const closeModal = () => {
     setSelectedReservation(null);
   };
-
-  const reservations =  [
-        {
-            ad: "Ali",
-            soyad: "Yılmaz",
-            numara: "0555 123 45 67",
-            alis: "01.01.2024",
-            alisYeri: "İstanbul",
-            iade: "05.01.2024",
-            iadeYeri: "Ankara",
-            ekstra: "1000",
-            toplam: "4.200₺",
-            durum: "Tamamlanmadı",
-            odemeDurumu: "Ödendi"
-        },
-        {
-            ad: "Ali",
-            soyad: "Yılmaz",
-            numara: "0555 123 45 67",
-            alis: "01.01.2024",
-            alisYeri: "İstanbul",
-            iade: "05.01.2024",
-            iadeYeri: "Ankara",
-            ekstra: "1000",
-            toplam: "4.200₺",
-            durum: "Tamamlanmadı",
-            odemeDurumu: "Ödendi"
-        },
-        {
-            ad: "Ali",
-            soyad: "Yılmaz",
-            numara: "0555 123 45 67",
-            alis: "01.01.2024",
-            alisYeri: "İstanbul",
-            iade: "05.01.2024",
-            iadeYeri: "Ankara",
-            ekstra: "1000",
-            toplam: "4.200₺",
-            durum: "Tamamlanmadı",
-            odemeDurumu: "Ödendi"
-        },
-        {
-            ad: "Ali",
-            soyad: "Yılmaz",
-            numara: "0555 123 45 67",
-            alis: "01.01.2024",
-            alisYeri: "İstanbul",
-            iade: "05.01.2024",
-            iadeYeri: "Ankara",
-            ekstra: "1000",
-            toplam: "4.200₺",
-            durum: "Tamamlanmadı",
-            odemeDurumu: "Ödendi"
-        },
-        {
-            ad: "Ali",
-            soyad: "Yılmaz",
-            numara: "0555 123 45 67",
-            alis: "01.01.2024",
-            alisYeri: "İstanbul",
-            iade: "05.01.2024",
-            iadeYeri: "Ankara",
-            ekstra: "1000",
-            toplam: "4.200₺",
-            durum: "Tamamlanmadı",
-            odemeDurumu: "Ödendi"
-        },
-        {
-            ad: "Ali",
-            soyad: "Yılmaz",
-            numara: "0555 123 45 67",
-            alis: "01.01.2024",
-            alisYeri: "İstanbul",
-            iade: "05.01.2024",
-            iadeYeri: "Ankara",
-            ekstra: "1000",
-            toplam: "4.200₺",
-            durum: "Tamamlanmadı",
-            odemeDurumu: "Ödendi"
-        },
-        {
-            ad: "Veli",
-            soyad: "Yılar",
-            numara: "0555 123 45 67",
-            alis: "01.01.2024",
-            alisYeri: "Ankara",
-            iade: "05.01.2024",
-            iadeYeri: "Nevşehir",
-            ekstra: "500",
-            toplam: "4.700₺",
-            durum: "Tamamlanmadı",
-            odemeDurumu: "Ödendi"
-        }
-    ];
 
   const handlePrev = () => {
     setStartIndex((prev) => Math.max(prev - perPage, 0));
@@ -141,22 +42,18 @@ export default function CarReservations({ res }) {
         </thead>
         <tbody>
           {currentReservations.map((r, index) => (
-            <tr
-              key={startIndex + index}
-              onClick={() => handleRowClick(r)}
-              className="cursor-pointer hover:bg-gray-100"
-            >
+            <tr  key={startIndex + index} onClick={() => setSelectedReservation(r)} className="cursor-pointer hover:bg-gray-100">
               <Td
                 cls={TDclass}
                 contents={[
-                  r.ad + " " + r.soyad,
-                  r.alis,
-                  r.iade,
-                  <span className="text-green-600 font-semibold" key="odeme">
-                    {r.odemeDurumu}
+                  r.name + " " + r.surname,
+                    new Date(r.pickup_datetime).toLocaleString("tr-TR", { day:"numeric", month:"numeric", year:"numeric", hour:"2-digit", minute:"2-digit" }).replace(/\./g, " / "),
+                    new Date(r.return_datetime).toLocaleString("tr-TR", { day:"numeric", month:"numeric", year:"numeric", hour:"2-digit", minute:"2-digit" }).replace(/\./g, " / "),
+                  <span className={`${r.payment_status.toLowerCase() === 'paid' ? 'text-green-600' : r.payment_status.toLowerCase() === 'failed' ? 'text-red-600' : 'text-yellow-600'} font-semibold`} key="odeme">
+                    {r.payment_status}
                   </span>,
-                    <span className={`font-semibold ${r.durum.toLocaleLowerCase() === "tamamlandı" ? "text-green-600" : "text-red-600"}`}>
-                      {r.durum}
+                    <span className={`font-semibold ${r.status.toLocaleLowerCase() === "pending" ? "text-yellow-600" : r.status.toLocaleLowerCase() === "confirmed" ? "text-green-600" : r.status.toLocaleLowerCase() === "cancelled" ? "text-red-600" : "text-black"} `}>
+                      {r.status}
                   </span>,
                 ]}
               />
@@ -165,15 +62,7 @@ export default function CarReservations({ res }) {
         </tbody>
       </table>
 
-      < ChevronNavigation
-        handlePrev={handlePrev}
-        handleNext={handleNext}
-        startIndex={startIndex}
-        perPage={perPage}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        length={reservations.length}
-      />
+      < ChevronNavigation handlePrev={handlePrev} handleNext={handleNext} startIndex={startIndex} perPage={perPage} currentPage={currentPage} totalPages={totalPages} length={reservations.length}/>
       {selectedReservation && (
         <ShowResCard res={selectedReservation} closeModal={closeModal} isRes={res} />
       )}

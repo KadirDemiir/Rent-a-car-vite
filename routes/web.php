@@ -221,7 +221,7 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
         Route::inertia(dbTransRoute('adminpanel'). '/'. dbTransRoute('locations'), 'adminPanel/locations/Locations')->name('adminLocations ');
         Route::inertia(dbTransRoute('adminpanel'). '/'. dbTransRoute('locations').'/'.dbTransRoute('add'), 'adminPanel/locations/AddLocation')->name('adminAddLocation ');
-        Route::inertia(dbTransRoute('adminpanel'). '/'. dbTransRoute('reservations'), 'adminPanel/reservation/Reservations')->name('adminReservations ');
+        Route::get(dbTransRoute('adminpanel'). '/'. dbTransRoute('reservations'), [ReservationController::class, 'showReservations'])->name('adminReservations ');
         Route::inertia(dbTransRoute('adminpanel'). '/'. dbTransRoute('reservations') .'/'. dbTransRoute('add'), 'adminPanel/reservations/AddReservation')->name('adminAddReservation ');
         Route::inertia(dbTransRoute('adminpanel'). '/'. dbTransRoute('add'), 'adminPanel/users/Users')->name('adminUsers ');
 

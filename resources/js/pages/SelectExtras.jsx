@@ -11,7 +11,7 @@ export default function SelectExtras({car, params}){
     console.log(car);
     const {t} = useTranslation();
     const [selectedExtras, setSelectedExtras] = useState([]);
-    const [user, setUser] = useState({name: {value: "", error: ""}, surname: {value: "", error: ""}, mail: {value: "", error: ""}, phone: {value: "", error: ""}, address: {value: "", error: ""}, birthday: {value: "", error: ""}, identity: {value: "", error: ""}, arrivalFlightNo: {value: "", error: ""}, returnFlightNo: {value: "", error: ""}, isNative: true});
+    const [user, setUser] = useState({name: {value: "", error: ""}, surname: {value: "", error: ""}, mail: {value: "", error: ""}, phone: {value: "", error: ""}, address: {value: "", error: ""}, birthday: {value: "", error: ""}, identity: {value: "", error: ""}, arrivalFlightNo: {value: "", error: ""}, returnFlightNo: {value: "", error: ""}, notes: {value: "", error: ""}, isNative: true});
     const [error, setError] = useState();
 
     const handleSubmit =  () => {

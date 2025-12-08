@@ -280,4 +280,8 @@ class ReservationController extends Controller
 
         return false;
     }
+
+    public function showReservations(){
+        return Inertia::render('adminPanel/reservation/Reservations', ['reservations' => Reservation::with(['reservation_extras', 'pickupLocation', 'returnLocation'])->get()]);
+    }
 }

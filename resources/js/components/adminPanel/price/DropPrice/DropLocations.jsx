@@ -11,7 +11,7 @@ export default function DropLocations({locations: locationObjects, dropPrice, on
     const [loading, setLoading] = useState(true);
     const [locationData, setLocationData] = useState({});
     const [locationError, setLocationError] = useState({});
-    const currencyOptions = currencies.map(c => ({label: `${c.code.toUpperCase()} (${c.symbol})`, value: c.id,}));
+    const currencyOptions = currencies?.map(c => ({label: `${c.code.toUpperCase()} (${c.symbol})`, value: c.id,}));
     const [currency, setCurrency] = useState(currencyOptions[0]?.value);
     const [formError, setFormError] = useState();
 

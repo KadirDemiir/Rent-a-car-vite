@@ -2,22 +2,25 @@ import CarReservations from "../../../components/adminPanel/car/CarReservations.
 import Navbar from "../../../components/adminPanel/navbar/Navbar.jsx";
 import ReservationFilter from "../../../components/adminPanel/reservations/ReservationFilter.jsx";
 import {useTranslation} from "react-i18next";
+import {useState} from "react";
 
-export default function Reservations(){
+export default function Reservations({reservations}){
+    console.log(reservations);
     const {t} = useTranslation();
+    const [res, setRes] = useState(reservations);
     return(
         <div className="flex flex-col min-h-[calc(100vh+100px)] w-full">
             < Navbar >
                 <div className="flex-1">
                   <p className="font-bold text-l">{t("adminpanel.reservation.reservations")}</p>
                   <hr />
-                  <ReservationFilter />
+                  <ReservationFilter originalRes={reservations} res={res} setRes={setRes}/>
                   <div>
                     <div className="space-x-4 flex items-center justify-start overflow-y-auto">
                       <span className="font-semibold text-l">{t("adminpanel.reservation.reservations")}</span>
                       <span className="text-[12px]">({t("adminpanel.reservation.click_to_view_details_and_proceed_with_the_transaction")}.)</span>
                       </div>
-                    <CarReservations />
+                    <CarReservations reservations={res} />
                   </div>
                 </div>
             </Navbar>

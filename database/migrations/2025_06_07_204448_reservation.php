@@ -28,11 +28,12 @@ return new class extends Migration
             $table->decimal('total_price', 10, 2);
             $table->string('email');
             $table->text('address');
-            $table->dateTime('birth_date');
-            $table->string('arrival_flight_no');
-            $table->string('return_flight_no');
+            $table->dateTime('birthdate');
+            $table->string('arrival_flight_no')->nullable();
+            $table->string('return_flight_no')->nullable();
             $table->decimal('drop_price', 10, 2)->default(0);
             $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
+            $table->text('notes')->nullable();
             $table->enum('payment_type', ['credit_card', 'cash', 'bank_transfer']);
             $table->enum('payment_status', ['pending', 'paid', 'failed'])->default('pending');
             $table->enum('status', ['pending', 'confirmed', 'cancelled', 'completed'])->default('pending');

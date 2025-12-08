@@ -1,4 +1,5 @@
 import LanguageDropdown from "../../websites/LanguageDropdown.jsx";
+import CurrencyDropDown from "../../CurrencyDropDown.jsx";
 
 export default function UpSide() {
     return(
@@ -7,6 +8,7 @@ export default function UpSide() {
             <div>
                 <LanguageDropdown/>
             </div>
+            <div><CurrencyDropDown/></div>
             <div>PROFILE</div>
         </div>
     );

@@ -4,7 +4,7 @@ import DropCoefficient from "../../../components/adminPanel/price/DropPrice/Drop
 import {useTranslation} from "react-i18next";
 import {useState} from "react";
 
-export default function DropPrice({locations, dropPrice, segments, success, general}) {
+export default function DropPrice({locations, dropPrice, segments, success, general, currencies}) {
     const {t} = useTranslation();
     const [successMessage, setSuccessMessage] = useState(success);
     const [generalMessage, setGeneralMessage] = useState(general);
@@ -58,6 +58,7 @@ export default function DropPrice({locations, dropPrice, segments, success, gene
                             dropPrice={dropPrice}
                             onSuccess={handleSuccess}
                             onError={handleError}
+                            currencies={currencies}
                         />
                     </div>
                 </div>
