@@ -17,4 +17,9 @@ class ReservationExtra extends Model
     {
         return $this->belongsTo(Reservation::class);
     }
+
+    public function extra()
+    {
+        return $this->belongsTo(ExtraServices::class , 'extra_service_id');
+    }
 }

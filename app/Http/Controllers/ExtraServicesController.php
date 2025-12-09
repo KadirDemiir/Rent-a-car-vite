@@ -43,6 +43,7 @@ class ExtraServicesController extends Controller
                     'max_limit' => $validated['max_limit'],
                     'currency_id' => $validated['currency'],
                     'stock' => $validated['stock'],
+                    'current_stock' => $validated['stock'],
                 ]
             );
 

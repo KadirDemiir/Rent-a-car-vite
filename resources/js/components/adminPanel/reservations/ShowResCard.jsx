@@ -113,10 +113,10 @@ export default function ShowResCard({ res, closeModal, isRes }) {
                                 {t("adminpanel.reservation.reservation_modal.taken_extra_services")}
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                {res.ekstraHizmetler.map((hizmet, index) => (
+                                {res.extras.map((hizmet, index) => (
                                     <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
-                                        <span className="font-medium text-sm text-gray-700">{hizmet.ad}</span>
-                                        <span className="font-bold text-sm text-gray-900 bg-white px-2 py-1 rounded shadow-sm">{hizmet.tutar}</span>
+                                        <span className="font-medium text-sm text-gray-700">{hizmet.extra.name[i18n.language]}</span>
+                                        <span className="font-bold text-sm text-gray-900 bg-white px-2 py-1 rounded shadow-sm">{hizmet.price}</span>
                                     </div>
                                 ))}
                             </div>

@@ -6,6 +6,7 @@ import UserInfo from "../components/websites/reservation/create-reservation/User
 import PriceInformationCard from "../components/websites/reservation/create-reservation/PriceInformationCard.jsx";
 import {useTranslation} from "react-i18next";
 import axios from "axios";
+import ResercationDatePreview from "../components/websites/reservation/ReservationDatePreview.jsx";
 
 export default function SelectExtras({car, params}){
     console.log(car);
@@ -99,6 +100,8 @@ export default function SelectExtras({car, params}){
                         <UserInfo user={user} setUser={setUser}/>
                     </div>
                     <div className={`basis-3/10`}>
+                        <ResercationDatePreview pickupDate={params.startDateTime} returnDate={params.finishDateTime} pickupLocation={params.PULocation} returnLocation={params.RLocation}/>
+                        <br/>
                         <PriceInformationCard total_days={car.total_days} daily_price={car.daily_price} extra_price={Object.values(selectedExtras).reduce((sum, se) => sum + (se.price ?? 0) * (se.count ?? 1), 0)}/>
                         <br/>
                         {error && <div className="text-red-600 font-bold mb-2">{error}</div>}

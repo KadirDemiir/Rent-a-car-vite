@@ -54,7 +54,7 @@ class Reservation extends Model
 
     public function extras()
     {
-        return $this->hasMany(ReservationExtra::class);
+        return $this->hasMany(ReservationExtra::class)->with('extra');
     }
 
     public function reservation_extras()

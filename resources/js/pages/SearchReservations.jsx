@@ -37,14 +37,7 @@ export default function SearchReservations(){
 
                         {availableCars.length > 0 ?
                         (
-                            < SortSearchReservations
-                                availableCars={availableCars}
-                                sortBy={sortBy}
-                                fuelType={fuelType}
-                                transmissionType={transmissionType}
-                                segment={segment}
-                                reservation={reservation}
-                            />
+                            < SortSearchReservations availableCars={availableCars} sortBy={sortBy} fuelType={fuelType} transmissionType={transmissionType} segment={segment} reservation={reservation}/>
                         ) :
                         (<div className=" flex items-center justify-center">Seçilen Tarih Ve Konum İçin Uygun Arabamız Bulunmamaktadr.</div>)
                         }

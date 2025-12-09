@@ -25,7 +25,7 @@ class ReservationController extends Controller
         }
 
         $request->validate([
-            'startDateTime' => 'required|date',
+            'startDateTime' => 'required|date|after:today',
             'finishDateTime' => 'required|date|after:startDateTime',
             'PULocation' => 'required|exists:locations,id',
             'RLocation' => 'required|exists:locations,id',
@@ -45,10 +45,9 @@ class ReservationController extends Controller
             $eachReservations = Reservation::where('car_id', $car->id)->get();
             Log::info('eachReservations', [$car->id, $eachReservations]);
             foreach($eachReservations as $eachRes){
-                $resStart = Carbon::parse($eachRes->pickup_datetime)->format('Y-m-d');
-                $resEnd = Carbon::parse($eachRes->return_datetime)->format('Y-m-d');
-            Log::info('resDate', [$resStart, $resEnd]);
-
+                $resStart = Carbon::parse($eachRes->pickup_datetime)->format('Y-m-d H:i:s');
+                $resEnd = Carbon::parse($eachRes->return_datetime)->format('Y-m-d H:i:s');
+            Log::info('resDate, reqDay', [$resStart, $resEnd, $reqStart, $reqEnd]);
                 if ($resStart < $reqEnd && $resEnd > $reqStart) {
                     $isAvailable = false;
                     break;
@@ -79,7 +78,7 @@ class ReservationController extends Controller
     }
 
     public function showDetailPage(Request $request){
-        $request->validate([
+        $validated = $request->validate([
             'car_id' => 'required|exists:cars,id',
             'startDateTime' => 'required|date',
             'finishDateTime' => 'required|date|after:startDateTime',
@@ -117,7 +116,12 @@ class ReservationController extends Controller
 
         return Inertia::render('SelectExtras', [
             'car' => $car,
-            'params' => $request->all()
+            'params' => [
+                'startDateTime' => $validated['startDateTime'],
+                'finishDateTime' => $validated['finishDateTime'],
+                'PULocation' => Locations::find($validated['PULocation'])->name,
+                'RLocation' => Locations::find($validated['RLocation'])->name,
+            ]
         ]);
     }
 
@@ -180,7 +184,7 @@ class ReservationController extends Controller
                 'return_location_id' => 'required|exists:locations,id',
                 'total_days' => 'required|numeric|min:1',
                 'daily_price' => 'required|numeric|min:1',
-                'drop_price' => 'required|numeric|min:1',
+                'drop_price' => 'required|numeric|min:0',
                 'currency_id' => 'required|exists:currencies,id',
                 'user_info.name' => 'required|string',
                 'user_info.surname' => 'required|string',
@@ -195,13 +199,12 @@ class ReservationController extends Controller
             ]);
 
             DB::beginTransaction();
-
-            $eachReservations = Reservation::where('car_id', $validated['car_id'])->get();
+            $eachReservations = Reservation::where('car_id', $validated['car_id'])->latest()->get();
             $start = Carbon::parse($validated['start_date_time']);
             $end = Carbon::parse($validated['finish_date_time']);
 
             $conflict = $this->hasConflict($eachReservations, $start, $end);
-
+            Log::info('hasConflict', ['conflict' => $conflict]);
             if($conflict) {
                 return response()->json(['error' => 'Conflict on reservation'], 409);
             }
@@ -225,7 +228,7 @@ class ReservationController extends Controller
                 'rental_days' => $validated['total_days'],
                 'daily_price' => $validated['daily_price'],
                 'drop_price' => $validated['drop_price'],
-                'extras_total_price' => $extras_total_price,
+                'extras_total' => $extras_total_price,
                 'total_price' => $total_price,
                 'name' => $validated['user_info']['name'],
                 'surname' => $validated['user_info']['surname'],
@@ -268,8 +271,8 @@ class ReservationController extends Controller
 
     public function hasConflict($eachReservations, $start, $end){
         foreach($eachReservations as $eachRes){
-            $resStart = Carbon::parse($eachRes->pickup_dateTime);
-            $resEnd = Carbon::parse($eachRes->return_dateTime);
+            $resStart = Carbon::parse($eachRes->pickup_datetime);
+            $resEnd = Carbon::parse($eachRes->return_datetime);
 
             if ($resStart < $end && $resEnd > $start) {
                 return true;
@@ -282,6 +285,6 @@ class ReservationController extends Controller
     }
 
     public function showReservations(){
-        return Inertia::render('adminPanel/reservation/Reservations', ['reservations' => Reservation::with(['reservation_extras', 'pickupLocation', 'returnLocation'])->get()]);
+        return Inertia::render('adminPanel/reservation/Reservations', ['reservations' => Reservation::with(['extras', 'pickupLocation', 'returnLocation'])->get()]);
     }
 }

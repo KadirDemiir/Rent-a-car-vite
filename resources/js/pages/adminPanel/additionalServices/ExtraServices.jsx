@@ -59,7 +59,7 @@ export default function ExtraServices({ extraServices, success, error }) {
                                             es.extra_service_prices.find(e => e.min_days === 16 && e.max_days === 999).price,
                                             es.stock,
                                             es.max_limit,
-                                            es.current_count ?? "-",
+                                            es.current_stock ?? "-",
                                             description[i18n.language]
                                         ]}
                                         cls={TDclass}

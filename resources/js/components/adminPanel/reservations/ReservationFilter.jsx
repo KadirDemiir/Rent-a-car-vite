@@ -5,15 +5,30 @@ import {useTranslation} from "react-i18next";
 export default function ReservationFilter({originalRes, res, setRes}) {
     const {t} = useTranslation();
     const [status, setStatus] = useState([]);
-    const [sort, setSort] = useState([]);
+    const [sort, setSort] = useState("");
     const [filter, setFilter] = useState("");
 
     useEffect(() => {
+        console.log(sort);
         if((status.length === 1 && status[0] === "") || status.length === 0) {
             setRes(originalRes);
             return;
         }
         let newRes = originalRes.filter(r => status.includes(r.status));
+        switch (sort) {
+            case "priceInc":
+                setRes([...newRes].sort((a, b) => a.total_price - b.total_price));
+                break;
+            case "priceDesc":
+                setRes([...newRes].sort((a, b) => b.total_price - a.total_price));
+                break;
+            case "recently":
+                setRes([...newRes].sort((a,b) => a.return_datetime - b.return_datetime));
+                break;
+            case "oldest":
+                setRes([...newRes].sort((a,b) => b.return_datetime - a.return_datetime));
+                break;
+        }
         setRes(newRes);
     }, [status, sort]);
 
@@ -25,7 +40,7 @@ export default function ReservationFilter({originalRes, res, setRes}) {
                     onChange={setSort}
                     options={[
                         { label: t("adminpanel.reservation.filter.sort.suggested"), value: "primary" },
-                        { label: t("adminpanel.reservation.filter.sort.increase_based_price"), value: "priceInc" },
+                            { label: t("adminpanel.reservation.filter.sort.increase_based_price"), value: "priceInc" },
                         { label: t("adminpanel.reservation.filter.sort.decrease_based_price"), value: "priceDesc" },
                         { label: t("adminpanel.reservation.filter.date_based_latest"), value: "recently" },
                         { label: t("adminpanel.reservation.filter.date_based_oldest"), value: "oldest" },
