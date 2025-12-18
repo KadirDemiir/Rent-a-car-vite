@@ -9,7 +9,7 @@ import axios from "axios";
 import ResercationDatePreview from "../components/websites/reservation/ReservationDatePreview.jsx";
 
 export default function SelectExtras({car, params}){
-    console.log(car);
+    console.log(car, params) ;
     const {t} = useTranslation();
     const [selectedExtras, setSelectedExtras] = useState([]);
     const [user, setUser] = useState({name: {value: "", error: ""}, surname: {value: "", error: ""}, mail: {value: "", error: ""}, phone: {value: "", error: ""}, address: {value: "", error: ""}, birthday: {value: "", error: ""}, identity: {value: "", error: ""}, arrivalFlightNo: {value: "", error: ""}, returnFlightNo: {value: "", error: ""}, notes: {value: "", error: ""}, isNative: true});
@@ -50,8 +50,8 @@ export default function SelectExtras({car, params}){
             total_days: car.total_days,
             daily_price: car.daily_price,
             currency_id: car.currency_id,
-            pick_up_location_id: params.PULocation,
-            return_location_id: params.RLocation,
+            pick_up_location_id: params.PULocation.id,
+            return_location_id: params.RLocation.id,
             start_date_time: params.startDateTime,
             finish_date_time: params.finishDateTime,
             extras: JSON.stringify(selectedExtras),
@@ -59,6 +59,7 @@ export default function SelectExtras({car, params}){
                 name: user.name.value,
                 surname: user.surname.value,
                 email: user.mail.value,
+                notes: user.notes.value,
                 phone: user.phone.value,
                 address: user.address.value,
                 birthday: user.birthday.value,
@@ -100,7 +101,7 @@ export default function SelectExtras({car, params}){
                         <UserInfo user={user} setUser={setUser}/>
                     </div>
                     <div className={`basis-3/10`}>
-                        <ResercationDatePreview pickupDate={params.startDateTime} returnDate={params.finishDateTime} pickupLocation={params.PULocation} returnLocation={params.RLocation}/>
+                        <ResercationDatePreview pickupDate={params.startDateTime} returnDate={params.finishDateTime} pickupLocation={params.PULocation.name} returnLocation={params.RLocation.name}/>
                         <br/>
                         <PriceInformationCard total_days={car.total_days} daily_price={car.daily_price} extra_price={Object.values(selectedExtras).reduce((sum, se) => sum + (se.price ?? 0) * (se.count ?? 1), 0)}/>
                         <br/>

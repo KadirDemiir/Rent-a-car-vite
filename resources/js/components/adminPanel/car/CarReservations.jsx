@@ -4,7 +4,7 @@ import ShowResCard from "../reservations/ShowResCard.jsx";
 import ChevronNavigation from "../reservations/ChevronNavigation.jsx";
 import {useTranslation} from "react-i18next";
 
-export default function CarReservations({ reservations, res=true }) {
+export default function  CarReservations({ reservations, res=true }) {
     console.log(reservations)
   const {t} = useTranslation();
   const [selectedReservation, setSelectedReservation] = useState(null);

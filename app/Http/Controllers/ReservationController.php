@@ -119,8 +119,8 @@ class ReservationController extends Controller
             'params' => [
                 'startDateTime' => $validated['startDateTime'],
                 'finishDateTime' => $validated['finishDateTime'],
-                'PULocation' => Locations::find($validated['PULocation'])->name,
-                'RLocation' => Locations::find($validated['RLocation'])->name,
+                'PULocation' => Locations::find($validated['PULocation']),
+                'RLocation' => Locations::find($validated['RLocation']),
             ]
         ]);
     }
@@ -191,6 +191,7 @@ class ReservationController extends Controller
                 'user_info.email' => 'required|email',
                 'user_info.phone' => 'required|string',
                 'user_info.address' => 'required|string',
+                'user_info.notes' => 'nullable|string',
                 'user_info.id' => 'required',
                 'user_info.birthday' => 'required|date|before:' . Carbon::now()->subYears(18)->format('Y-m-d'),
                 'user_info.arrival_flight_no' => 'nullable|string',
@@ -235,6 +236,7 @@ class ReservationController extends Controller
                 'email' => $validated['user_info']['email'],
                 'phone_number' => $validated['user_info']['phone'],
                 'address' => $validated['user_info']['address'],
+                'notes' => $validated['user_info']['notes'],
                 'birthday' => $validated['user_info']['birthday'],
                 'arrival_flight_no' => $validated['user_info']['arrival_flight_no'] ?? null,
                 'return_flight_no' => $validated['user_info']['return_flight_no'] ?? null,
