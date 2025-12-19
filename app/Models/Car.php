@@ -37,8 +37,8 @@ class Car extends Model
     ];
 
 
-    public function reservation() {
-        return $this->hasMany(Reservation::class);
+    public function reservations() {
+        return $this->hasMany(Reservation::class, 'car_id')->with(['extras', 'pickupLocation', 'returnLocation']);
     }
 
     public function location()

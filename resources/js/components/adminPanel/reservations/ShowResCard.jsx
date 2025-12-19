@@ -9,8 +9,9 @@ const DetailItem = ({ label, value, className = "" }) => (
     </div>
 );
 
-export default function ShowResCard({ res, closeModal, isRes }) {
-    const { t } = useTranslation();
+export default function ShowResCard({ res, closeModal, curr, past }) {
+    const { t, i18n } = useTranslation();
+    console.log(i18n.language);
     const {calculateTotal, current} = useCurrency();
     const formatDate = (date) => {
         return new Date(date).toLocaleString("tr-TR", {
@@ -27,7 +28,7 @@ export default function ShowResCard({ res, closeModal, isRes }) {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4 transition-all">
-            <div className="bg-white w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl flex flex-col relative">
+            <div className="bg-white w-full max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl flex flex-col relative">
 
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 sticky top-0 bg-white/95 backdrop-blur z-10">
                     <div>
@@ -61,6 +62,7 @@ export default function ShowResCard({ res, closeModal, isRes }) {
                                 <DetailItem label={t("adminpanel.reservation.reservation_modal.surname")} value={res.surname} />
                                 <DetailItem label={t("adminpanel.reservation.reservation_modal.email")} value={res.email} />
                                 <DetailItem label={t("adminpanel.reservation.reservation_modal.phone_number")} value={res.phone_number} />
+                                <DetailItem label={t("adminpanel.reservation.reservation_modal.address")} value={res.address} className={`max-h-50 overflow-auto scroll-y-auto`}/>
                             </dl>
                         </div>
 
@@ -76,7 +78,7 @@ export default function ShowResCard({ res, closeModal, isRes }) {
                                 <DetailItem label={t("adminpanel.reservation.reservation_modal.pick_up_location")} value={res.pickup_location.name} />
                                 <DetailItem label={t("adminpanel.reservation.reservation_modal.return_date")} value={formatDate(res.return_datetime)} />
                                 <DetailItem label={t("adminpanel.reservation.reservation_modal.return_location")} value={res.return_location.name} />
-                                <DetailItem label={t("adminpanel.reservation.reservation_modal.notes", "Notes")} value={res.notes} className="bg-yellow-50/50 p-2 rounded mt-2 border-none" />
+                                <DetailItem label={t("adminpanel.reservation.reservation_modal.notes", "Notes")} value={res.notes} className="bg-yellow-50/50 p-2 rounded mt-2 border-none h-50 overflow-auto scroll-y-auto" />
                             </dl>
                         </div>
 
@@ -97,16 +99,34 @@ export default function ShowResCard({ res, closeModal, isRes }) {
                                 <DetailItem label={t("adminpanel.reservation.reservation_modal.payment_method")} value={res.payment_type} />
                                 <DetailItem label={t("adminpanel.reservation.reservation_modal.extra_price")} value={res.extras_total} />
                                 <DetailItem label={t("adminpanel.reservation.reservation_modal.drop_price", "Drop Price")} value={res.drop_price} />
-                                <DetailItem label={t("adminpanel.reservation.reservation_modal.day*daily_price", "Day*Daily Price")} value={`${res.rental_days}*${calculateTotal(res.daily_price)} ${current.symbol}`} />
+                                <DetailItem label={t("adminpanel.reservation.reservation_modal.day*daily_price", "Day x fDaily Price")} value={`${res.rental_days} x ${calculateTotal(res.daily_price)} ${current.symbol}`} />
                                 <div className="mt-auto pt-4 border-t border-gray-100">
                                     <dt className="text-xs font-medium text-gray-500 uppercase mb-1">{t("adminpanel.reservation.reservation_modal.total_price")}</dt>
                                     <dd className="text-2xl font-bold text-gray-900">{`${calculateTotal(res.total_price)} ${current.symbol}`}</dd>
                                 </div>
                             </dl>
                         </div>
+
+                        <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex flex-col">
+                            <div className="flex justify-center items-center gap-2 mb-4 pb-2 border-b border-gray-100">
+                                <div className="p-2 bg-green-50 text-green-600 rounded-lg">
+                                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <dl className="flex flex-col gap-1 grow">
+                                {res.extras?.map((e, index) => {
+                                    const names = JSON.parse(e.extra.name);
+                                    return (
+                                        <DetailItem key={e.id || index} label={names[i18n.language] || names['tr']} value={`${e.quantity} x ${calculateTotal(e.price)} ${current.symbol}`}/>
+                                    );
+                                })}
+                            </dl>
+                        </div>
                     </div>
 
-                    {res.reservation_extras?.length > 0 && (
+                    {/*{res.reservation_extras?.length > 0 && (
                         <div className="mt-6 bg-white p-5 rounded-xl shadow-sm border border-gray-200">
                             <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 flex items-center gap-2">
                                 <svg className="w-4 h-4 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
@@ -122,13 +142,13 @@ export default function ShowResCard({ res, closeModal, isRes }) {
                             </div>
                         </div>
                     )}
-                </div>
+                */}</div>
 
-                {isRes && (
+                {curr && (
                     <div className="p-6 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
                         <ReservationAction closeModal={closeModal} res={res} />
                     </div>
-                )}
+                )}x
             </div>
         </div>
     );

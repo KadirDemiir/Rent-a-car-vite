@@ -6,6 +6,7 @@ import {useState} from "react";
 
 
 export default function Car({car}){
+    console.log(car);
     const [success, setSuccess] = useState("");
     return(
       <div className="w-full">
@@ -23,11 +24,11 @@ export default function Car({car}){
                   < ModifyCar car={car} setSuccess={setSuccess}/>
                 <div className="max-h-[40vh] overflow-y-hidden">
                     <span className="font-bold ">Araca Ait Rezervasyonalar </span><span className="text-[14px]">(Detayar İçin Tıklayınız)</span>
-                    < CarReservations res={true}/>
+                    < CarReservations allReservations={car.reservations} past={false}/>
                 </div>
                 <div className="max-h-[40vh] overflow-y-hidden">
                     <span className="font-bold ">Araca Ait Geçmiş Rezervasyonalar </span><span className="text-[14px]">(Detayar İçin Tıklayınız)</span>
-                    < CarReservations res={false}/>
+                    < CarReservations allReservations={car.reservations} current={false}/>
                 </div>
                 < IncomingGraph />
               </div>

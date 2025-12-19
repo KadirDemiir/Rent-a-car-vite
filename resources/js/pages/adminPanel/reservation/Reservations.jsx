@@ -20,7 +20,7 @@ export default function Reservations({reservations}){
                       <span className="font-semibold text-l">{t("adminpanel.reservation.reservations")}</span>
                       <span className="text-[12px]">({t("adminpanel.reservation.click_to_view_details_and_proceed_with_the_transaction")}.)</span>
                       </div>
-                    <CarReservations reservations={res} />
+                    <CarReservations alReservations={res} />
                   </div>
                 </div>
             </Navbar>

@@ -227,6 +227,7 @@
             "adminpanel.reservation.reservation_modal.payment_method" => "Label for payment method",
             "adminpanel.reservation.reservation_modal.payment_status" => "Label for payment status in modal",
             "adminpanel.reservation.reservation_modal.taken_extra_services" => "Label for extra services list",
+            "adminpanel.reservation.reservation_modal.address" => "Addres bilgisi",
 
             "adminpanel.pricing.drop_price.drop_price" => "Heading for dynamic pricing section",
             "adminpanel.pricing.drop_price.vehicle_segment_coefficient.vehicle_segment_coefficient" => "Heading for segment coefficients",
@@ -633,6 +634,7 @@
             "adminpanel.reservation.reservation_modal.payment_method" => "Ödeme Yöntemi",
             "adminpanel.reservation.reservation_modal.payment_status" => "Ödeme Durumu",
             "adminpanel.reservation.reservation_modal.taken_extra_services" => "Alınan Ek Hizmetler",
+            "adminpanel.reservation.reservation_modal.address" => "Adres",
 
             "adminpanel.pricing.drop_price.drop_price" => "Dinamik Fiyat",
             "adminpanel.pricing.drop_price.vehicle_segment_coefficient.vehicle_segment_coefficient" => "Araç Segment Katsayısı",

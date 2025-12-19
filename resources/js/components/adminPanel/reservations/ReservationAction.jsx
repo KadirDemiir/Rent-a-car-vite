@@ -1,8 +1,8 @@
 export default function ReservationAction({ closeModal, res }) {
     const handleApprove = () => {
-        const confirm = window.confirm(`${res.ad} ${res.soyad} adlı kişinin rezervasyonunu onaylamak istediğinize emin misiniz?`);
+        const confirm = window.confirm(`${res.name} ${res.surname} adlı kişinin rezervasyonunu onaylamak istediğinize emin misiniz?`);
         if (confirm) {
-            alert(`Rezervasyon onaylandı: ${res.ad} ${res.soyad}`);
+            alert(`Rezervasyon onaylandı: ${res.name} ${res.surname}`);
             closeModal();
         }
     };
@@ -20,7 +20,7 @@ export default function ReservationAction({ closeModal, res }) {
                 onClick={() => handleApprove()}
                 className="group flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-medium shadow-md shadow-green-200 hover:shadow-lg hover:shadow-green-100 transition-all duration-200 active:scale-95 cursor-pointer"
             >
-                Onayla
+                Onaylax
                 <svg className="w-5 h-5 text-green-100 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
