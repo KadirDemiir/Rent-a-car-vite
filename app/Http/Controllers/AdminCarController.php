@@ -27,9 +27,7 @@ class AdminCarController extends Controller
 
     public function showIndex($id)
     {
-        $car = Car::where('id', $id)->with(['reservations', 'photos'])->with(['brandKey', 'modelKey', 'price' => fn($query) =>  $query->where('is_active', 1)])->first();
-
-        return Inertia::render('adminPanel/cars/Car', ['car' => $car]);
+        return Inertia::render('adminPanel/cars/Car', ['id' => $id]);
     }
 
     public function updateCar(Request $request, $id)

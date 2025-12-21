@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Carbon\Carbon;
+use function Laravel\Prompts\error;
 
 class ReservationController extends Controller
 {
@@ -287,6 +288,16 @@ class ReservationController extends Controller
     }
 
     public function showReservations(){
-        return Inertia::render('adminPanel/reservation/Reservations', ['reservations' => Reservation::with(['extras', 'pickupLocation', 'returnLocation'])->get()]);
+        return Inertia::render('adminPanel/reservation/Reservations');
+    }
+
+    public function rejectReservation($id)
+    {
+        $res = Reservation::findOrFail($id);
+        if($res->status !== 'pending')
+            return response()->json(['error' => 'Reservation not pending'], 422);
+        $res->status = 'cancelled';
+        $res->save();
+        return response()->json(['success' => 'Reservation cancelled'], 200);
     }
 }

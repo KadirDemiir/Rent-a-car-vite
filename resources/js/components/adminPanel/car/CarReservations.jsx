@@ -4,14 +4,14 @@ import ShowResCard from "../reservations/ShowResCard.jsx";
 import ChevronNavigation from "../reservations/ChevronNavigation.jsx";
 import {useTranslation} from "react-i18next";
 
-export default function CarReservations({allReservations, current = true, past = true}) {
+export default function CarReservations({allReservations, updateData, current = true, past = true}) {
+    console.log(allReservations);
     const reservations = useMemo(() => {
         if (current && past) return allReservations;
-
         return allReservations.filter(res =>
             current
                 ? ['pending', 'confirmed'].includes(res.status)
-                : ['failed', 'completed'].includes(res.status)
+                : ['cancelled', 'completed'].includes(res.status)
         );
     }, [current, past, allReservations]);
     console.log(reservations)
@@ -37,8 +37,8 @@ export default function CarReservations({allReservations, current = true, past =
         }
     };
 
-    const currentReservations = reservations.slice(startIndex, startIndex + perPage);
-    const totalPages = Math.ceil(reservations.length / perPage);
+    const currentReservations = reservations?.slice(startIndex, startIndex + perPage);
+    const totalPages = Math.ceil(reservations?.length / perPage);
     const currentPage = Math.floor(startIndex / perPage) + 1;
 
     return (
@@ -50,8 +50,11 @@ export default function CarReservations({allReservations, current = true, past =
                 </tr>
                 </thead>
                 <tbody>
-                {currentReservations.map((r, index) => (
-                    <tr key={startIndex + index} onClick={() => setSelectedReservation(r)}
+                {currentReservations?.map((r, index) => (
+                    <tr key={startIndex + index} onClick={() => {
+                        setSelectedReservation(r);
+                        console.log(r);
+                    }}
                         className="cursor-pointer hover:bg-gray-100">
                         <Td
                             cls={TDclass}
@@ -89,9 +92,9 @@ export default function CarReservations({allReservations, current = true, past =
 
             < ChevronNavigation handlePrev={handlePrev} handleNext={handleNext} startIndex={startIndex}
                                 perPage={perPage} currentPage={currentPage} totalPages={totalPages}
-                                length={reservations.length}/>
+                                length={reservations?.length}/>
             {selectedReservation && (
-                <ShowResCard res={selectedReservation} closeModal={closeModal} curr={current} past={past}/>
+                <ShowResCard res={selectedReservation} updateData={updateData} closeModal={closeModal} curr={current} past={past}/>
             )}
         </div>
     );

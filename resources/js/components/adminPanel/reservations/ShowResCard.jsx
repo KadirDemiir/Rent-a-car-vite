@@ -1,6 +1,7 @@
 import ReservationAction from "./ReservationAction.jsx";
 import { useTranslation } from "react-i18next";
 import {useCurrency} from "../../../providers/CurrencyContext.jsx";
+import {useState} from "react";
 
 const DetailItem = ({ label, value, className = "" }) => (
     <div className={`flex flex-col py-2 border-b border-gray-100 last:border-0 ${className}`}>
@@ -9,9 +10,9 @@ const DetailItem = ({ label, value, className = "" }) => (
     </div>
 );
 
-export default function ShowResCard({ res, closeModal, curr, past }) {
+export default function ShowResCard({ res, updateData, closeModal, curr, past }) {
+    console.log(res);
     const { t, i18n } = useTranslation();
-    console.log(i18n.language);
     const {calculateTotal, current} = useCurrency();
     const formatDate = (date) => {
         return new Date(date).toLocaleString("tr-TR", {
@@ -125,28 +126,10 @@ export default function ShowResCard({ res, closeModal, curr, past }) {
                             </dl>
                         </div>
                     </div>
-
-                    {/*{res.reservation_extras?.length > 0 && (
-                        <div className="mt-6 bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-                            <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 flex items-center gap-2">
-                                <svg className="w-4 h-4 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
-                                {t("adminpanel.reservation.reservation_modal.taken_extra_services")}
-                            </h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                {res.extras.map((hizmet, index) => (
-                                    <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
-                                        <span className="font-medium text-sm text-gray-700">{hizmet.extra.name[i18n.language]}</span>
-                                        <span className="font-bold text-sm text-gray-900 bg-white px-2 py-1 rounded shadow-sm">{hizmet.price}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                */}</div>
-
+                </div>
                 {curr && (
                     <div className="p-6 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
-                        <ReservationAction closeModal={closeModal} res={res} />
+                        <ReservationAction closeModal={closeModal} updateData={updateData} res={res} />
                     </div>
                 )}x
             </div>

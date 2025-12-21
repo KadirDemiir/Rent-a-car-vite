@@ -1,4 +1,6 @@
-export default function ReservationAction({ closeModal, res }) {
+import axios from "axios";
+
+export default function ReservationAction({updateData, closeModal, res }) {
     const handleApprove = () => {
         const confirm = window.confirm(`${res.name} ${res.surname} adlı kişinin rezervasyonunu onaylamak istediğinize emin misiniz?`);
         if (confirm) {
@@ -7,10 +9,30 @@ export default function ReservationAction({ closeModal, res }) {
         }
     };
 
+    const handleReject = async () => {
+        try {
+            const response = await axios.patch(`/reservation/reject/${res.id}`, {
+                headers: { 'Accept': 'application/json' }
+            });
+            updateData();
+            console.log(response.data.success);
+            closeModal();
+
+        } catch (error) {
+            if (error.response?.status === 422) {
+                alert(error.response.data.error);
+            } else if (error.response?.status === 405) {
+                console.error("Metot hatası: Laravel rotası PATCH mi POST mu kontrol et!");
+            } else {
+                console.error("Bir hata oluştu:", error.message);
+            }
+        }
+    };
+
     return (
         <div className="mt-2 flex items-center justify-end gap-3 pt-2">
             <button
-                onClick={() => closeModal()}
+                onClick={() => handleReject()}
                 className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 bg-white hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300 font-medium transition-all duration-200 shadow-sm active:scale-95 cursor-pointer"
             >
                 İptal Et

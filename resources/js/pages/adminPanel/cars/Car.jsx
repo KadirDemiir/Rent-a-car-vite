@@ -2,12 +2,35 @@ import Navbar from "../../../components/adminPanel/navbar/Navbar.jsx";
 import ModifyCar from "../../../components/adminPanel/car/ModifyCar.jsx";
 import CarReservations from "../../../components/adminPanel/car/CarReservations.jsx";
 import IncomingGraph from "../../../components/adminPanel/car/IncomingGraph.jsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import axios from "axios";
 
 
-export default function Car({car}){
-    console.log(car);
+export default function Car({id}){
+    console.log(id);
+    const [car, setCar] = useState(null);
+    const [reservations, setReservations] = useState(null);
     const [success, setSuccess] = useState("");
+    const [loading, setLoading] = useState(true);
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const response = await axios.get(`/get-car-information/${id}`);
+            setCar(response.data.car);
+            setReservations(response.data.car.reservations)
+            console.log(response.data.car);
+        } catch (error) {
+            console.log(error.response?.data || error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+    useEffect(() => {
+        fetchData();
+    }, [id]);
+
+    if (loading) return <div>Loading...</div>;
+    if (!car) return <div>Car not found</div>;
     return(
       <div className="w-full">
           < Navbar>
@@ -24,11 +47,11 @@ export default function Car({car}){
                   < ModifyCar car={car} setSuccess={setSuccess}/>
                 <div className="max-h-[40vh] overflow-y-hidden">
                     <span className="font-bold ">Araca Ait Rezervasyonalar </span><span className="text-[14px]">(Detayar İçin Tıklayınız)</span>
-                    < CarReservations allReservations={car.reservations} past={false}/>
+                    < CarReservations updateData={fetchData} allReservations={reservations} past={false}/>
                 </div>
                 <div className="max-h-[40vh] overflow-y-hidden">
                     <span className="font-bold ">Araca Ait Geçmiş Rezervasyonalar </span><span className="text-[14px]">(Detayar İçin Tıklayınız)</span>
-                    < CarReservations allReservations={car.reservations} current={false}/>
+                    < CarReservations updateData={fetchData} allReservations={reservations} current={false}/>
                 </div>
                 < IncomingGraph />
               </div>
