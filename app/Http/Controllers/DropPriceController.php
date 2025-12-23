@@ -59,12 +59,10 @@ class DropPriceController extends Controller
                     'currency' => $validatedData['currency'],
                 ]);
             }
-            return redirect()->route('adminShowDropPrice')->with('success', 'Fiyatlar başarıyla güncellendi.');
+            return response()->json(['success' => true], 200);
         } catch (\Exception $e) {
             Log::error('Drop price update error: '.$e->getMessage());
-            return redirect()->back()->withErrors([
-                'general' => 'Fiyatlar güncellenirken bir hata oluştu. Lütfen tekrar deneyin.'
-            ]);
+            return response()->json(['error' => 'Fiyatlar güncellenirken bir hata oluştu. Lütfen tekrar deneyin.'], 422);
         }
     }
 
@@ -74,18 +72,16 @@ class DropPriceController extends Controller
                 'coefficients' => 'required|json',
             ]);
             $coeffs = json_decode($validatedData['coefficients'], true);
-            foreach ($coeffs as $segmentName => $segmentData) {
+            foreach ($coeffs as $segment_id => $segmentData) {
                 Segment::updateOrCreate(
-                    ['name' => $segmentName],
+                    ['id' => $segment_id],
                     ['coefficient' => $segmentData['value']]
                 );
             }
-            return redirect()->route('adminShowDropPrice')->with('success', 'Fiyatlar başarıyla güncellendi.');
+            return response()->json(['success' => true, 'segments' => Segment::where('is_active', true)->get()], 200);
         } catch (\Exception $e) {
             Log::error('Drop price update error: '.$e->getMessage());
-            return redirect()->back()->withErrors([
-                'general' => 'Fiyatlar güncellenirken bir hata oluştu. Lütfen tekrar deneyin.'
-            ]);
+            return response()->json(['errors' => 'Fiyatlar güncellenirken bir hata oluştu. Lütfen tekrar deneyin.'], 422);
         }
 
     }

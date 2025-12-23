@@ -41,7 +41,7 @@ export default function DropCoefficient({segments, onSuccess, onError}) {
             .then((res) => {
                 setCoeffiError({});
                 if (res.data?.success) {
-                    onSuccess?.(res.data.success);
+                    onSuccess?.("Updated Successfully.");
                 }
             })
             .catch((errors) => {

@@ -69,7 +69,7 @@ export default function DropLocations({locations: locationObjects, dropPrice, on
                 setLocationError({});
                 window.scrollTo({top: 0, behavior: "smooth"});
                 if (res.data?.success) {
-                    onSuccess?.(res.data.success);
+                    onSuccess?.("Updated Successfully.");
                 }
             })
             .catch((errors) => {

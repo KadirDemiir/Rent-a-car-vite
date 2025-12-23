@@ -39,9 +39,11 @@ export default function DropForm({handleSubmit, opt, data, setData, error, setEr
 
     return (
         <>
-            {opt.map((s, index) => (
+            {opt.map((s, index) => {
+                const name = minZero ? s : t(`segment.${s}`);
+                return(
                 <div key={index} className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700 text-center">{t(`segment.${s}`)}</label>
+                    <label className="block text-sm font-medium text-gray-700 text-center">{name}</label>
                     <input
                         name={s}
                         value={data[s]?.value || ""}
@@ -51,7 +53,7 @@ export default function DropForm({handleSubmit, opt, data, setData, error, setEr
                     />
                     {error[s] && <div className="text-sm text-center text-red-500">{error[s]}</div>}
                 </div>
-            ))}
+            )})}
             <div className="md:col-span-full flex justify-end">
                 <button
                     type="button"
