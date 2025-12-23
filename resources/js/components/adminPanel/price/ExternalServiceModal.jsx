@@ -7,7 +7,6 @@ export default function ExternalServiceModal({ service, close}) {
     const {t} = useTranslation();
     const [error, setError] = useState(null);
     const [languages, setLanguages] = useState([]);
-    const [currencies, setCurrencies] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -15,21 +14,11 @@ export default function ExternalServiceModal({ service, close}) {
             .then(res => {
                 const langs = res.data.languages.map(l => ({ label: l.name, value: l.code }));
                 setLanguages(langs);
+                setLoading(false);
             })
             .catch(err => {
                 console.error(err);
             });
-        axios.get("/get-supported-currencies")
-            .then(res => {
-                const currs = res.data.currencies.map(c => ({label: `${c.code} (${c.symbol})`, value: c.id}));
-                setCurrencies(currs);
-                setLoading(false);
-            })
-            .catch(err => {
-                setLoading(false);
-                console.error(err);
-            });
-
     }, []);
 
     const handleSubmit = (data) => {
@@ -74,7 +63,7 @@ export default function ExternalServiceModal({ service, close}) {
                 </h3>
                 <hr className="mb-6" />
                 {error && <div className={`border-l-12 border-red-600 bg-red-400 text-white p-2 mb-4`}>{error}</div>}
-                {!loading && <ExternalServiceForm service={service} close={close} onSubmit={handleSubmit} languages={languages} currencies={currencies}/>}
+                {!loading && <ExternalServiceForm service={service} close={close} onSubmit={handleSubmit} languages={languages}/>}
             </div>
         </div>
     );

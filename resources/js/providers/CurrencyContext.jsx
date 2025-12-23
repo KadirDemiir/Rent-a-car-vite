@@ -55,9 +55,9 @@ export const CurrencyProvider = ({ children }) => {
     };
 
     const calculateTotal = useMemo(() => {
-        return (a = 0) => {
+        return (a = 0, curr = current) => {
             if (!current) return a;
-            const result = a * current.exchange_rate;
+            const result = a * curr.exchange_rate;
             return parseFloat(result.toFixed(2));
         };
     }, [current]);
