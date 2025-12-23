@@ -127,7 +127,7 @@ export default function ShowResCard({ res, updateData, closeModal, curr, past })
                         </div>
                     </div>
                 </div>
-                {curr && (
+                {res.status === 'pending' && (
                     <div className="p-6 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
                         <ReservationAction closeModal={closeModal} updateData={updateData} res={res} />
                     </div>
