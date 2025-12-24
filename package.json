@@ -8,17 +8,15 @@
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.14",
         "@vitejs/plugin-react": "^4.3.4",
-        "axios": "^1.8.4",
+        "axios": "^1.13.2",
         "concurrently": "^9.1.2",
         "laravel-vite-plugin": "^1.2.0",
         "tailwindcss": "^4.0.14",
         "vite": "^6.2.2"
     },
     "dependencies": {
-        "@inertiajs/inertia": "^0.11.1",
-        "@inertiajs/inertia-react": "^0.8.1",
         "@inertiajs/progress": "^0.1.2",
-        "@inertiajs/react": "^2.0.5",
+        "@inertiajs/react": "^2.3.4",
         "@lexical/react": "^0.33.0",
         "@tiptap/extension-color": "^2.24.2",
         "@tiptap/extension-heading": "^2.24.2",
@@ -40,7 +38,7 @@
         "react-datepicker": "^6.9.0",
         "react-dom": "^18.3.1",
         "react-i18next": "^15.5.1",
-        "react-quill": "^2.0.0",
+        "react-quill-new": "^3.7.0",
         "react-router-dom": "^7.6.0",
         "recharts": "^2.15.3",
         "version": "^0.0.1"
