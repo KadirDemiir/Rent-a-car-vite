@@ -1,8 +1,8 @@
 
-export default function CarCardProp({photo_path, context}){
+export default function CarCardProp({photo, context}){
     return(
         <div className="h-12 w-full flex items-center gap-2">
-            <img src={photo_path} className="h-6 w-6" alt="" />
+            {photo}
             <span className="font-semibold text-gray-600">{context}</span>
         </div>
     );

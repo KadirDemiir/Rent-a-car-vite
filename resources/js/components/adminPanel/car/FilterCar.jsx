@@ -2,6 +2,7 @@ import {useEffect, useMemo, useState} from "react";
 import SelectOptions from "../../websites/filterSelectors/SelectOptions.jsx";
 import {useTranslation} from "react-i18next";
 import axios from "axios";
+import {SlidersHorizontal} from 'lucide-react';
 
 export default function FilterCar({cars, setFilteredCars}) {
     const {t} = useTranslation();
@@ -124,7 +125,8 @@ export default function FilterCar({cars, setFilteredCars}) {
                         onClick={handleFilterToggle}
                         className="inline-flex items-center gap-2 rounded-xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:border-gray-400"
                     >
-                        <img src="/storage/svg/filter.svg" alt="" className="h-3" />
+                        {/*<img src="/storage/svg/filter.svg" alt="" className="h-3" />*/}
+                        <SlidersHorizontal/>
                         {openFilter ? hideFiltersLabel : showFiltersLabel}
                     </button>
                     <button
@@ -138,7 +140,7 @@ export default function FilterCar({cars, setFilteredCars}) {
             </div>
 
             <div className="flex flex-col gap-3 md:flex-row">
-                <div className="relative flex-1 min-w-[240px]">
+                <div className="relative flex-1 min-w-60">
                     <input
                         value={searchTerm}
                         onChange={(e) => handleSearch(e.target.value)}

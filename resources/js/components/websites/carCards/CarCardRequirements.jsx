@@ -1,5 +1,5 @@
 import CarCardsProp from './carCardsProp/CarCardsProp.jsx';
-
+import {User, Car, Shield} from 'lucide-react';
 export default function CarCardRequirements({min_age, experience, collateral, compName}){
     return(
         <div className="flex-1 flex flex-col gap-4">
@@ -7,15 +7,15 @@ export default function CarCardRequirements({min_age, experience, collateral, co
             {compName}
         </div>
         <CarCardsProp
-        photo_path = "/storage/svg/requirements/calendar.svg"
+        photo ={<User/>}
         context = {min_age}
         />
         <CarCardsProp
-        photo_path = "/storage/svg/requirements/steering-wheel.svg"
+        photo ={<Car/>}
         context = {experience}
         />
         <CarCardsProp
-        photo_path = "/storage/svg/requirements/assurance.svg"
+        photo ={<Shield/>}
         context = {collateral}
         />
     </div>
