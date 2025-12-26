@@ -23,7 +23,15 @@ export default function ExternalServiceForm({ service, close, onSubmit, language
     const [pricingTiers, setPricingTiers] = useState(null);
 
     useEffect(() => {
-        if (!service?.extra_service_prices) return;
+        if (!service?.extra_service_prices) {
+            setPricingTiers([
+                {min_days:1, max_days:3, price: "", label_key:"1-3_days_price"},
+                {min_days:4, max_days:7, price: "", label_key:"4-7_days_price"},
+                {min_days:8, max_days:15, price:"", label_key:"8-15_days_price"},
+                {min_days:16, max_days:999, price: "", label_key:"more_than_15_days_price"}
+            ]);
+            return;
+        };
         const getP = (min, max) => {
             const basePrice = service.extra_service_prices.find(e => e.min_days === min && e.max_days === max)?.price;
             return calculateTotal(basePrice, currencies.find(c => c.code === currency)) || "";
@@ -34,7 +42,7 @@ export default function ExternalServiceForm({ service, close, onSubmit, language
             {min_days:8, max_days:15, price:getP(8,15), label_key:"8-15_days_price"},
             {min_days:16, max_days:999, price:getP(16,999), label_key:"more_than_15_days_price"}
         ]);
-    }, [currency, service, calculateTotal]);
+    }, [service, calculateTotal]);
 
     const handlePriceChange = (i, v) => setPricingTiers(p => {
         const n = [...p];
