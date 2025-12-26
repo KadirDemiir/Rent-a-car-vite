@@ -20,7 +20,7 @@ export default function ReservationCarInfo({
                 <div className="flex flex-wrap gap-3 justify-center">
                     {features.map((item, index) => (
                         <div key={index} className="flex flex-col items-center justify-center p-2 rounded-xl w-20 shadow-xl">
-                            <img src={item.icon} alt="" className="w-6 h-6 mb-1" />
+                            {item.icon}
                             <span className="text-sm text-gray-600 text-center">{item.label}</span>
                         </div>
                     ))}
@@ -31,7 +31,7 @@ export default function ReservationCarInfo({
                 <div className="flex flex-wrap gap-3 justify-center">
                     {requirements.map((item, index) => (
                         <div key={index} className="flex flex-col items-center justify-center p-2 rounded-xl w-24 shadow-2xl">
-                            <img src={item.icon} alt="" className="w-6 h-6 mb-1" />
+                            {item.icon}
                             <span className="text-sm text-gray-600 text-center">{item.label}</span>
                         </div>
                     ))}

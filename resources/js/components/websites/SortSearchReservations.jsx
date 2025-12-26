@@ -6,6 +6,7 @@ import ReservationCarPhoto from "./reservation/ReservationCarPhoto.jsx";
 import ReservationCarInfo from "./reservation/ReservationCarInfo.jsx";
 import ReservationCarPayment from "./reservation/ReservationCarPayment.jsx";
 import {router} from "@inertiajs/react";
+import {Fuel, Settings2, Shield, User, Users} from "lucide-react";
 
 const applyFilters = (cars, segment, fuelType, transmissionType) => {
     return cars.filter(car => {
@@ -55,29 +56,29 @@ export default function SortSearchReservations({availableCars = [], sortBy, segm
                 const title = `${t(filteredCar.brand_key.key)} ${t(filteredCar.model_key.key)} • ${t(`fuel.${filteredCar.fuel_id}`)} • ${t(`transmission.${filteredCar.transmission_id}`)}`;
                 const features = [
                     {
-                        icon: "/storage/svg/carFeatures/gas_station.svg",
+                        icon: <Fuel/>,
                         label: t(`fuel.${filteredCar.fuel_id}`),
                     },
                     {
-                        icon: "/storage/svg/carFeatures/transmission.svg",
+                        icon: <Settings2/>,
                         label: t(`transmission.${filteredCar.transmission_id}`),
                     },
                     {
-                        icon: "/storage/svg/carFeatures/groups.svg",
+                        icon: <Users />,
                         label: t("website.car_card.properties.seat_count_{count}", {count: filteredCar.seat_count}),
                     },
                 ];
                 const requirements = [
                     {
-                        icon: "/storage/svg/requirements/assurance.svg",
+                        icon: <Shield />,
                         label: t("website.car_card.requirement.{amount}_{currency}_deposit", {amount: filteredCar.deposit, currency: "try"}),
                     },
                     {
-                        icon: "/storage/svg/requirements/calendar.svg",
+                        icon: <User/>,
                         label: t("website.car_card.requirements.required_min_{age}", {age: 22}),
                     },
                     {
-                        icon: "/storage/svg/requirements/steering-wheel.svg",
+                        icon: <User/>,
                         label: t("website.car_card.requirements.{year}_year_experience", {year: 2}),
                     },
                 ];
