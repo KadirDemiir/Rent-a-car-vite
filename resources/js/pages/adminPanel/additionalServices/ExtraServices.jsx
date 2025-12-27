@@ -3,12 +3,14 @@ import Td from "../../../components/adminPanel/table/Td.jsx";
 import { useState } from "react";
 import ExternalServiceModal from "../../../components/adminPanel/price/ExternalServiceModal.jsx";
 import {useTranslation} from "react-i18next";
+import {useCurrency} from "../../../providers/CurrencyContext.jsx";
 
 export default function ExtraServices({ extraServices, success, error }) {
     console.log(extraServices);
     const {t, i18n} = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [instantService, setInstantService] = useState(null);
+    const {calculateTotal} = useCurrency();
 
     const header = [t("adminpanel.pricing.adding_services.external_services.service"), t("adminpanel.pricing.adding_services.external_services.1-3_days_price"), t("adminpanel.pricing.adding_services.external_services.4-7_days_price"), t("adminpanel.pricing.adding_services.external_services.8-15_days_price"), t("adminpanel.pricing.adding_services.external_services.more_than_15_days_price"), t("adminpanel.pricing.adding_services.external_services.stock"), t("adminpanel.pricing.adding_services.external_services.max_limit"), t("adminpanel.pricing.adding_services.external_services.current_stock"), t("adminpanel.pricing.adding_services.external_services.description")];
     const TDclass = "border border-gray-500 px-4 py-2";
@@ -53,10 +55,10 @@ export default function ExtraServices({ extraServices, success, error }) {
                                     <Td
                                         contents={[
                                             name[i18n.language],
-                                            es.extra_service_prices.find(e => e.min_days === 1 && e.max_days === 3).price,
-                                            es.extra_service_prices.find(e => e.min_days === 4 && e.max_days === 7).price,
-                                            es.extra_service_prices.find(e => e.min_days === 8 && e.max_days === 15).price,
-                                            es.extra_service_prices.find(e => e.min_days === 16 && e.max_days === 999).price,
+                                            calculateTotal(es.extra_service_prices.find(e => e.min_days === 1 && e.max_days === 3).base_price).toFixed(2),
+                                            calculateTotal(es.extra_service_prices.find(e => e.min_days === 4 && e.max_days === 7).base_price).toFixed(2),
+                                            calculateTotal(es.extra_service_prices.find(e => e.min_days === 8 && e.max_days === 15).base_price).toFixed(2),
+                                            calculateTotal(es.extra_service_prices.find(e => e.min_days === 16 && e.max_days === 999).base_price).toFixed(2),
                                             es.stock,
                                             es.max_limit,
                                             es.current_stock ?? "-",

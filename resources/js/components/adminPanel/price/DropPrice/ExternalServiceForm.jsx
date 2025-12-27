@@ -7,11 +7,11 @@ import { useTranslation } from "react-i18next";
 import {useCurrency} from "../../../../providers/CurrencyContext.jsx";
 
 export default function ExternalServiceForm({ service, close, onSubmit, languages = [] }) {
-    console.log(service);
+    console.log(service?.extra_service_prices);
     const { t } = useTranslation();
     const [lang, setLang] = useState(languages[0]?.value ?? '');
-    const {currencies, current, calculateTotal} = useCurrency();
-    const [currency, setCurrency] = useState(currencies[1]?.code ?? '');
+    const {currencies, calculateTotal} = useCurrency();
+    const [currency, setCurrency] = useState(service?.extra_service_prices[0]?.currency_id ?? currencies[1]?.id ?? '');
     const [inputErrors, setInputErrors] = useState({});
     const [formError, setFormError] = useState();
     const [name, setName] = useState(service?.name ? JSON.parse(service.name) : {});
@@ -19,7 +19,6 @@ export default function ExternalServiceForm({ service, close, onSubmit, language
     const [stock, setStock] = useState(service?.stock || "");
     const [maxLimit, setMaxLimit] = useState(service?.max_limit || "");
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-
     const [pricingTiers, setPricingTiers] = useState(null);
 
     useEffect(() => {
@@ -33,8 +32,7 @@ export default function ExternalServiceForm({ service, close, onSubmit, language
             return;
         };
         const getP = (min, max) => {
-            const basePrice = service.extra_service_prices.find(e => e.min_days === min && e.max_days === max)?.price;
-            return calculateTotal(basePrice, currencies.find(c => c.code === currency)) || "";
+            return service.extra_service_prices.find(e => e.min_days === min && e.max_days === max)?.price;
         };
         setPricingTiers([
             {min_days:1, max_days:3, price: getP(1,3), label_key:"1-3_days_price"},
@@ -93,7 +91,7 @@ export default function ExternalServiceForm({ service, close, onSubmit, language
         formData.append("description", JSON.stringify(description));
         formData.append("stock", stock);
         formData.append("max_limit", maxLimit);
-        formData.append("currency", currencies.find(c => c.code === currency).id);
+        formData.append("currency", currency);
         formData.append("pricing", JSON.stringify(pricingTiers.map(({ label_key, ...rest }) => rest)));
 
         if (service)
@@ -127,7 +125,7 @@ export default function ExternalServiceForm({ service, close, onSubmit, language
             />
 
             <div className={`col-span-2`}>
-                <SelectOptions options={currencies.map(c => ({label: `${c.code.toUpperCase()} ${c.symbol}`, value: c.code}))} value={[currency]} onChange={(e) => setCurrency(e)} options_name={t("adminpanel.pricing.adding_services.external_services.add_new_service_modal.currency")} />
+                <SelectOptions options={currencies.map(c => ({label: `${c.code.toUpperCase()} ${c.symbol}`, value: c.id}))} value={[currency]} onChange={(e) => setCurrency(e)} options_name={t("adminpanel.pricing.adding_services.external_services.add_new_service_modal.currency")} />
             </div>
 
             {pricingTiers?.map((tier, index) => (

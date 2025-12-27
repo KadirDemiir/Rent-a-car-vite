@@ -13,6 +13,7 @@ class ExtraServicePrice extends Model
         'min_days',
         'max_days',
         'price',
+        'base_price',
         'currency_id'
     ];
 

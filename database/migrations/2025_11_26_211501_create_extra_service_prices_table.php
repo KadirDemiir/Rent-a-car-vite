@@ -18,7 +18,8 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->integer('min_days')->unsigned(); // Örn: 1
             $table->integer('max_days')->unsigned(); // Örn: 3
-            $table->decimal('price', 10, 2);         // Örn: 150.00
+            $table->decimal('price', 15, 4);
+            $table->decimal('base_price', 15, 4);
             $table->foreignId('currency_id')->constrained('currencies')->onDelete('cascade');
 
             $table->timestamps();

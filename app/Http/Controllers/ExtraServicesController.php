@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Currency;
 use App\Models\ExtraServicePrice;
 use App\Models\ExtraServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class ExtraServicesController extends Controller
@@ -34,7 +34,8 @@ class ExtraServicesController extends Controller
 
         try {
             DB::beginTransaction();
-
+            $selectedCurrency = Currency::findOrFail($validated['currency']);
+            $rate = $selectedCurrency->exchange_rate;
             $extraService = ExtraServices::updateOrCreate(
                 ['id' => $validated['id'] ?? null],
                 [
@@ -49,7 +50,6 @@ class ExtraServicesController extends Controller
 
             $prices = json_decode($validated['pricing'], true);
 
-            // Remove old prices for this service to prevent duplication or obsolete tiers
             ExtraServicePrice::where('extra_service_id', $extraService->id)->delete();
 
             foreach ($prices as $price) {
@@ -59,6 +59,7 @@ class ExtraServicesController extends Controller
                     'min_days' => $price['min_days'],
                     'max_days' => $price['max_days'],
                     'price' => $price['price'],
+                    'base_price' => (float) $price['price'] / $rate,
                 ]);
             }
 
