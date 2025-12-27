@@ -57,6 +57,8 @@ class  CarController extends Controller
         ]);
         Log::info('car', ['aşama 1' => 1]);
         try {
+            $selectedCurrency = Currency::findOrFail($validated['currency']);
+            $rate = $selectedCurrency->exchange_rate;
             DB::beginTransaction();
             $brandTranslationKey = TranslationKey::create([
                 'key' => 'car.brand.' . Str::uuid(),
@@ -124,6 +126,7 @@ class  CarController extends Controller
                             'max_days' => $maxDayVal,
                             'currency_id' => $validated['currency'],
                             'price' => $priceValue,
+                            'base_price' => (float) $priceValue / $rate,
                             'is_active' => true,
                         ]);
                 }

@@ -40,7 +40,7 @@ export default function Car({ id }) {
                     {car.license_plate} - {car.brand} {car.model} {car.fuel_type} {car.transmission_type} {car.year}
                 </div>
                 <hr className="my-4" />
-                
+
                 {success && (
                     <div className="mb-4 p-3 rounded bg-green-100 text-green-800 border border-green-300">
                         {success}
@@ -49,19 +49,19 @@ export default function Car({ id }) {
 
                 <div className="w-full flex flex-col gap-16">
                     <ModifyCar car={car} setCar={setCar} setSuccess={setSuccess} />
-                    
+
                     <div className="max-h-[40vh] overflow-y-hidden">
                         <span className="font-bold">Araca Ait Rezervasyonlar </span>
                         <span className="text-sm text-gray-500">(Detaylar İçin Tıklayınız)</span>
                         <CarReservations updateData={fetchData} allReservations={reservations} past={false} />
                     </div>
-                    
+
                     <div className="max-h-[40vh] overflow-y-hidden">
                         <span className="font-bold">Araca Ait Geçmiş Rezervasyonlar </span>
                         <span className="text-sm text-gray-500">(Detaylar İçin Tıklayınız)</span>
                         <CarReservations updateData={fetchData} allReservations={reservations} current={false} />
                     </div>
-                    
+
                     <IncomingGraph />
                 </div>
             </Navbar>
