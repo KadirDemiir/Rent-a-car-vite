@@ -1,13 +1,13 @@
-import React from "react";
 import CarForm from "./form/CarForm.jsx";
-import {usePage} from "@inertiajs/react";
-import {useTranslation} from "react-i18next";
+import { usePage } from "@inertiajs/react";
+import { useTranslation } from "react-i18next";
 import axios from "axios";
-import {reloadTranslations} from "../../../i18n.js";
+import { reloadTranslations } from "../../../i18n.js";
 
-export default function CarModify({ closeModal = null, car = null, setCar}) {
-    const {t, i18n} = useTranslation();
-    const {success, error} = usePage().props;
+export default function CarModify({ closeModal = null, car = null, setCar }) {
+    const { t, i18n } = useTranslation();
+    const { success, error } = usePage().props;
+
     const handleSubmit = async (data) => {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         try {
@@ -15,7 +15,6 @@ export default function CarModify({ closeModal = null, car = null, setCar}) {
                 headers: { 'X-CSRF-TOKEN': csrfToken },
             });
             await reloadTranslations(i18n.language);
-            console.log(t(res.data.car.brand_key.key));
             setCar(res.data.car);
             closeModal();
         } catch (error) {
@@ -23,7 +22,6 @@ export default function CarModify({ closeModal = null, car = null, setCar}) {
             closeModal();
         }
     };
-
 
     return (
         <>
@@ -45,9 +43,7 @@ export default function CarModify({ closeModal = null, car = null, setCar}) {
                     {error}
                 </div>
             )}
-            < CarForm mode="edit" onSubmit={handleSubmit} car={car}/>
-
-
+            <CarForm mode="edit" onSubmit={handleSubmit} car={car} />
         </>
     );
 }

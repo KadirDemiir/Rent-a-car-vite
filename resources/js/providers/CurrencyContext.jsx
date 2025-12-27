@@ -55,10 +55,14 @@ export const CurrencyProvider = ({ children }) => {
     };
 
     const calculateTotal = useMemo(() => {
-        return (a = 0, curr = current) => {
+        return (a = 0, curr = current, convertToBase = true) => {
             if (!current) return a;
-            const result = a * curr.exchange_rate;
-            return parseFloat(result.toFixed(2));
+            let result = a;
+            if(convertToBase)
+                result *= curr.exchange_rate;
+            else
+                 result /= curr.exchange_rate;
+            return result;
         };
     }, [current]);
 

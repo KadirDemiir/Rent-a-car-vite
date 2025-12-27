@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Car;
+use App\Models\Currency;
 use App\Models\Language;
 use App\Models\Photo;
 use App\Models\Price;
@@ -53,6 +54,8 @@ class AdminCarController extends Controller
         ]);
         Log::info(2);
         try {
+            $selectedCurrency = Currency::findOrFail($validated['currency']);
+            $rate = $selectedCurrency->exchange_rate;
             DB::beginTransaction();
             $car = Car::with(['photos', 'brandKey', 'modelKey', 'price' => fn($query) => $query->where('is_active', true)])->findOrFail($id);
 
@@ -80,6 +83,7 @@ class AdminCarController extends Controller
                         'max_days' => $maxDayVal,
                         'currency_id' => $validated['currency'],
                         'price' => $priceValue,
+                        'base_price' => (float) $priceValue / $rate,
                         'is_active' => true,
                     ]);
 

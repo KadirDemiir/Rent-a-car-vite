@@ -1,5 +1,4 @@
 import Navbar from "../../../components/adminPanel/navbar/Navbar.jsx";
-
 import CampaignForm from "../../../components/adminPanel/campaign/CampaignForm.jsx";
 import {router} from "@inertiajs/react";
 import {useTranslation} from "react-i18next";

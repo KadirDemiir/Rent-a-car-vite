@@ -18,7 +18,8 @@ return new class extends Migration
             $table->enum('month', ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']);
             $table->unsignedSmallInteger('min_days');
             $table->unsignedSmallInteger('max_days');
-            $table->decimal('price', 10, 2);
+            $table->decimal('price', 15, 2);
+            $table->decimal('base_price', 15, 2);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

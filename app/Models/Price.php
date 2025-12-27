@@ -13,6 +13,7 @@ class Price extends Model
         'max_days',
         'currency_id',
         'price',
+        'base_price',
         'is_active',
     ];
 
