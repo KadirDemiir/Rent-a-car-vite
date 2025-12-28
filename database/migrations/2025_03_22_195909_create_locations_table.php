@@ -13,10 +13,15 @@ return new class extends Migration
     {
         Schema::create('locations', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('parent_id')->nullable()->constrained('locations')->onDelete('set null');
             $table->string('name');
             $table->string('city');
-            $table->string('address');
+            $table->text('address');
             $table->string('phone');
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
+
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

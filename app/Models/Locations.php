@@ -11,11 +11,20 @@ class Locations extends Model
 
     protected $fillable = [
         'name',
+        'parent_id',
         'city',
         'address',
-        'phone'
+        'phone',
+        'latitude',
+        'longitude',
+        'is_active'
     ];
 
+
+    public function parent()
+    {
+        return $this->belongsTo(Locations::class, 'parent_id');
+    }
     public function cars()
     {
         return $this->hasMany(Car::class);
