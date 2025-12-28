@@ -107,10 +107,10 @@ export default function SortSearchReservations({availableCars = [], sortBy, segm
                         />
 
                         <ReservationCarPayment
-                            dailyPrice={dailyPriceValue}
-                            dropPrice={dropPriceValue}
+                            dailyPrice={dailyPriceValue.toFixed(2)}
+                            dropPrice={dropPriceValue.toFixed(2)}
                             totalDays={totalDays}
-                            totalPrice={totalPriceValue}
+                            totalPrice={totalPriceValue.toFixed(2)}
                             currencySymbol={currencySymbol}
                             rentLabel={t("website.searchReservation.rent_now")}
                             onRentNow={() => {

@@ -64,7 +64,7 @@ export default function Extras({car, selectedExtras, setSelectedExtras}){
                     <div key={e.id} className={`relative group rounded-lg shadow-lg  flex justify-between p-4 ${isSelected ? 'bg-blue-100 border-2 border-blue-600' : 'bg-white border-2 border-gray-200 hover:bg-gray-50'} cursor-pointer`} onClick={() => handleToggle(e.id, price, currency_id)}>
                         <div className={`flex flex-col gap-2`}>
                             <div className={`font-bold `}>{name[i18n.language]}</div>
-                            <div className={`text-sm`}><span className={`text-sm font-thin text-gray-700`}>{e.type}</span>: <span>{calculateTotal(price)} {current.symbol}</span></div>
+                            <div className={`text-sm`}><span className={`text-sm font-thin text-gray-700`}>{e.type}</span>: <span>{calculateTotal(price).toFixed(2)} {current.symbol}</span></div>
                         </div>
                         <div className={`flex flex-col items-end justify-end gap-2`}>
                             <div>
