@@ -17,11 +17,6 @@ class LocationsController extends Controller
         return response()->json(['locations' => $locations]);
     }
 
-    public function showAllAdminpanel()
-    {
-        $locations = Locations::all();
-        return Inertia::render('adminPanel/locations/Locations', ['locations' => $locations]);
-    }
 
     public function addLocation(Request $request)
     {

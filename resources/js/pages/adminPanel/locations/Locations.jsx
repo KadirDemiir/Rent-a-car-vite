@@ -1,14 +1,33 @@
 import Navbar from "../../../components/adminPanel/navbar/Navbar.jsx";
 import { useEffect, useState } from "react";
-import LocationForm from "../../../components/adminPanel/locations/LocationForm.jsx";
-import LocationMap from "../../../components/adminPanel/locations/LoactionMap.jsx";
-import axios from "axios";
 import LocationAdd from "../../../components/adminPanel/locations/LocationAdd.jsx";
+import LocationsList from "../../../components/adminPanel/locations/LocationsList.jsx";
+import axios from "axios";
 
-export default function Locations({ locations }) {
+export default function Locations() {
+    const [locations, setLocations] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [errors, setErrors] = useState({});
     const [success, setSuccess] = useState();
-    const [isModalOpen, setIsModalOpen] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get('/adminpanel/get-locations');
+            if (response.data.success) {
+                setLocations(response.data.data);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     useEffect(() => {
         if (success) {
@@ -18,10 +37,6 @@ export default function Locations({ locations }) {
             return () => clearTimeout(timer);
         }
     }, [success]);
-
-
-
-
 
     return (
         <div className="min-h-screen bg-slate-50 relative">
@@ -59,8 +74,12 @@ export default function Locations({ locations }) {
                     </div>
                     <br/>
                     {isModalOpen && (
-                        <LocationAdd errors={errors} setErrors={setErrors} setSuccess={setSuccess} locations={locations} closeModal={() => setIsModalOpen(false)}/>
+                        <LocationAdd errors={errors} setErrors={setErrors} refresh={fetchData} setSuccess={setSuccess} locations={locations} closeModal={() => setIsModalOpen(false)}/>
                     )}
+                </div>
+
+                <div>
+                    <LocationsList locations={locations} />
                 </div>
             </Navbar>
         </div>

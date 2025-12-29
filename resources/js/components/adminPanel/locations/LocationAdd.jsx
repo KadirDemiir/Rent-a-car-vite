@@ -3,7 +3,7 @@ import LocationMap from "./LoactionMap.jsx";
 import axios from "axios";
 import {useEffect, useState} from "react";
 
-export default function LocationAdd({errors, setErrors, setSuccess, locations, closeModal}){
+export default function LocationAdd({errors, refresh, setErrors, setSuccess, locations, closeModal}){
     const [latitude, setLatitude] = useState(0);
     const [longitude, setLongitude] = useState(0);
     const [searchQuery, setSearchQuery] = useState("");
@@ -49,6 +49,7 @@ export default function LocationAdd({errors, setErrors, setSuccess, locations, c
             if (response.status === 200 || response.status === 201) {
                 setSuccess("Lokasyon başarıyla kaydedildi!");
                 setFormData({ name: '', city: '', phone: '', email: '', address: '' });
+                refresh();
                 closeModal();
             }
         } catch (error) {

@@ -196,6 +196,15 @@ Route::patch('/reservation/reject/{id}', [ReservationController::class, 'rejectR
 
 Route::post('/adminpanel/locations/add', [LocationsController::class, 'addLocation'])->name('adminAddLocation');
 
+Route::get('/adminpanel/get-locations', function () {
+    $locations = \App\Models\Locations::with('parent')->get();
+    return response()->json([
+        'success' => true,
+        'data'    => $locations,
+        'count'   => $locations->count()
+    ], 200);
+});
+
 Route::group([
     'prefix' => LaravelLocalization::setLocale(),
     'middleware' => [
@@ -239,7 +248,7 @@ Route::group([
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('campaigns') . '/{id}', [CampaignsController::class, 'showIndexAdminPanel'])->name('showIndexAdminPanel');
     Route::post('/adminpanel/campaign/add', [CampaignsController::class, 'addCampaign'])->name('adminAddCampaign');
 
-    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('locations'), [LocationsController::class, 'showAllAdminpanel'])->name('adminLocations ');
+    Route::inertia(dbTransRoute('adminpanel') . '/' . dbTransRoute('locations'), 'adminPanel/locations/Locations')->name('adminLocations ');
     Route::inertia(dbTransRoute('adminpanel') . '/' . dbTransRoute('locations') . '/' . dbTransRoute('add'), 'adminPanel/locations/AddLocation')->name('adminAddLocation ');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('reservations'), [ReservationController::class, 'showReservations'])->name('adminReservations ');
     Route::inertia(dbTransRoute('adminpanel') . '/' . dbTransRoute('reservations') . '/' . dbTransRoute('add'), 'adminPanel/reservations/AddReservation')->name('adminAddReservation ');
