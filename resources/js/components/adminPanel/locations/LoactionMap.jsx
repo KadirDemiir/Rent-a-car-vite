@@ -1,9 +1,8 @@
-import { useEffect } from 'react'; // Ekledik
+import { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css'; // CSS burada mutlaka olmalı
+import 'leaflet/dist/leaflet.css';
 
-// İkon hatasını burada tanımlayarak çözüyoruz
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
@@ -17,8 +16,6 @@ let DefaultIcon = L.icon({
 function ChangeView({ center }) {
     const map = useMap();
     useEffect(() => {
-        // Harita boyutu değiştiğinde veya modal açıldığında
-        // grileşme sorununu çözen kritik komut
         map.invalidateSize();
         map.setView(center, 14);
     }, [center, map]);
@@ -32,14 +29,12 @@ function MapEvents({ setLatitude, setLongitude, latitude, longitude }) {
             setLongitude(e.latlng.lng);
         },
     });
-    // icon={DefaultIcon} eklemesini yaptık
     return latitude && longitude ? <Marker position={[latitude, longitude]} icon={DefaultIcon} /> : null;
 }
 
 export default function LocationMap({ latitude, setLatitude, longitude, setLongitude, searchQuery, setSearchQuery, handleSearch }) {
     return (
         <div className="space-y-4">
-            {/* Arama ve Koordinat Başlığı Kısmı */}
             <div className="flex flex-col sm:flex-row gap-3 items-end">
                 <div className="flex-1 w-full">
                     <label className="text-xs font-bold text-slate-400 uppercase ml-1 tracking-wider">Haritada Konum Seç</label>
@@ -52,7 +47,7 @@ export default function LocationMap({ latitude, setLatitude, longitude, setLongi
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
                         />
-                        <button onClick={handleSearch} className="absolute right-1.5 top-1.5 bg-slate-800 text-white px-4 py-1.5 rounded-lg text-xs font-medium hover:bg-black transition-colors">
+                        <button type={`button`} onClick={handleSearch} className="absolute right-1.5 top-1.5 bg-slate-800 text-white px-4 py-1.5 rounded-lg text-xs font-medium hover:bg-black transition-colors">
                             Bul
                         </button>
                     </div>
@@ -62,12 +57,11 @@ export default function LocationMap({ latitude, setLatitude, longitude, setLongi
                 </div>
             </div>
 
-            {/* Harita Konteynırı - Yüksekliği h-[400px] yaparak sabitledik */}
-            <div className="h-[400px] w-full rounded-3xl overflow-hidden border-4 border-slate-50 shadow-inner relative z-0">
+            <div className="h-100 w-full rounded-3xl overflow-hidden border-4 border-slate-50 shadow-inner relative z-0">
                 <MapContainer
                     center={[latitude, longitude]}
                     zoom={11}
-                    scrollWheelZoom={true} // Opsiyonel: Daha iyi UX
+                    scrollWheelZoom={true}
                     style={{ height: '100%', width: '100%' }}
                 >
                     <TileLayer

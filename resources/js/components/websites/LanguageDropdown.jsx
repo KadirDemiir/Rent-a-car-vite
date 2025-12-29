@@ -78,7 +78,7 @@ export default function LanguageDropdown() {
 
     return (
         <div ref={ref} className="w-24 relative flex items-center justify-center">
-            <button onClick={() => setOpen(!open)} className="px-2 py-1 border rounded-xl flex items-center justify-center gap-2">
+            <button type={`button`} onClick={() => setOpen(!open)} className="px-2 py-1 border rounded-xl flex items-center justify-center gap-2">
                 <img src={languages[current]?.flag} alt="" className="h-6 w-6 rounded-2xl" />
                 <span>{current.toUpperCase()}</span>
                 <div className="h-6 w-6">
