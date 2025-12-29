@@ -17,10 +17,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('city');
             $table->text('address');
+            $table->string('email');
             $table->string('phone');
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();
-
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

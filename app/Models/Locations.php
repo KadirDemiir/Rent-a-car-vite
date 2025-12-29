@@ -14,6 +14,7 @@ class Locations extends Model
         'parent_id',
         'city',
         'address',
+        'email',
         'phone',
         'latitude',
         'longitude',
