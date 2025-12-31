@@ -3,12 +3,12 @@ import LocationMap from "./LoactionMap.jsx";
 import axios from "axios";
 import {useEffect, useState} from "react";
 
-export default function LocationAdd({errors, refresh, setErrors, setSuccess, locations, closeModal}){
-    const [latitude, setLatitude] = useState(0);
-    const [longitude, setLongitude] = useState(0);
+export default function LocationAdd({deflocation = null, formData, setFormData, errors, setErrors, locations, latitude, setLatitude, longitude, setLongitude, submit}){
+/*    const [latitude, setLatitude] = useState(deflocation?.latitude ?? 0);
+    const [longitude, setLongitude] = useState(deflocation?.longitude ?? 0);*/
     const [searchQuery, setSearchQuery] = useState("");
     const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState({ name: '', city: '', phone: '', email: '', address: '' });
+    /*const [formData, setFormData] = useState({ name: deflocation?.name ?? '', city: deflocation?.city ?? '', phone: deflocation?.phone ?? '', email: deflocation?.email ?? '', address: deflocation?.address ?? '' });*/
     const locationsOptions = [
         { label: "Yok (Ana Ofis)", value: '' },
         ...(locations?.map(l => ({ label: l.name, value: l.id })) || [])
@@ -16,6 +16,7 @@ export default function LocationAdd({errors, refresh, setErrors, setSuccess, loc
     const [selectedParentLocation, setSelectedParentLocation] = useState(locationsOptions[0].value);
 
     useEffect(() => {
+        if(latitude > 0 || longitude > 0) return;
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((pos) => {
                 setLatitude(pos.coords.latitude);
@@ -39,30 +40,9 @@ export default function LocationAdd({errors, refresh, setErrors, setSuccess, loc
 
     const handleSave = async () => {
         if (!validate()) return
-
         setLoading(true);
         const finalData = { ...formData, latitude, longitude, parentId: selectedParentLocation };
-
-        try {
-            const response = await axios.post('/adminpanel/locations/add', finalData);
-
-            if (response.status === 200 || response.status === 201) {
-                setSuccess("Lokasyon başarıyla kaydedildi!");
-                setFormData({ name: '', city: '', phone: '', email: '', address: '' });
-                refresh();
-                closeModal();
-            }
-        } catch (error) {
-            console.error(error);
-            if (error.response?.data?.errors) {
-                setErrors(error.response.data.errors);
-                setErrors("Lütfen formdaki hataları kontrol edin.");
-            } else {
-                setErrors("Bir hata oluştu, lütfen tekrar deneyin.");
-            }
-        } finally {
-            setLoading(false);
-        }
+        submit(finalData);
     };
 
     const handleInputChange = (e) => {

@@ -22,13 +22,19 @@ class Locations extends Model
     ];
 
 
+    protected $casts = [
+        'latitude' => 'double',
+        'longitude' => 'double',
+        'isActive' => 'boolean',
+    ];
+
     public function parent()
     {
         return $this->belongsTo(Locations::class, 'parent_id');
     }
     public function cars()
     {
-        return $this->hasMany(Car::class);
+        return $this->hasMany(Car::class, 'location_id');
     }
 
     /*public function reservations()

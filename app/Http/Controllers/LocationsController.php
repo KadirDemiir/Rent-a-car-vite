@@ -17,6 +17,15 @@ class LocationsController extends Controller
         return response()->json(['locations' => $locations]);
     }
 
+    public function getIndexLocationInfo($id)
+    {
+        $location = Locations::with(['cars.price', 'cars.brandKey', 'cars.modelKey'])->findOrFail($id);
+        Log::info($location);
+        $locations = Locations::all();
+        Log::info($locations);
+        return response()->json(['location' => $location, 'locations' => $locations]);
+    }
+
 
     public function addLocation(Request $request)
     {
@@ -56,6 +65,60 @@ class LocationsController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Bir hata oluştu.',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updateLocation(Request $request, $id)
+    {
+        Log::info("Lokasyon Güncelleme İsteği - ID: " . $id);
+
+        $validator = Validator::make($request->all(), [
+            'name'      => 'required|string|max:255',
+            'city'      => 'required|string|max:100',
+            'phone'     => 'required|string|max:20',
+            'email'     => 'required|email|max:255',
+            'address'   => 'required|string',
+            'latitude'  => 'required|numeric',
+            'longitude' => 'required|numeric',
+            'parentId'  => 'nullable|exists:locations,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validasyon hatası oluştu.',
+                'errors'  => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $location = Locations::findOrFail($id);
+
+            $location->name = $request->name;
+            $location->city = $request->city;
+            $location->phone = $request->phone;
+            $location->email = $request->email;
+            $location->address = $request->address;
+            $location->latitude = $request->latitude;
+            $location->longitude = $request->longitude;
+            $location->parent_id = $request->parentId ?: null;
+
+            $location->save();
+
+            return response()->json([
+                'message' => 'Lokasyon başarıyla güncellendi.',
+                'data'    => $location
+            ], 200);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Güncellenmek istenen lokasyon bulunamadı.',
+            ], 404);
+        } catch (\Exception $e) {
+            Log::error("Güncelleme hatası: " . $e->getMessage());
             return response()->json([
                 'message' => 'Bir hata oluştu.',
                 'error'   => $e->getMessage()

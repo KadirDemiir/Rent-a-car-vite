@@ -33,6 +33,7 @@ function MapEvents({ setLatitude, setLongitude, latitude, longitude }) {
 }
 
 export default function LocationMap({ latitude, setLatitude, longitude, setLongitude, searchQuery, setSearchQuery, handleSearch }) {
+    console.log(typeof (longitude), typeof (latitude));
     return (
         <div className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-3 items-end">
@@ -53,7 +54,7 @@ export default function LocationMap({ latitude, setLatitude, longitude, setLongi
                     </div>
                 </div>
                 <div className="hidden sm:flex items-center px-4 py-2.5 bg-blue-50 text-blue-700 rounded-xl text-xs font-mono border border-blue-100">
-                    {latitude.toFixed(4)}, {longitude.toFixed(4)}
+                    {latitude?.toFixed(4)}, {longitude?.toFixed(4)}
                 </div>
             </div>
 

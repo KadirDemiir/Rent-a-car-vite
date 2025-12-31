@@ -10,6 +10,9 @@ export default function Locations() {
     const [errors, setErrors] = useState({});
     const [success, setSuccess] = useState();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [formData, setFormData] = useState({ name: '', city: '', phone: '', email: '', address: '' });
+    const [latitude, setLatitude] = useState( 0);
+    const [longitude, setLongitude] = useState( 0);
 
     const fetchData = async () => {
         setLoading(true);
@@ -38,6 +41,27 @@ export default function Locations() {
         }
     }, [success]);
 
+    const handleSubmit = async (finalData) => {
+        try {
+            const response = await axios.post('/adminpanel/locations/add', finalData);
+
+            if (response.status === 200 || response.status === 201) {
+                setSuccess("Lokasyon başarıyla kaydedildi!");
+                setFormData({ name: '', city: '', phone: '', email: '', address: '' });
+                fetchData();
+                setIsModalOpen(false);
+            }
+        } catch (error) {
+            console.error(error);
+            if (error.response?.data?.errors) {
+                setErrors(error.response.data.errors);
+                setErrors("Lütfen formdaki hataları kontrol edin.");
+            } else {
+                setErrors("Bir hata oluştu, lütfen tekrar deneyin.");
+            }
+            return false;
+        }
+    }
     return (
         <div className="min-h-screen bg-slate-50 relative">
             <Navbar>
@@ -74,7 +98,9 @@ export default function Locations() {
                     </div>
                     <br/>
                     {isModalOpen && (
-                        <LocationAdd errors={errors} setErrors={setErrors} refresh={fetchData} setSuccess={setSuccess} locations={locations} closeModal={() => setIsModalOpen(false)}/>
+                        <div className={``}>
+                            <LocationAdd formData={formData} setFormData={setFormData} errors={errors} setErrors={setErrors} locations={locations} setLatitude={setLatitude} setLongitude={setLongitude} latitude={latitude} longitude={longitude} submit={handleSubmit}/>
+                        </div>
                     )}
                 </div>
 

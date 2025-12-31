@@ -43,7 +43,7 @@ class Car extends Model
 
     public function location()
     {
-        return $this->belongsTo(Locations::class, 'location_id');
+        return $this->belongsTo(Locations::class);
     }
     public function photos(): HasMany
     {

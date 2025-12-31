@@ -195,6 +195,7 @@ Route::post('/create-reservation', [ReservationController::class, 'createReserva
 Route::patch('/reservation/reject/{id}', [ReservationController::class, 'rejectReservation'])->name('rejectReservation');
 
 Route::post('/adminpanel/locations/add', [LocationsController::class, 'addLocation'])->name('adminAddLocation');
+Route::post('/adminpanel/locations/update/{id}', [LocationsController::class, 'updateLocation'])->name('adminAddLocation');
 
 Route::get('/adminpanel/get-locations', function () {
     $locations = \App\Models\Locations::with('parent')->get();
@@ -204,6 +205,8 @@ Route::get('/adminpanel/get-locations', function () {
         'count'   => $locations->count()
     ], 200);
 });
+
+Route::get('/adminpanel/get-info/locations/{id}', [LocationsController::class, 'getIndexLocationInfo']);
 
 Route::group([
     'prefix' => LaravelLocalization::setLocale(),
@@ -248,10 +251,15 @@ Route::group([
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('campaigns') . '/{id}', [CampaignsController::class, 'showIndexAdminPanel'])->name('showIndexAdminPanel');
     Route::post('/adminpanel/campaign/add', [CampaignsController::class, 'addCampaign'])->name('adminAddCampaign');
 
-    Route::inertia(dbTransRoute('adminpanel') . '/' . dbTransRoute('locations'), 'adminPanel/locations/Locations')->name('adminLocations ');
-    Route::inertia(dbTransRoute('adminpanel') . '/' . dbTransRoute('locations') . '/' . dbTransRoute('add'), 'adminPanel/locations/AddLocation')->name('adminAddLocation ');
+    Route::inertia(dbTransRoute('adminpanel') . '/' . dbTransRoute('locations'), 'adminPanel/locations/Locations')->name('adminLocations');
+    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('locations'). '/{id}', function ($id) {
+        return inertia('adminPanel/locations/IndexLocation', [
+            'id' => $id
+        ]);
+    })->name('adminIndexLocations');
+    //Route::inertia(dbTransRoute('adminpanel') . '/' . dbTransRoute('locations') . '/' . dbTransRoute('add'), 'adminPanel/locations/AddLocation')->name('adminAddLocation ');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('reservations'), [ReservationController::class, 'showReservations'])->name('adminReservations ');
-    Route::inertia(dbTransRoute('adminpanel') . '/' . dbTransRoute('reservations') . '/' . dbTransRoute('add'), 'adminPanel/reservations/AddReservation')->name('adminAddReservation ');
+    //Route::inertia(dbTransRoute('adminpanel') . '/' . dbTransRoute('reservations') . '/' . dbTransRoute('add'), 'adminPanel/reservations/AddReservation')->name('adminAddReservation ');
     Route::inertia(dbTransRoute('adminpanel') . '/' . dbTransRoute('add'), 'adminPanel/users/Users')->name('adminUsers ');
 
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('drop-price'), [DropPriceController::class, 'showAdminDropPrice'])->name('adminShowDropPrice');
