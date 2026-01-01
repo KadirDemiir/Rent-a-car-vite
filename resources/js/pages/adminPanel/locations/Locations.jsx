@@ -10,7 +10,7 @@ export default function Locations() {
     const [errors, setErrors] = useState({});
     const [success, setSuccess] = useState();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [formData, setFormData] = useState({ name: '', city: '', phone: '', email: '', address: '' });
+    const [formData, setFormData] = useState({ name: '', city: '', phone: '', email: '', address: '', image: null });
     const [latitude, setLatitude] = useState( 0);
     const [longitude, setLongitude] = useState( 0);
 
@@ -42,12 +42,22 @@ export default function Locations() {
     }, [success]);
 
     const handleSubmit = async (finalData) => {
+        const formData = new FormData();
+        Object.entries(finalData).forEach(([key, value]) => {
+            if (value !== null && value !== undefined) {
+                formData.append(key, value);
+            }
+        });
         try {
-            const response = await axios.post('/adminpanel/locations/add', finalData);
+            const response = await axios.post('/adminpanel/locations/add', formData, {
+                header: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
 
             if (response.status === 200 || response.status === 201) {
                 setSuccess("Lokasyon başarıyla kaydedildi!");
-                setFormData({ name: '', city: '', phone: '', email: '', address: '' });
+                setFormData({ name: '', city: '', phone: '', email: '', address: '', image: null });
                 fetchData();
                 setIsModalOpen(false);
             }

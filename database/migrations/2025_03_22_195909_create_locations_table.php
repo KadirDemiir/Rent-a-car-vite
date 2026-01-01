@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('phone');
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();
+            $table->string('photo_path')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

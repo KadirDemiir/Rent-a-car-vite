@@ -17,6 +17,7 @@ class Locations extends Model
         'email',
         'phone',
         'latitude',
+        'photo_path',
         'longitude',
         'is_active'
     ];

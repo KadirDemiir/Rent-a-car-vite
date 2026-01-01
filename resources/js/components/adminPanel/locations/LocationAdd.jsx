@@ -1,14 +1,10 @@
 import LocationForm from "./LocationForm.jsx";
 import LocationMap from "./LoactionMap.jsx";
-import axios from "axios";
 import {useEffect, useState} from "react";
 
-export default function LocationAdd({deflocation = null, formData, setFormData, errors, setErrors, locations, latitude, setLatitude, longitude, setLongitude, submit}){
-/*    const [latitude, setLatitude] = useState(deflocation?.latitude ?? 0);
-    const [longitude, setLongitude] = useState(deflocation?.longitude ?? 0);*/
+export default function LocationAdd({ formData, setFormData, errors, setErrors, locations, latitude, setLatitude, longitude, setLongitude, submit}){
     const [searchQuery, setSearchQuery] = useState("");
     const [loading, setLoading] = useState(false);
-    /*const [formData, setFormData] = useState({ name: deflocation?.name ?? '', city: deflocation?.city ?? '', phone: deflocation?.phone ?? '', email: deflocation?.email ?? '', address: deflocation?.address ?? '' });*/
     const locationsOptions = [
         { label: "Yok (Ana Ofis)", value: '' },
         ...(locations?.map(l => ({ label: l.name, value: l.id })) || [])
@@ -43,12 +39,16 @@ export default function LocationAdd({deflocation = null, formData, setFormData, 
         setLoading(true);
         const finalData = { ...formData, latitude, longitude, parentId: selectedParentLocation };
         submit(finalData);
+        setLoading(false);
     };
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-        //if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
+        if (!e || !e.target) return;
+        const { name, value, type, files } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'file' ? files[0] : value
+        }));
     };
     const validate = () => {
         setErrors({});

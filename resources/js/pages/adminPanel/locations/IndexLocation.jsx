@@ -9,11 +9,10 @@ export default function IndexLocation({ id }) {
     const [locations, setLocations] = useState(null);
     const [success, setSuccess] = useState("");
     const [loading, setLoading] = useState(true);
-    // ÖNEMLİ: errors her zaman bir OBJE olmalı
     const [errors, setErrors] = useState({});
     const [latitude, setLatitude] = useState(0);
     const [longitude, setLongitude] = useState(0);
-    const [formData, setFormData] = useState({ name: '', city: '', phone: '', email: '', address: '' });
+    const [formData, setFormData] = useState({ name: '', city: '', phone: '', email: '', address: '', image: null });
 
     useEffect(() => {
         fetchData();
@@ -26,7 +25,8 @@ export default function IndexLocation({ id }) {
                 city: location.city || '',
                 phone: location.phone || '',
                 email: location.email || '',
-                address: location.address || ''
+                address: location.address || '',
+                image: location.photo_path ? `/storage/${location.photo_path}` : ''
             });
             setLatitude(Number(location.latitude) || 0);
             setLongitude(Number(location.longitude) || 0);
@@ -42,16 +42,20 @@ export default function IndexLocation({ id }) {
             setLoading(false);
         } catch (err) {
             console.error("Veri çekme hatası:", err);
-            // HATALIYDI: setErrors("string") yerine obje gönderiyoruz
             setErrors({ fetch: "Lokasyon bilgileri yüklenirken bir hata oluştu." });
             setLoading(false);
         }
     };
 
     const handleSubmit = async (finalData) => {
-        setErrors({}); // İstek başında hataları temizle
+        console.log(finalData);
+        setErrors({});
         try {
-            const response = await axios.post(`/adminpanel/locations/update/${id}`, finalData);
+            const response = await axios.post(`/adminpanel/locations/update/${id}`, finalData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
 
             if (response.status === 200 || response.status === 201) {
                 setSuccess("Lokasyon başarıyla kaydedildi!");
@@ -59,10 +63,8 @@ export default function IndexLocation({ id }) {
             }
         } catch (error) {
             if (error.response?.data?.errors) {
-                // Laravel'den gelen validasyon hatalarını (obje) set et
                 setErrors(error.response.data.errors);
             } else {
-                // Genel hatayı bir anahtar altında tut
                 setErrors({ general: "Bir hata oluştu, lütfen tekrar deneyin." });
             }
         }

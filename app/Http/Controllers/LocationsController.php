@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Locations;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
@@ -38,6 +39,7 @@ class LocationsController extends Controller
             'address'   => 'required|string',
             'latitude'  => 'required|numeric',
             'longitude' => 'required|numeric',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'parentId'  => 'nullable|exists:locations,id',
         ]);
 
@@ -47,7 +49,8 @@ class LocationsController extends Controller
                 'errors'  => $validator->errors()
             ], 422);
         }
-        Log::info(1);
+        if ($request->hasFile('image'))
+            $path = $request->file('image')->store('uploads', 'public');
         try {
             $location = new Locations();
             $location->name = $request->name;
@@ -58,6 +61,7 @@ class LocationsController extends Controller
             $location->latitude = $request->latitude;
             $location->longitude = $request->longitude;
             $location->parent_id = $request->parentId ?: null;
+            $location->photo_path = $path;
             $location->save();Log::info(2);
             return response()->json([
                 'message' => 'Lokasyon başarıyla kaydedildi.',
@@ -85,6 +89,7 @@ class LocationsController extends Controller
             'latitude'  => 'required|numeric',
             'longitude' => 'required|numeric',
             'parentId'  => 'nullable|exists:locations,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -97,6 +102,14 @@ class LocationsController extends Controller
         try {
             $location = Locations::findOrFail($id);
 
+            if ($request->hasFile('image')) {
+                if ($location->photo_path && Storage::disk('public')->exists($location->photo_path)) {
+                    Storage::disk('public')->delete($location->photo_path);
+                }
+                $path = $request->file('image')->store('uploads', 'public');
+                $location->photo_path = $path;
+            }
+
             $location->name = $request->name;
             $location->city = $request->city;
             $location->phone = $request->phone;
@@ -105,7 +118,6 @@ class LocationsController extends Controller
             $location->latitude = $request->latitude;
             $location->longitude = $request->longitude;
             $location->parent_id = $request->parentId ?: null;
-
             $location->save();
 
             return response()->json([
