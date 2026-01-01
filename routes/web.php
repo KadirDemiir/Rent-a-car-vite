@@ -197,6 +197,10 @@ Route::patch('/reservation/reject/{id}', [ReservationController::class, 'rejectR
 Route::post('/adminpanel/locations/add', [LocationsController::class, 'addLocation'])->name('adminAddLocation');
 Route::post('/adminpanel/locations/update/{id}', [LocationsController::class, 'updateLocation'])->name('adminAddLocation');
 
+Route::get('/get-locations', function () {
+    return response()->json(['success' => true, 'locations' => Locations::where('is_active', 1)->get()], 200);
+});
+
 Route::get('/adminpanel/get-locations', function () {
     $locations = \App\Models\Locations::with('parent')->get();
     return response()->json([

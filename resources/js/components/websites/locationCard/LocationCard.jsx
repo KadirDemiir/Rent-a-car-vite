@@ -1,26 +1,30 @@
-import {Plane, Phone, Mail} from 'lucide-react';
+import {Plane, Phone, Mail, MapPin} from 'lucide-react';
 export default function LocationCard({location}){
     return(
         <div className="col-span-1 rounded-2xl bg-white shadow-md">
-            <img src="/storage/kayseri-havalani.png" alt="" className="rounded-t-2xl  h-60" />
+            {location.photo_path ?
+                (<img src={`/storage/${location.photo_path}`} alt="" className="w-full rounded-t-2xl h-60" />)
+                :
+                (
+                    <div className="w-full rounded-t-2xl h-60 flex items-center justify-center">
+                        <MapPin/>
+                    </div>)
+            }
             <br />
             <div className="mx-4 pb-16 grid gap-6 ">
-                <div className="font-extrabold text-xl font-sans">Kayseri Havalanı</div>
-                <div className="font-normal text-gray-700">Kayseri Havalanı</div>
+                <div className="font-extrabold text-xl font-sans">{location.name}</div>
+                <div className="font-normal text-gray-700">{location.city}</div>
                 <div className="flex gap-4 h-8 items-center">
-                    {/*<img src="/storage/svg/locationCard/plane.svg" className="h-6 w-4" alt="" />*/}
                     <Plane />
-                    <div className="font-medium text-gray-700">Yeşil, Mustafa Kemal Paşa Blv., 38090 Kocasinan/Kayseri</div>
+                    <div className="font-medium text-gray-700">{location.address}</div>
                 </div>
                 <div className="flex gap-4 h-8 items-center">
-                    {/*<img src="/storage/svg/locationCard/phone.svg" className="h-6 w-4" alt="" />*/}
                     <Phone/>
-                    <div className="font-medium text-gray-700">+905555555555</div>
+                    <div className="font-medium text-gray-700">{location.phone}</div>
                 </div>
                 <div className="flex gap-4 h-8 items-center">
-                    {/*<img src="/storage/svg/locationCard/mail.svg" className="h-6 w-4" alt="" />*/}
                     <Mail/>
-                    <div className="font-medium text-gray-700">deneme@deneme.com</div>
+                    <div className="font-medium text-gray-700">{location.email}</div>
                 </div>
             </div>
         </div>
