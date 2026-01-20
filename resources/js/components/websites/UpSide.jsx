@@ -3,7 +3,7 @@ import { usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import LanguageDropdown from './LanguageDropdown.jsx';
 import CurrencyDropDown from "../CurrencyDropDown.jsx";
-import {User, CarFront} from 'lucide-react';
+import {User, CarFront, ClipboardCheck} from 'lucide-react';
 
 export default function UpSide() {
     const { auth } = usePage().props;
@@ -30,6 +30,12 @@ export default function UpSide() {
                 <div className="flex h-full min-w-[50%]">
                     <nav className="flex items-center justify-center h-full w-full">
                         <ul className="flex items-center justify-center gap-4 h-full w-[80%]">
+                            <li>
+                                <Link href={`/${i18n.language}/${t('address.checkReservation')}`} className="h-10 px-4 rounded-full bg-gray-100 border border-blue-800 flex items-center gap-2 hover:bg-blue-600 hover:shadow-lg transition-all duration-300 hover:text-white text-blue-800">
+                                    <ClipboardCheck size={20}/>
+                                    <div className="font-medium">{upperFirstLetter(t("website.navigator.check_reservation"))}</div>
+                                </Link>
+                            </li>
                             <li>
                                 {user ? (
                                 <button type="button" onClick={handleLogout} className="btn btn-danger">
