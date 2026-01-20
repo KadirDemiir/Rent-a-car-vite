@@ -39,6 +39,7 @@ class Reservation extends Model
     protected $casts = [
         'pickup_datetime' => 'datetime',
         'return_datetime' => 'datetime',
+        'birthday' => 'date'
     ];
 
     // İlişkiler

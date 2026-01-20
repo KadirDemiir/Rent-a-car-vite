@@ -28,7 +28,7 @@ return new class extends Migration
             $table->decimal('total_price', 10, 2);
             $table->string('email');
             $table->text('address');
-            $table->dateTime('birthdate');
+            $table->dateTime('birthday');
             $table->string('arrival_flight_no')->nullable();
             $table->string('return_flight_no')->nullable();
             $table->decimal('drop_price', 10, 2)->default(0);

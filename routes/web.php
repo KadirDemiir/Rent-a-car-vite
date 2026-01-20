@@ -193,6 +193,7 @@ Route::get('/get-extras', function () {
 });
 Route::post('/create-reservation', [ReservationController::class, 'createReservation'])->name('createReservation');
 Route::patch('/reservation/reject/{id}', [ReservationController::class, 'rejectReservation'])->name('rejectReservation');
+Route::patch('/reservation/approve/{id}', [ReservationController::class, 'approveReservation'])->name('approveReservation');
 
 Route::post('/adminpanel/locations/add', [LocationsController::class, 'addLocation'])->name('adminAddLocation');
 Route::post('/adminpanel/locations/update/{id}', [LocationsController::class, 'updateLocation'])->name('adminAddLocation');
