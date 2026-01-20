@@ -33,7 +33,7 @@ export default function UpSide() {
                             <li>
                                 <Link href={`/${i18n.language}/${t('address.checkReservation')}`} className="h-10 px-4 rounded-full bg-gray-100 border border-blue-800 flex items-center gap-2 hover:bg-blue-600 hover:shadow-lg transition-all duration-300 hover:text-white text-blue-800">
                                     <ClipboardCheck size={20}/>
-                                    <div className="font-medium">{upperFirstLetter(t("website.navigator.check_reservation"))}</div>
+                                    <div className="font-medium">{upperFirstLetter(t("website.navigator.check_reservation", "rez-kontrol"))}</div>
                                 </Link>
                             </li>
                             <li>

@@ -421,30 +421,58 @@ class ReservationController extends Controller
         return back()->with('success', 'Reservation cancelled successfully.');
     }
 
-    public function checkReservationPage()
+    public function checkReservationPage(Request $request)
     {
+        if ($request->filled('reservation_id') && $request->filled('email')) {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'email' => 'required|email',
+                'reservation_id' => 'required|numeric',
+            ]);
+
+            if ($validator->fails()) {
+                if ($request->wantsJson()) {
+                    return response()->json(['errors' => $validator->errors()], 422);
+                }
+                return Inertia::render('CheckReservation')->withErrors($validator);
+            }
+
+            $reservation = Reservation::where('id', $request->reservation_id)
+                ->where('email', $request->email)
+                ->with(['car.photos', 'pickupLocation', 'returnLocation', 'car.brandKey', 'car.modelKey', 'currency'])
+                ->first();
+
+            if ($reservation) {
+                return Inertia::render('GuestReservationDetails', [
+                    'reservation' => $reservation
+                ]);
+            }
+
+            return Inertia::render('CheckReservation')->withErrors([
+                'email' => 'Reservation not found or email does not match.'
+            ]);
+        }
+
         return Inertia::render('CheckReservation');
     }
 
     public function checkReservation(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'email' => 'required|email',
             'reservation_id' => 'required|numeric',
         ]);
 
-        $reservation = Reservation::where('id', $request->reservation_id)
-            ->where('email', $request->email)
-            ->with(['car.photos', 'pickupLocation', 'returnLocation', 'car.brandKey', 'car.modelKey', 'currency'])
-            ->first();
+        $exists = Reservation::where('id', $validated['reservation_id'])
+            ->where('email', $validated['email'])
+            ->exists();
 
-        if (!$reservation) {
-            return back()->with('error', 'Reservation not found or email does not match.');
+        if (!$exists) {
+            return back()->withErrors([
+                'email' => 'Reservation not found or email does not match.'
+            ]);
         }
 
-        return Inertia::render('GuestReservationDetails', [
-            'reservation' => $reservation
-        ]);
+        return to_route('checkReservationPage', $validated);
     }
 
     public function guestCancelReservation(Request $request, $id)
@@ -458,11 +486,22 @@ class ReservationController extends Controller
             ->firstOrFail();
 
         if ($reservation->status !== 'pending') {
+            if ($request->wantsJson()) {
+                return response()->json(['message' => 'Only pending reservations can be cancelled.', 'status' => 'error'], 422);
+            }
             return back()->with('error', 'Only pending reservations can be cancelled.');
         }
 
         $reservation->status = 'cancelled';
         $reservation->save();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Reservation cancelled successfully.',
+                'status' => 'success',
+                'reservation_status' => 'cancelled'
+            ]);
+        }
 
         return back()->with('success', 'Reservation cancelled successfully.');
     }

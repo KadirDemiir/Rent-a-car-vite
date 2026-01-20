@@ -1,18 +1,31 @@
-import React from 'react';
-import { Head, useForm, Link } from '@inertiajs/react';
+import React, { useState } from 'react';
+import { Head, Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import NavBar from '../components/websites/Navbar.jsx';
-import { Calendar, MapPin, CreditCard, Clock, CheckCircle, XCircle, AlertCircle, ArrowLeft } from 'lucide-react';
+import { MapPin, CreditCard, Clock, CheckCircle, XCircle, AlertCircle, ArrowLeft } from 'lucide-react';
+import axios from 'axios';
 
-export default function GuestReservationDetails({ reservation }) {
+export default function GuestReservationDetails({ reservation: initialReservation }) {
     const { t, i18n } = useTranslation();
-    const { patch, processing } = useForm({
-        email: reservation.email 
-    });
+    const [reservation, setReservation] = useState(initialReservation);
+    const [processing, setProcessing] = useState(false);
 
     const handleCancel = () => {
         if (confirm(t('website.reservation_details.confirm_cancel'))) {
-            patch(`/guest-reservation/${reservation.id}/cancel`);
+            setProcessing(true);
+            axios.patch(`/guest-reservation/${reservation.id}/cancel`, {
+                email: reservation.email
+            })
+            .then(response => {
+                 setReservation(prev => ({ ...prev, status: 'cancelled' }));
+            })
+            .catch(error => {
+                console.error(error);
+                alert('An error occurred while cancelling the reservation.');
+            })
+            .finally(() => {
+                setProcessing(false);
+            });
         }
     };
 
@@ -41,7 +54,7 @@ export default function GuestReservationDetails({ reservation }) {
             <NavBar />
 
             <div className="container mx-auto px-4 py-8">
-                <Link 
+                <Link
                     href={`/${i18n.language}/${t('address.checkReservation')}`}
                     className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6"
                 >
@@ -67,9 +80,9 @@ export default function GuestReservationDetails({ reservation }) {
                             <div className="w-full md:w-1/3">
                                 <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden bg-gray-100 mb-4">
                                      {reservation.car.photos && reservation.car.photos.length > 0 ? (
-                                        <img 
-                                            src={`/storage/${reservation.car.photos[0].photo_path}`} 
-                                            alt={reservation.car.brandKey?.key + ' ' + reservation.car.modelKey?.key} 
+                                        <img
+                                            src={`/storage/${reservation.car.photos[0].photo_path}`}
+                                            alt={reservation.car.brandKey?.key + ' ' + reservation.car.modelKey?.key}
                                             className="object-cover w-full h-full"
                                         />
                                     ) : (
@@ -80,7 +93,7 @@ export default function GuestReservationDetails({ reservation }) {
                                     {reservation.car.brandKey?.key} {reservation.car.modelKey?.key}
                                 </h3>
                             </div>
-                            
+
                             <div className="w-full md:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-4">
                                     <div className="bg-gray-50 p-4 rounded-lg">
@@ -90,7 +103,7 @@ export default function GuestReservationDetails({ reservation }) {
                                         <p className="font-bold text-gray-800">{reservation.pickup_location?.name}</p>
                                         <p className="text-sm text-gray-600">{formatDate(reservation.pickup_datetime)}</p>
                                     </div>
-                                    
+
                                     <div className="bg-gray-50 p-4 rounded-lg">
                                         <h4 className="flex items-center text-gray-500 font-semibold mb-2">
                                             <MapPin size={18} className="mr-2" /> {t('website.reservation_details.return')}
@@ -167,7 +180,7 @@ export default function GuestReservationDetails({ reservation }) {
                                 </button>
                             </div>
                         )}
-                        
+
                         {reservation.status === 'cancelled' && (
                              <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-md flex items-center">
                                 <AlertCircle size={20} className="mr-2" />
