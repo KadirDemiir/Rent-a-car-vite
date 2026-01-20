@@ -124,6 +124,7 @@ class AdminCarController extends Controller
                 'body_type' => 'required|int|exists:body_types,id',
                 'transmission_type' => 'required|int|exists:transmissions,id',
                 'fuel_type' => 'required|int|exists:fuels,id',
+                'status' => 'required|in:available,rented,unavailable',
             ]);
         Log::info('Kontrol Detay', ['car' => $validated]);
             $car = Car::with(['brandKey', 'modelKey'])->findOrFail($id);
@@ -151,6 +152,7 @@ class AdminCarController extends Controller
                 'body_type_id' => (int) $validated['body_type'],
                 'transmission_id' => (int) $validated['transmission_type'],
                 'fuel_id' => (int) $validated['fuel_type'],
+                'status' => $validated['status'],
             ]);
             $updatedCar = Car::with(['photos', 'brandKey', 'modelKey', 'price' => fn($query) => $query->where('is_active', true)])->findOrFail($id);
             Log::info('Car Detail Control', ['car_fuel' => $car->transmission_id]);

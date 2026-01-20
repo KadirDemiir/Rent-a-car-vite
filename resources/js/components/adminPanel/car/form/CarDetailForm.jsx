@@ -27,7 +27,8 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit }, ref) => {
         segment: car?.segment_id || "",          // Laravel: segment_id -> React: segment
         bodyType: car?.body_type_id || "",       // Laravel: body_type_id -> React: bodyType
         fuelType: car?.fuel_id || "",            // Laravel: fuel_id -> React: fuelType
-        transmissionType: car?.transmission_id || "" // Laravel: transmission_id -> React: transmissionType
+        transmissionType: car?.transmission_id || "", // Laravel: transmission_id -> React: transmissionType
+        status: car?.status || "available"
     };
 
     const [formData, setFormData] = useState(defaultData);
@@ -69,6 +70,7 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit }, ref) => {
                     bodyType: car?.body_type_id ?? res.data.bodyTypes[0]?.id ?? "",
                     fuelType: car?.fuel_id ?? res.data.fuels[0]?.id ?? "",
                     transmissionType: car?.transmission_id ?? res.data.transmissions[0]?.id ?? "",
+                    status: car?.status || "available",
                     brand,
                     model
                 };
@@ -150,6 +152,7 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit }, ref) => {
         fd.append("segment", d.segment);
         fd.append("body_type", d.bodyType);             // Backend: body_type
         fd.append("fuel_type", d.fuelType);             // Backend: fuel_type
+        fd.append("status", d.status);
         fd.append("transmission_type", d.transmissionType); // Backend: transmission_type
 
         return fd;
@@ -225,6 +228,17 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit }, ref) => {
                 options_name={t("adminpanel.car.car_modify.edit_car_information.transmission_type")}
                 onChange={e => handleSelectChange("transmissionType", e)}
                 value={[formData.transmissionType]}
+            />
+
+            <SelectOptions
+                options={[
+                    { label: "Available", value: "available" },
+                    { label: "Rented", value: "rented" },
+                    { label: "Unavailable", value: "unavailable" }
+                ]}
+                options_name={"Status"}
+                onChange={e => handleSelectChange("status", e)}
+                value={[formData.status]}
             />
         </form>
     );

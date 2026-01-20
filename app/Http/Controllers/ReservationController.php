@@ -335,6 +335,8 @@ class ReservationController extends Controller
 
     public function isCarAvailable($carId, $startDateTime, $finishDateTime, $pickupLocationId)
     {
+
+    if(Car::find($carId)->status === 'unavailable') return false;
         $bufferHours = 4;
 
         $reqStart = Carbon::parse($startDateTime);
@@ -361,7 +363,7 @@ class ReservationController extends Controller
             return $lastReservation->return_location_id == $pickupLocationId;
         } else {
             $car = Car::find($carId);
-            return $car && $car->current_location_id == $pickupLocationId;
+            return $car && $car->status == 'available' && $car->current_location_id == $pickupLocationId;
         }
     }
 

@@ -37,7 +37,7 @@ export default function Car({ id }) {
         <div className="w-full">
             <Navbar>
                 <div className="font-bold text-xl">
-                    {car.license_plate} - {car.brand} {car.model} {car.fuel_type} {car.transmission_type} {car.year}
+                    {car.license_plate} - {car.brand} {car.model} {car.fuel_type} {car.transmission_type} {car.year} <span className="text-blue-600">({car.status})</span>
                 </div>
                 <hr className="my-4" />
 
