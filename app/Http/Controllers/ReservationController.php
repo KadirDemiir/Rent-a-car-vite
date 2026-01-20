@@ -392,4 +392,78 @@ class ReservationController extends Controller
         $res->save();
         return response()->json(['success' => 'Reservation confirmed'], 200);
     }
+
+    public function myReservations()
+    {
+        $user = auth()->user();
+        $reservations = Reservation::where('user_id', $user->id)
+            ->with(['car.photos', 'pickupLocation', 'returnLocation', 'car.brandKey', 'car.modelKey', 'currency'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return Inertia::render('Profile/MyReservations', [
+            'reservations' => $reservations
+        ]);
+    }
+
+    public function cancelReservation($id)
+    {
+        $user = auth()->user();
+        $reservation = Reservation::where('user_id', $user->id)->where('id', $id)->firstOrFail();
+
+        if ($reservation->status !== 'pending') {
+            return back()->with('error', 'Only pending reservations can be cancelled.');
+        }
+
+        $reservation->status = 'cancelled';
+        $reservation->save();
+
+        return back()->with('success', 'Reservation cancelled successfully.');
+    }
+
+    public function checkReservationPage()
+    {
+        return Inertia::render('CheckReservation');
+    }
+
+    public function checkReservation(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'reservation_id' => 'required|numeric',
+        ]);
+
+        $reservation = Reservation::where('id', $request->reservation_id)
+            ->where('email', $request->email)
+            ->with(['car.photos', 'pickupLocation', 'returnLocation', 'car.brandKey', 'car.modelKey', 'currency'])
+            ->first();
+
+        if (!$reservation) {
+            return back()->with('error', 'Reservation not found or email does not match.');
+        }
+
+        return Inertia::render('GuestReservationDetails', [
+            'reservation' => $reservation
+        ]);
+    }
+
+    public function guestCancelReservation(Request $request, $id)
+    {
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        $reservation = Reservation::where('id', $id)
+            ->where('email', $request->email)
+            ->firstOrFail();
+
+        if ($reservation->status !== 'pending') {
+            return back()->with('error', 'Only pending reservations can be cancelled.');
+        }
+
+        $reservation->status = 'cancelled';
+        $reservation->save();
+
+        return back()->with('success', 'Reservation cancelled successfully.');
+    }
 }

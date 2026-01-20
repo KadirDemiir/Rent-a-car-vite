@@ -28,6 +28,9 @@ export default function DownSide() {
             <li className="h-full hover:bg-blue-700 flex flex-1 items-center justify-center rounded-md">
                 <Link href={`/${lang}/${t('address.about')}`} className="h-full w-full text-white flex items-center justify-center">{upperFirstLetter(t ('website.navigator.about_us'))}</Link>
             </li>
+            <li className="h-full hover:bg-blue-700 flex flex-1 items-center justify-center rounded-md">
+                <Link href="/check-reservation" className="h-full w-full text-white flex items-center justify-center">Check Reservation</Link>
+            </li>
             {/*
             <li className="h-full hover:bg-blue-700 flex flex-1 items-center justify-center rounded-md">
                 <Link href="/blog" className="h-full w-full text-white flex items-center justify-center">Blog</Link>

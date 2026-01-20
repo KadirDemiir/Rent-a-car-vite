@@ -242,7 +242,16 @@ Route::group([
     Route::get(dbTransRoute('reservation-create'), [ReservationController::class, 'showDetailPage'])->name('reservation-create');
     Route::post('/auth', [AuthController::class, 'auth'])->name('auth');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    Route::middleware('auth')->group(function () {
+        Route::get('/my-reservations', [ReservationController::class, 'myReservations'])->name('myReservations');
+        Route::patch('/my-reservations/{id}/cancel', [ReservationController::class, 'cancelReservation'])->name('cancelMyReservation');
+    });
     Route::get('/location', [LocationsController::class, 'index']);
+
+    Route::get('/check-reservation', [ReservationController::class, 'checkReservationPage'])->name('checkReservationPage');
+    Route::post('/check-reservation', [ReservationController::class, 'checkReservation'])->name('checkReservation');
+    Route::patch('/guest-reservation/{id}/cancel', [ReservationController::class, 'guestCancelReservation'])->name('guestCancelReservation');
 
     Route::inertia(dbTransRoute('adminpanel'), 'adminPanel/Home')->name('adminHome');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('cars'), [AdminCarController::class, 'showAll'])->name('adminCars');

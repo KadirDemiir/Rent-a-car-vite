@@ -11,6 +11,7 @@ class Reservation extends Model
 
     protected $fillable = [
         'car_id',
+        'user_id',
         'name',
         'surname',
         'tc_number',
@@ -74,5 +75,10 @@ class Reservation extends Model
     public function returnLocation()
     {
         return $this->belongsTo(Locations::class, 'return_location_id');
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo(Currency::class);
     }
 }
