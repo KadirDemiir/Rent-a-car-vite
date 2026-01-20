@@ -1,12 +1,11 @@
 import ReservationAction from "./ReservationAction.jsx";
 import { useTranslation } from "react-i18next";
 import {useCurrency} from "../../../providers/CurrencyContext.jsx";
-import {useState} from "react";
 
 const DetailItem = ({ label, value, className = "" }) => (
     <div className={`flex flex-col py-2 border-b border-gray-100 last:border-0 ${className}`}>
         <dt className="text-xs font-medium text-gray-500 local-uppercase tracking-wider mb-1">{label}</dt>
-        <dd className="text-sm font-semibold text-gray-900 break-words">{value || "-"}</dd>
+        <dd className="text-sm font-semibold text-gray-900 wrap-break-words">{value || "-"}</dd>
     </div>
 );
 

@@ -374,7 +374,7 @@ class ReservationController extends Controller
         $res = Reservation::findOrFail($id);
         if($res->status !== 'pending')
             return response()->json(['error' => 'Reservation not pending'], 422);
-        $res->payment_status = 'rejected';
+        $res->payment_status = 'failed';
         $res->status = 'cancelled';
         $res->save();
         return response()->json(['success' => 'Reservation cancelled'], 200);
