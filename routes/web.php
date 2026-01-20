@@ -191,6 +191,9 @@ Route::post('/adminpanel/cars/{id}', [AdminCarController::class, 'updateCar'])->
 Route::get('/get-extras', function () {
     return response()->json(['extras' => \App\Models\ExtraServices::where('stock', '>', 0)->with('extraServicePrices')->get()]);
 });
+Route::get('/get-included-services', function () {
+    return response()->json(['services' => \App\Models\InternalService::all()]);
+});
 Route::post('/create-reservation', [ReservationController::class, 'createReservation'])->name('createReservation');
 Route::patch('/reservation/reject/{id}', [ReservationController::class, 'rejectReservation'])->name('rejectReservation');
 Route::patch('/reservation/approve/{id}', [ReservationController::class, 'approveReservation'])->name('approveReservation');

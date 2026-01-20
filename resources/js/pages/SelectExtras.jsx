@@ -7,9 +7,10 @@ import PriceInformationCard from "../components/websites/reservation/create-rese
 import {useTranslation} from "react-i18next";
 import axios from "axios";
 import ReservationDatePreview from "../components/websites/reservation/ReservationDatePreview.jsx";
+import IncludedServices from "../components/websites/reservation/create-reservation/IncludeServicesList.jsx";
 
 export default function SelectExtras({car, params}){
-    console.log(car, params) ;
+    console.log(car, params);
     const {t} = useTranslation();
     const [selectedExtras, setSelectedExtras] = useState([]);
     const [user, setUser] = useState({name: {value: "", error: ""}, surname: {value: "", error: ""}, mail: {value: "", error: ""}, phone: {value: "", error: ""}, address: {value: "", error: ""}, birthday: {value: "", error: ""}, identity: {value: "", error: ""}, arrivalFlightNo: {value: "", error: ""}, returnFlightNo: {value: "", error: ""}, notes: {value: "", error: ""}, isNative: true});
@@ -72,17 +73,14 @@ export default function SelectExtras({car, params}){
         console.log(submissionData);
         axios.post('/create-reservation', submissionData)
             .then(res => {
-                // Başarılı ise sunucudan gelen veriyi göster
                 console.log('Reservation created:', res.data);
                 alert('Reservation successfully created!');
             })
             .catch(error => {
                 if (error.response) {
-                    // Sunucudan gelen hata
                     console.error('Validation errors:', error.response.data.errors || error.response.data);
                     alert('Error: ' + JSON.stringify(error.response.data));
                 } else {
-                    // Ağ veya başka bir hata
                     console.error('Error:', error.message);
                     alert('An unexpected error occurred.');
                 }
@@ -98,6 +96,9 @@ export default function SelectExtras({car, params}){
                 <div className={`flex flex-row gap-4`}>
                     <div className={`basis-7/10 flex flex-col gap-4`}>
                         <CarReview car={car}/>
+
+                        <IncludedServices />
+
                         <Extras car={car} selectedExtras={selectedExtras} setSelectedExtras={setSelectedExtras}/>
                         <UserInfo user={user} setUser={setUser}/>
                     </div>

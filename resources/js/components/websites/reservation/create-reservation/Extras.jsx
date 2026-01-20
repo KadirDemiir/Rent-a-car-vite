@@ -52,8 +52,12 @@ export default function Extras({car, selectedExtras, setSelectedExtras}){
     if(loading)
         return <>loading...</>
     return(
-        <div className={`grid grid-cols-3 gap-3`}>
-            <div className={`col-span-3 flex items-center justify-center bg-blue-600 rounded-lg text-white text-lg font-bold py-2`}>Extralar</div>
+        <div className={`bg-white grid grid-cols-3 gap-3 p-6 rounded-2xl shadow-md`}>
+            <div className={`col-span-3 `}>
+                <h2 className="text-lg font-bold text-gray-800 border-b pb-2">
+                    Ekstra Hizmetler
+                </h2>
+            </div>
             {extras?.map(e => {
                 console.log(selectedExtras);
                 let name = JSON.parse(e.name);
