@@ -222,11 +222,13 @@ class ReservationController extends Controller
             return [
                 'has_discount' => false,
                 'amount' => 0,
+                'discount_value' => 0,
                 'meta' => null
             ];
         }
 
         $discountAmount = 0;
+
 
         if ($discountRule->discount_type === 'percentage') {
             $discountAmount = $unitPrice * $discountRule->discount_value;
@@ -237,6 +239,7 @@ class ReservationController extends Controller
         return [
             'has_discount' => true,
             'amount' => round($discountAmount, 2),
+            'value' => $discountRule->discount_value,
             'meta' => $discountRule
         ];
     }
@@ -292,7 +295,11 @@ class ReservationController extends Controller
                 $baseDailyPrice
             );
 
-            $discountedDailyPrice = max(0, $baseDailyPrice - $discountData['amount']);
+            $dailyDiscountAmount = $discountData['amount'];
+            $discountRule = $discountData['meta'] ?? null;
+
+            $discountedDailyPrice = max(0, $baseDailyPrice - $dailyDiscountAmount);
+
             $rental_cost = $validated['total_days'] * $discountedDailyPrice;
 
             $total_price = $rental_cost + $drop_cost + $extras_total_price;
@@ -306,9 +313,12 @@ class ReservationController extends Controller
                 'pickup_location_id' => $validated['pick_up_location_id'],
                 'return_location_id' => $validated['return_location_id'],
                 'rental_days' => $validated['total_days'],
-                'daily_price' => $discountedDailyPrice,
+                'daily_price' => $baseDailyPrice,
                 'drop_price' => $validated['drop_price'] ?? null,
                 'extras_total' => $extras_total_price,
+                'discount_amount' => $discountData['value'],
+                'discount_type' => $discountRule ? $discountRule->discount_type : null,
+                'discount_target' => $discountRule ? $discountRule->target_type : null,
                 'total_price' => $total_price,
                 'name' => $validated['user_info']['name'],
                 'surname' => $validated['user_info']['surname'],

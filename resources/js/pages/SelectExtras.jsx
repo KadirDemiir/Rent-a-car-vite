@@ -47,7 +47,7 @@ export default function SelectExtras({car, params}){
         console.log(1);
         const submissionData = {
             car_id: car.id,
-            drop_price: car.drop_price ?? 1,
+            drop_price: car.drop_price ?? 0,
             total_days: car.total_days,
             daily_price: car.daily_price,
             currency_id: car.currency_id,
