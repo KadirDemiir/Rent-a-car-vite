@@ -22,6 +22,7 @@ class Car extends Model
 
     protected $fillable = [
         'location_id',
+        'current_location_id',
         'brand_translation_key_id',
         'model_translation_key_id',
         'year',
@@ -33,6 +34,7 @@ class Car extends Model
         'trunk_capacity',
         'fuel_id',
         'transmission_id',
+        'status',
         'license_plate'
     ];
 
