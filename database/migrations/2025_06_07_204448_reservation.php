@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('reservations', function (Blueprint $table) {
@@ -24,14 +21,17 @@ return new class extends Migration
             $table->dateTime('return_datetime');
             $table->unsignedTinyInteger('rental_days');
             $table->decimal('daily_price', 10, 2);
+            $table->decimal('drop_price', 10, 2)->default(0);
             $table->decimal('extras_total', 10, 2)->default(0);
+            $table->decimal('discount_amount', 10, 2)->default(0);
+            $table->string('discount_type')->nullable();
+            $table->string('discount_target')->nullable();
             $table->decimal('total_price', 10, 2);
             $table->string('email');
             $table->text('address');
             $table->dateTime('birthday');
             $table->string('arrival_flight_no')->nullable();
             $table->string('return_flight_no')->nullable();
-            $table->decimal('drop_price', 10, 2)->default(0);
             $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->text('notes')->nullable();
             $table->enum('payment_type', ['credit_card', 'cash', 'bank_transfer']);
@@ -41,9 +41,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('reservations');

@@ -104,7 +104,7 @@ export default function SelectExtras({car, params}){
                     <div className={`basis-3/10`}>
                         <ReservationDatePreview pickupDate={params.startDateTime} returnDate={params.finishDateTime} pickupLocation={params.PULocation.name} returnLocation={params.RLocation.name}/>
                         <br/>
-                        <PriceInformationCard total_days={car.total_days} daily_price={car.daily_price} extra_price={Object.values(selectedExtras).reduce((sum, se) => sum + (se.price ?? 0) * (se.count ?? 1), 0)}/>
+                        <PriceInformationCard total_days={car.total_days} daily_price={car.calculated_price.final_daily_price} extra_price={Object.values(selectedExtras).reduce((sum, se) => sum + (se.price ?? 0) * (se.count ?? 1), 0)}/>
                         <br/>
                         {error && <div className="text-red-600 font-bold mb-2">{error}</div>}
                         <button onClick={handleSubmit} type={`button`} className={`px-4 py-1 bg-blue-600 text-white rounded-xl hover:bg-blue-8**`}>Ofiste Öde</button>

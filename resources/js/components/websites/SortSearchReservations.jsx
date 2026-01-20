@@ -1,4 +1,3 @@
-
 import {useState, useEffect} from "react";
 import {useTranslation} from "react-i18next";
 import {useCurrency} from "../../providers/CurrencyContext.jsx";
@@ -17,7 +16,12 @@ const applyFilters = (cars, segment, fuelType, transmissionType) => {
     });
 };
 
-const resolveComparablePrice = (car) => Number(car?.daily_price ?? car?.price ?? 0);
+const resolveComparablePrice = (car) => {
+    if (car.calculated_price?.final_daily_price) {
+        return Number(car.calculated_price.final_daily_price);
+    }
+    return Number(car?.daily_price ?? car?.price ?? 0);
+};
 
 const applySorting = (cars, sortBy) => {
     const sorted = [...cars];
@@ -35,7 +39,6 @@ const applySorting = (cars, sortBy) => {
 };
 
 export default function SortSearchReservations({availableCars = [], sortBy, segment, fuelType, transmissionType, reservation}) {
-    console.log(reservation);
     const {t, i18n} = useTranslation();
     const [filteredCars, setFilteredCars] = useState([]);
     const {current, calculateTotal} = useCurrency();
@@ -54,6 +57,7 @@ export default function SortSearchReservations({availableCars = [], sortBy, segm
                 const coverPhoto = filteredCar.photos?.find(p => p.is_cover)?.photo_path;
                 const photoSrc = coverPhoto ? `/storage/${coverPhoto}` : undefined;
                 const title = `${t(filteredCar.brand_key.key)} ${t(filteredCar.model_key.key)} • ${t(`fuel.${filteredCar.fuel_id}`)} • ${t(`transmission.${filteredCar.transmission_id}`)}`;
+
                 const features = [
                     {
                         icon: <Fuel/>,
@@ -68,6 +72,7 @@ export default function SortSearchReservations({availableCars = [], sortBy, segm
                         label: t("website.car_card.properties.seat_count_{count}", {count: filteredCar.seat_count}),
                     },
                 ];
+
                 const requirements = [
                     {
                         icon: <Shield />,
@@ -82,12 +87,21 @@ export default function SortSearchReservations({availableCars = [], sortBy, segm
                         label: t("website.car_card.requirements.{year}_year_experience", {year: 2}),
                     },
                 ];
-                const dailyPriceValue = calculateTotal(filteredCar.daily_price ?? 0);
-                const dropPriceValue = calculateTotal(filteredCar.drop_price ?? 0);
+
+                const priceData = filteredCar.calculated_price || {};
+                const hasDiscount = filteredCar.discount_data?.has_discount ?? false;
                 const totalDays = filteredCar.total_days ?? 0;
-                const numericDrop = Number(filteredCar.drop_price ?? 0);
-                const numericDaily = Number(filteredCar.daily_price ?? 0);
-                const totalPriceValue = calculateTotal(numericDrop + numericDaily * Number(totalDays));
+
+                const rawBaseDaily = priceData.base_daily_price ?? filteredCar.daily_price ?? 0;
+                const rawFinalDaily = priceData.final_daily_price ?? filteredCar.daily_price ?? 0;
+                const rawDrop = priceData.drop_price ?? filteredCar.drop_price ?? 0;
+                const rawTotal = priceData.grand_total ??
+                    ((Number(rawDrop) + (Number(rawFinalDaily) * Number(totalDays))));
+
+                const baseDailyPrice = calculateTotal(rawBaseDaily);
+                const finalDailyPrice = calculateTotal(rawFinalDaily);
+                const dropPrice = calculateTotal(rawDrop);
+                const totalPrice = calculateTotal(rawTotal);
 
                 return (
                     <div
@@ -107,10 +121,12 @@ export default function SortSearchReservations({availableCars = [], sortBy, segm
                         />
 
                         <ReservationCarPayment
-                            dailyPrice={dailyPriceValue.toFixed(2)}
-                            dropPrice={dropPriceValue.toFixed(2)}
+                            baseDailyPrice={baseDailyPrice.toFixed(2)}
+                            dailyPrice={finalDailyPrice.toFixed(2)}
+                            hasDiscount={hasDiscount}
+                            dropPrice={dropPrice.toFixed(2)}
                             totalDays={totalDays}
-                            totalPrice={totalPriceValue.toFixed(2)}
+                            totalPrice={totalPrice.toFixed(2)}
                             currencySymbol={currencySymbol}
                             rentLabel={t("website.searchReservation.rent_now")}
                             onRentNow={() => {

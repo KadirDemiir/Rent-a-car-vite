@@ -18,11 +18,14 @@ class Reservation extends Model
         'pickup_location_id',
         'return_location_id',
         'pickup_datetime',
-        'drop_price',
         'return_datetime',
         'rental_days',
         'daily_price',
+        'drop_price',
         'extras_total',
+        'discount_amount',
+        'discount_type',
+        'discount_target',
         'total_price',
         'currency_id',
         'email',
@@ -39,10 +42,10 @@ class Reservation extends Model
     protected $casts = [
         'pickup_datetime' => 'datetime',
         'return_datetime' => 'datetime',
-        'birthday' => 'date'
+        'birthday' => 'date',
+        'discount_amount' => 'decimal:2',
     ];
 
-    // İlişkiler
     public function user()
     {
         return $this->belongsTo(User::class);

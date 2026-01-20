@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Car;
+use App\Models\Discount;
 use App\Models\DropPrice;
 use App\Models\Locations;
 use App\Models\Price;
@@ -14,13 +15,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Carbon\Carbon;
-use function Laravel\Prompts\error;
 
 class ReservationController extends Controller
 {
     public function searchReservations(Request $request)
     {
-        Log::info('request', [$request->all()]);
         if (!$request->has(['startDateTime', 'finishDateTime', 'PULocation', 'RLocation'])) {
             return Inertia::render('SearchReservations', ['availableCars' => []]);
         }
@@ -40,15 +39,14 @@ class ReservationController extends Controller
 
         $reqStart = Carbon::parse($request->startDateTime);
         $reqEnd = Carbon::parse($request->finishDateTime);
-        Log::info('requestDate', [$reqStart, $reqEnd]);
+
         foreach ($cars as $car) {
             $isAvailable = true;
             $eachReservations = Reservation::where('car_id', $car->id)->get();
-            Log::info('eachReservations', [$car->id, $eachReservations]);
             foreach($eachReservations as $eachRes){
                 $resStart = Carbon::parse($eachRes->pickup_datetime)->format('Y-m-d H:i:s');
                 $resEnd = Carbon::parse($eachRes->return_datetime)->format('Y-m-d H:i:s');
-            Log::info('resDate, reqDay', [$resStart, $resEnd, $reqStart, $reqEnd]);
+
                 if ($resStart < $reqEnd && $resEnd > $reqStart) {
                     $isAvailable = false;
                     break;
@@ -147,7 +145,7 @@ class ReservationController extends Controller
             ->where('to_location_id', $rLocationId)
             ->first();
 
-        $dailyPrice = Price::select('price', 'currency_id', 'min_days', 'max_days')
+        $dailyPrice = Price::select('base_price', 'price', 'currency_id', 'min_days', 'max_days')
             ->where('car_id', $car->id)
             ->where('is_active', 1)
             ->where('month', (int)$month)
@@ -159,7 +157,7 @@ class ReservationController extends Controller
             });
 
         if($dailyPrice) {
-            $car->daily_price = $dailyPrice->price;
+            $car->daily_price = $dailyPrice->base_price;
             $car->daily_price_currency = $dailyPrice->currency;
         } else {
             $car->daily_price = null;
@@ -173,6 +171,74 @@ class ReservationController extends Controller
             $car->drop_price = null;
             $car->drop_currency = null;
         }
+
+        $baseDailyPrice = $car->daily_price ?? 0;
+        $discountData = $this->calculateDiscount($car->id, $startDateTime, $finishDateTime, $baseDailyPrice);
+
+        $discountedDailyPrice = max(0, $baseDailyPrice - $discountData['amount']);
+        $totalRentalPrice = $discountedDailyPrice * $dayCount;
+
+        $car->discount_data = $discountData;
+
+        $car->calculated_price = [
+            'base_daily_price' => $baseDailyPrice,
+            'daily_discount_amount' => $discountData['amount'],
+            'final_daily_price' => $discountedDailyPrice,
+            'total_rental_price' => $totalRentalPrice,
+            'drop_price' => $car->drop_price ?? 0,
+            'grand_total' => $totalRentalPrice + ($car->drop_price ?? 0)
+        ];
+    }
+
+    public function calculateDiscount($carId, $start, $end, $unitPrice = 0)
+    {
+        $segmentId = Car::find($carId)->segment_id;
+        $startDate = Carbon::parse($start);
+        $endDate = Carbon::parse($end);
+        $days = $startDate->diffInDays($endDate) ?: 1;
+
+        $discountRule = Discount::query()
+            ->where('status', 'active')
+            ->where('start_date', '<=', $startDate)
+            ->where('end_date', '>=', $endDate)
+            ->where('min_days', '<=', $days)
+            ->where('max_days', '>=', $days)
+            ->where(function ($query) use ($carId, $segmentId) {
+                $query->where(function ($q) use ($carId) {
+                    $q->where('target_type', 'car')
+                        ->where('car_id', $carId);
+                })
+                    ->orWhere(function ($q) use ($segmentId) {
+                        $q->where('target_type', 'segment')
+                            ->where('segment_id', $segmentId);
+                    })
+                    ->orWhere('target_type', 'all');
+            })
+            ->orderByRaw("FIELD(target_type, 'car', 'segment', 'all')")
+            ->orderBy('discount_value', 'desc')
+            ->first();
+
+        if (!$discountRule) {
+            return [
+                'has_discount' => false,
+                'amount' => 0,
+                'meta' => null
+            ];
+        }
+
+        $discountAmount = 0;
+
+        if ($discountRule->discount_type === 'percentage') {
+            $discountAmount = $unitPrice * $discountRule->discount_value;
+        } else {
+            $discountAmount = $discountRule->discount_value;
+        }
+
+        return [
+            'has_discount' => true,
+            'amount' => round($discountAmount, 2),
+            'meta' => $discountRule
+        ];
     }
 
     public function createReservation(Request $request){
@@ -206,7 +272,7 @@ class ReservationController extends Controller
             $end = Carbon::parse($validated['finish_date_time']);
 
             $conflict = $this->hasConflict($eachReservations, $start, $end);
-            Log::info('hasConflict', ['conflict' => $conflict]);
+
             if($conflict) {
                 return response()->json(['error' => 'Conflict on reservation'], 409);
             }
@@ -216,9 +282,21 @@ class ReservationController extends Controller
                 return $extra['price'] * $extra['count'];
             });
 
-            $rental_cost = $validated['total_days'] * $validated['daily_price'];
+            $baseDailyPrice = $validated['daily_price'];
             $drop_cost = $validated['drop_price'];
+
+            $discountData = $this->calculateDiscount(
+                $validated['car_id'],
+                $validated['start_date_time'],
+                $validated['finish_date_time'],
+                $baseDailyPrice
+            );
+
+            $discountedDailyPrice = max(0, $baseDailyPrice - $discountData['amount']);
+            $rental_cost = $validated['total_days'] * $discountedDailyPrice;
+
             $total_price = $rental_cost + $drop_cost + $extras_total_price;
+            $total_price = max(0, $total_price);
 
             $reservation = Reservation::create([
                 'car_id' => $validated['car_id'],
@@ -228,8 +306,8 @@ class ReservationController extends Controller
                 'pickup_location_id' => $validated['pick_up_location_id'],
                 'return_location_id' => $validated['return_location_id'],
                 'rental_days' => $validated['total_days'],
-                'daily_price' => $validated['daily_price'],
-                'drop_price' => $validated['drop_price'],
+                'daily_price' => $discountedDailyPrice,
+                'drop_price' => $validated['drop_price'] ?? null,
                 'extras_total' => $extras_total_price,
                 'total_price' => $total_price,
                 'name' => $validated['user_info']['name'],
@@ -271,7 +349,6 @@ class ReservationController extends Controller
         }
     }
 
-
     public function hasConflict($eachReservations, $start, $end){
         foreach($eachReservations as $eachRes){
             $resStart = Carbon::parse($eachRes->pickup_datetime);
@@ -308,8 +385,8 @@ class ReservationController extends Controller
         if($res->status !== 'pending')
             return response()->json(['error' => 'Reservation not pending'], 422);
         $res->status = 'confirmed';
-       $res->payment_status = 'paid';
+        $res->payment_status = 'paid';
         $res->save();
-        return response()->json(['success' => 'Reservation cancelled'], 200);
+        return response()->json(['success' => 'Reservation confirmed'], 200);
     }
 }
