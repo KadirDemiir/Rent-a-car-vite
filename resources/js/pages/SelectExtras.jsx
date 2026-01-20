@@ -93,8 +93,8 @@ export default function SelectExtras({car, params}){
             <Navbar/>
             <div className={`p-4`}>
 
-                <div className={`flex flex-row gap-4`}>
-                    <div className={`basis-7/10 flex flex-col gap-4`}>
+                <div className={`flex flex-col lg:flex-row gap-4`}>
+                    <div className={`w-full lg:basis-7/10 flex flex-col gap-4`}>
                         <CarReview car={car}/>
 
                         <IncludedServices />
@@ -102,13 +102,13 @@ export default function SelectExtras({car, params}){
                         <Extras car={car} selectedExtras={selectedExtras} setSelectedExtras={setSelectedExtras}/>
                         <UserInfo user={user} setUser={setUser}/>
                     </div>
-                    <div className={`basis-3/10`}>
+                    <div className={`w-full lg:basis-3/10`}>
                         <ReservationDatePreview pickupDate={params.startDateTime} returnDate={params.finishDateTime} pickupLocation={params.PULocation.name} returnLocation={params.RLocation.name}/>
                         <br/>
                         <PriceInformationCard total_days={car.total_days} daily_price={car.calculated_price.final_daily_price} extra_price={Object.values(selectedExtras).reduce((sum, se) => sum + (se.price ?? 0) * (se.count ?? 1), 0)}/>
                         <br/>
                         {error && <div className="text-red-600 font-bold mb-2">{error}</div>}
-                        <button onClick={handleSubmit} type={`button`} className={`px-4 py-1 bg-blue-600 text-white rounded-xl hover:bg-blue-8**`}>Ofiste Öde</button>
+                        <button onClick={handleSubmit} type={`button`} className={`px-4 py-1 bg-blue-600 text-white rounded-xl hover:bg-blue-8** w-full`}>Ofiste Öde</button>
                     </div>
                 </div>
             </div>

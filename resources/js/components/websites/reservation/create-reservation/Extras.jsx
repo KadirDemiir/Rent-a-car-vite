@@ -52,8 +52,8 @@ export default function Extras({car, selectedExtras, setSelectedExtras}){
     if(loading)
         return <>loading...</>
     return(
-        <div className={`bg-white grid grid-cols-3 gap-3 p-6 rounded-2xl shadow-md`}>
-            <div className={`col-span-3 `}>
+        <div className={`bg-white grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-6 rounded-2xl shadow-md`}>
+            <div className={`col-span-full`}>
                 <h2 className="text-lg font-bold text-gray-800 border-b pb-2">
                     Ekstra Hizmetler
                 </h2>

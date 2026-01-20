@@ -3,7 +3,7 @@ import Categories from "./Categories.jsx";
 import { useTranslation } from 'react-i18next';
 
 
-export default function LeftSide() {
+export default function LeftSide({ isOpen, onClose }) {
     const {i18n, t} = useTranslation();
     const menuSections = [
         {
@@ -91,13 +91,21 @@ export default function LeftSide() {
     };
 
     return (
-        <div className="fixed top-20 left-0 h-[calc(100vh-80px)] w-60 border border-blue-700 border-t-0 z-50 p-4 bg-blue-700 text-white overflow-y-auto"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-            <ul className="flex flex-col items-start justify-center gap-2">
-                {menuSections.map((menuSection, index) => (
-                    <Categories
-                        key={index}
+        <>
+            {/* Mobile Overlay */}
+            {isOpen && (
+                <div
+                    className="fixed inset-100 bg-black bg-opacity-50 z-40 md:hidden"
+                    onClick={onClose}
+                ></div>
+            )}
+            <div className={`fixed top-20 left-0 h-[calc(100vh-80px)] w-60 border border-blue-700 border-t-0 z-50 p-4 bg-blue-700 text-white overflow-y-auto transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+                <ul className="flex flex-col items-start justify-center gap-2">
+                    {menuSections.map((menuSection, index) => (
+                        <Categories
+                            key={index}
                         clickHandle={isOpenHandler}
                         index={index}
                         isOpenSection={isOpenSection[index]}
@@ -108,5 +116,6 @@ export default function LeftSide() {
                 ))}
             </ul>
         </div>
+        </>
     );
 }

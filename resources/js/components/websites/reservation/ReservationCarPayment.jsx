@@ -11,8 +11,8 @@ export default function ReservationCarPayment({
                                                   rentLabel = "Rent Now",
                                               }) {
     return (
-        <div className={`col-span-1 lg:col-span-3 flex flex-col justify-between items-center p-4 rounded-2xl bg-gray-50 gap-4 shadow-inner ${className}`}>
-            <div className="w-full space-y-2">
+        <div className={`col-span-1 md:col-span-10 lg:col-span-3 flex flex-col md:flex-row lg:flex-col justify-between items-center p-4 rounded-2xl bg-gray-50 gap-4 shadow-inner ${className}`}>
+            <div className="w-full md:w-auto md:flex-1 lg:w-full space-y-2">
                 <div className="flex justify-between items-center px-2 text-sm text-gray-700">
                     <span className="font-medium">Günlük:</span>
                     <div className="flex flex-col items-end">
@@ -47,7 +47,7 @@ export default function ReservationCarPayment({
                 </div>
             </div>
             <button
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition duration-300"
+                className="w-full md:w-auto lg:w-full px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition duration-300 md:min-w-[200px]"
                 onClick={onRentNow}
                 type="button"
             >

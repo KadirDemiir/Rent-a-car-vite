@@ -1,8 +1,8 @@
 export default function CarCardUpSide({brand, model, segment}){
     return(
-        <div className="row-span-1 p-2">
-            <div className="text-[14px] text-blue-600 font-semibold">{segment}</div>
-            <div className="font-semibold">{brand} {model}</div>
+        <div className="w-full p-3 border-b flex justify-between items-center bg-gray-50">
+            <div className="font-bold text-lg text-gray-800">{brand} {model}</div>
+            <div className="text-sm px-2 py-1 bg-blue-100 text-blue-700 rounded-full font-medium">{segment}</div>
         </div>
     );
 }

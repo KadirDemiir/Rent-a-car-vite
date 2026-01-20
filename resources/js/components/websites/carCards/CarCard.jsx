@@ -14,19 +14,22 @@ export default function CarCard({car}) {
     const carCoverPhotoPaths = car.photos.filter(c => {
         return c.is_cover === 1;
     });
-console.log(car);
 
     return (
-        <div className="grid grid-rows-9 h-140 w-110 rounded-xl shadow-md bg-white transition-transform duration-300 hover:scale-105 hover:outline-2 hover:outline-blue-500 hover:rounded-xl">
-            < CarCardUpSide
-            brand={t(`${car.brand_key.key}`)}
-            model={t(`${car.model_key.key}`)}
-            segment={upperFirstLetter(t(`segment.${car.segment_id}`))}
-            />
-            < CarCardPhoto
-            photo_path={`/storage/${carCoverPhotoPaths[0].photo_path}`}
-            />
-            <div className="row-span-5 flex p-2 gap-2">
+        <div className="flex flex-col w-full h-auto min-h-[500px] rounded-xl shadow-md bg-white transition-transform duration-300 hover:scale-105 hover:outline-2 hover:outline-blue-500 overflow-hidden">
+            <div className="flex-none">
+                < CarCardUpSide
+                brand={t(`${car.brand_key.key}`)}
+                model={t(`${car.model_key.key}`)}
+                segment={upperFirstLetter(t(`segment.${car.segment_id}`))}
+                />
+            </div>
+            <div className="flex-none h-48 sm:h-56">
+                < CarCardPhoto
+                photo_path={`/storage/${carCoverPhotoPaths[0].photo_path}`}
+                />
+            </div>
+            <div className="flex-1 flex p-4 gap-2 text-sm sm:text-base">
                 < CarCardProperties
                     compName={upperFirstLetter(t('website.car_card.properties.properties_label'))}
                     body_type={upperFirstLetter(t(`body_type.${car.body_type_id}`))}

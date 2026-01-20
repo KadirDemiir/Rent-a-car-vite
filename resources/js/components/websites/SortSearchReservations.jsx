@@ -106,7 +106,7 @@ export default function SortSearchReservations({availableCars = [], sortBy, segm
                 return (
                     <div
                         key={filteredCar.id}
-                        className="bg-white w-full rounded-2xl grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-10 gap-4 p-6 shadow-md"
+                        className="bg-white w-full rounded-2xl grid grid-cols-1 md:grid-cols-10 gap-4 p-6 shadow-md"
                     >
                         <ReservationCarPhoto
                             photoSrc={photoSrc}
