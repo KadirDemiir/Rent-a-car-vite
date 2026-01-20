@@ -6,7 +6,7 @@ import {useTranslation} from "react-i18next";
 export default function Language({languages}){
     const {i18n, t} = useTranslation();
     const handleClick = (id) => {
-        router.visit(`/aa/adminpanel/languages/${id}`, { method: 'get' })
+        router.visit(`/${i18n.language}/${t('address.adminpanel')}/${t('address.languages')}/${id}`, { method: 'get' })
     }
     return(
       <div className={`w-full`}>
