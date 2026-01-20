@@ -9,38 +9,50 @@ export default function ReservationFilter({originalRes, res, setRes}) {
     const [filter, setFilter] = useState("");
 
     useEffect(() => {
-        console.log(sort);
-        if((status.length === 1 && status[0] === "") || status.length === 0) {
-            setRes(originalRes);
+        if (!Array.isArray(originalRes)) {
             return;
         }
-        let newRes = originalRes.filter(r => status.includes(r.status));
+
+        let processedRes = [...originalRes];
+
+        if (status.length > 0 && !(status.length === 1 && status[0] === "")) {
+            processedRes = processedRes.filter(r => status.includes(r.status));
+        }
+
+        if (filter) {
+            processedRes = processedRes.filter(r =>
+                JSON.stringify(r).toLowerCase().includes(filter.toLowerCase())
+            );
+        }
+
         switch (sort) {
             case "priceInc":
-                setRes([...newRes].sort((a, b) => a.total_price - b.total_price));
+                processedRes.sort((a, b) => a.total_price - b.total_price);
                 break;
             case "priceDesc":
-                setRes([...newRes].sort((a, b) => b.total_price - a.total_price));
+                processedRes.sort((a, b) => b.total_price - a.total_price);
                 break;
             case "recently":
-                setRes([...newRes].sort((a,b) => a.return_datetime - b.return_datetime));
+                processedRes.sort((a, b) => new Date(b.return_datetime) - new Date(a.return_datetime));
                 break;
             case "oldest":
-                setRes([...newRes].sort((a,b) => b.return_datetime - a.return_datetime));
+                processedRes.sort((a, b) => new Date(a.return_datetime) - new Date(b.return_datetime));
                 break;
         }
-        setRes(newRes);
-    }, [status, sort]);
+
+        setRes(processedRes);
+
+    }, [status, sort, filter, originalRes]);
 
     return (
         <div className="w-full p-4 rounded-xl shadow flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-44">
                 <SelectOptions
                     value={sort}
-                    onChange={setSort}
+                    onChange={(e) => setSort(e)}
                     options={[
                         { label: t("adminpanel.reservation.filter.sort.suggested"), value: "primary" },
-                            { label: t("adminpanel.reservation.filter.sort.increase_based_price"), value: "priceInc" },
+                        { label: t("adminpanel.reservation.filter.sort.increase_based_price"), value: "priceInc" },
                         { label: t("adminpanel.reservation.filter.sort.decrease_based_price"), value: "priceDesc" },
                         { label: t("adminpanel.reservation.filter.date_based_latest"), value: "recently" },
                         { label: t("adminpanel.reservation.filter.date_based_oldest"), value: "oldest" },
@@ -48,7 +60,6 @@ export default function ReservationFilter({originalRes, res, setRes}) {
                     options_name={t("adminpanel.reservation.filter.sort.sort_label")}
                 />
             </div>
-
 
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-36">
                 <SelectOptions

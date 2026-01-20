@@ -14,6 +14,7 @@ export default function Reservations({}){
         await axios.get('/get-reservations-informations')
             .then(response => {
                 setRes(response.data.reservations);
+                setAllRes(response.data.reservations);
                 console.log(response);
             })
             .catch(error => console.log(error.response.error))
