@@ -164,8 +164,7 @@ class ReservationController extends Controller
         ];
     }
 
-    public function calculateDiscount($carId, $start, $end, $unitPrice = 0)
-    {
+    public function calculateDiscount($carId, $start, $end, $unitPrice = 0){
         $segmentId = Car::find($carId)->segment_id;
         $startDate = Carbon::parse($start);
         $endDate = Carbon::parse($end);
@@ -333,8 +332,7 @@ class ReservationController extends Controller
         }
     }
 
-    public function isCarAvailable($carId, $startDateTime, $finishDateTime, $pickupLocationId)
-    {
+    public function isCarAvailable($carId, $startDateTime, $finishDateTime, $pickupLocationId){
 
     if(Car::find($carId)->status === 'unavailable') return false;
         $bufferHours = 4;
@@ -406,8 +404,7 @@ class ReservationController extends Controller
         ]);
     }
 
-    public function cancelReservation($id)
-    {
+    public function cancelReservation($id){
         $user = auth()->user();
         $reservation = Reservation::where('user_id', $user->id)->where('id', $id)->firstOrFail();
 
@@ -421,8 +418,7 @@ class ReservationController extends Controller
         return back()->with('success', 'Reservation cancelled successfully.');
     }
 
-    public function checkReservationPage(Request $request)
-    {
+    public function checkReservationPage(Request $request){
         if ($request->filled('reservation_id') && $request->filled('email')) {
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
                 'email' => 'required|email',

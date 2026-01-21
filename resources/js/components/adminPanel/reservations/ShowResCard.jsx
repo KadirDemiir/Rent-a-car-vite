@@ -66,6 +66,53 @@ export default function ShowResCard({ res, updateData, closeModal, curr, past })
                             </dl>
                         </div>
 
+                        {/* Car Info Card */}
+                        <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                            <div className="flex justify-center items-center gap-2 mb-4 pb-2 border-b border-gray-100">
+                                <div className="p-2 bg-orange-50 text-orange-600 rounded-lg">
+                                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m10 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                                    </svg>
+                                </div>
+                            </div>
+                            
+                            {res.car?.photos?.length > 0 && (
+                                <div className="mb-4 rounded-lg overflow-hidden h-32 w-full bg-gray-100">
+                                    <img 
+                                        src={`/storage/${res.car.photos.find(p => p.is_cover)?.photo_path || res.car.photos[0].photo_path}`} 
+                                        alt="Car" 
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                            )}
+
+                            <dl className="flex flex-col gap-1">
+                                {(() => {
+                                    const getTrans = (val) => {
+                                        if (!val) return '-';
+                                        if (typeof val === 'object') return val[i18n.language] || val['en'] || Object.values(val)[0] || '-';
+                                        try {
+                                            const parsed = JSON.parse(val);
+                                            return parsed[i18n.language] || parsed['en'] || Object.values(parsed)[0] || '-';
+                                        } catch (e) {
+                                            return val;
+                                        }
+                                    };
+                                    return (
+                                        <>
+                                            <DetailItem label="ID" value={`#${res.car?.id || '-'}`} />
+                                            <DetailItem label={t("adminpanel.car.car_modify.edit_car_information.plate") || "Plaka"} value={res.car?.license_plate} />
+                                            <DetailItem label={t("adminpanel.car.car_modify.edit_car_information.brand")} value={t(res.car?.brand_key.key)} />
+                                            <DetailItem label={t("adminpanel.car.car_modify.edit_car_information.model")} value={t(res.car?.model_key.key)} />
+                                            <DetailItem label={t("adminpanel.car.car_modify.edit_car_information.year") || "Yıl"} value={res.car?.year} />
+                                            <DetailItem label={t("adminpanel.car.car_modify.edit_car_information.fuel_type") || "Yakıt"} value={t(`fuel.${res.car?.fuel_id}`)} />
+                                        </>
+                                    );
+                                })()}
+                            </dl>
+                        </div>
+
                         <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
                             <div className="flex justify-center items-center gap-2 mb-4 pb-2 border-b border-gray-100">
                                 <div className="p-2 bg-purple-50 text-purple-600 rounded-lg">

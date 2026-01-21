@@ -37,7 +37,7 @@ use Inertia\Inertia;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 Route::get('/get-reservations-informations', function () {
-    return response(['reservations' => Reservation::with(['extras', 'pickupLocation', 'returnLocation'])->get()], 200);
+    return response(['reservations' => Reservation::with(['extras', 'car', 'pickupLocation', 'returnLocation'])->get()], 200);
 });
 Route::get('/get-car-information/{id}', function ($id) {
     $car = Car::where('id', $id)

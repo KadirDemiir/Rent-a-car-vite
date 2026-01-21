@@ -54,7 +54,7 @@ class Reservation extends Model
 
     public function car()
     {
-        return $this->belongsTo(Car::class);
+        return $this->belongsTo(Car::class)->with('brandKey', 'modelKey');
     }
 
     public function extras()
