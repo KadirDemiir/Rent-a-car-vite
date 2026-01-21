@@ -1,10 +1,7 @@
-import { useState } from 'react';
 import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
-import { Menu, X } from 'lucide-react';
 
-export default function DownSide() {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+export default function DownSide({ isMobileMenuOpen }) {
     const {i18n,  t } = useTranslation();
     const lang = i18n.language.split('-')[0];
     const upperFirstLetter = (str) => {
@@ -14,13 +11,9 @@ export default function DownSide() {
             .join(' ');
     }
     return (
-        <nav className="bg-blue-800 min-h-[5rem] flex flex-col md:flex-row items-center justify-center relative">
-            <div className="w-full md:hidden flex justify-end p-4">
-                <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white">
-                    {isMenuOpen ? <X size={24}/> : <Menu size={24}/>}
-                </button>
-            </div>
-            <ul className={`${isMenuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row items-center justify-center gap-4 w-full md:w-[80%] md:h-20 pb-4 md:pb-0`}>
+        <nav className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:flex bg-blue-800 md:min-h-[5rem] flex-col md:flex-row items-center justify-center relative`}>
+            {/* The toggle button is now controlled by parent Navbar, so we don't need internal toggle logic or the hidden button div */}
+            <ul className={`flex flex-col md:flex-row items-center justify-center gap-4 w-full md:w-[80%] md:h-20 pb-4 md:pb-0 pt-4 md:pt-0`}>
             <li className="w-full md:w-auto md:flex-1 h-12 md:h-full hover:bg-blue-700 flex items-center justify-center rounded-md">
                 <Link href={`/${lang}/${t('address.cars')}`} className="h-full w-full text-white flex items-center justify-center">{upperFirstLetter(t('website.navigator.cars'))}</Link>
             </li>

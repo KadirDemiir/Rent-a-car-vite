@@ -16,13 +16,16 @@ export default function ModifyCar({ car, setCar, setSuccess }) {
     const closeModalUP = () => setOpenUploadPhoto(false);
 
     return (
-        <div className="w-full bg-white rounded-xl shadow-md p-6">
+        <div className="w-full bg-white rounded-xl shadow-md p-4 md:p-6">
             <div className="flex flex-col lg:flex-row gap-6 items-stretch mt-4">
                 <div
-                    className="flex-1 min-w-[300px] h-60 border border-gray-300 rounded-lg overflow-hidden bg-gray-50 cursor-pointer hover:opacity-90 transition"
+                    className="w-full lg:flex-1 h-60 border border-gray-300 rounded-lg overflow-hidden bg-gray-50 cursor-pointer hover:opacity-90 transition relative group"
                     onClick={() => setOpenUploadPhoto(true)}
                 >
                     <CarModifyPhoto photos={car.photos} />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
+                        <span className="text-white font-medium">{t("adminpanel.car.car_modify.edit_photos.edito_photos")}</span>
+                    </div>
                 </div>
 
                 <div className="w-full lg:w-1/3 flex flex-col justify-center gap-4 bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-200">
@@ -74,8 +77,8 @@ export default function ModifyCar({ car, setCar, setSuccess }) {
 
 function ModalWrapper({ children }) {
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-            <div className="bg-white w-[75%] max-h-[90vh] overflow-y-auto rounded-xl shadow-lg p-12 relative overflow-x-visible">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
+            <div className="bg-white w-full md:w-[75%] max-h-[90vh] overflow-y-auto rounded-xl shadow-lg p-6 md:p-12 relative overflow-x-hidden">
                 {children}
             </div>
         </div>

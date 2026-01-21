@@ -1,13 +1,11 @@
-import { useState } from 'react';
 import { Link, useForm } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import LanguageDropdown from './LanguageDropdown.jsx';
 import CurrencyDropDown from "../CurrencyDropDown.jsx";
-import {User, CarFront, ClipboardCheck, Menu, X} from 'lucide-react';
+import {User, CarFront, ClipboardCheck} from 'lucide-react';
 
-export default function UpSide() {
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+export default function UpSide({ isMobileMenuOpen }) {
     const { auth } = usePage().props;
     const user = auth.user;
     const { post } = useForm();
@@ -26,18 +24,12 @@ export default function UpSide() {
     });
 };
     return (
-        <div className="min-h-[15vh] w-full flex items-center justify-center bg-gray-100 p-2">
+        <div className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:flex md:min-h-[15vh] w-full items-center justify-center bg-gray-100 p-2`}>
             <div className="w-[95%] md:w-[80%] flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
-                <div className="w-full md:w-auto flex items-center justify-between">
+                <div className="hidden md:flex w-full md:w-auto items-center justify-center md:justify-start">
                     <Link href="/"><CarFront/></Link>
-                    <button
-                        className="md:hidden p-2 text-gray-700"
-                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    >
-                        {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                    </button>
                 </div>
-                <div className={`${isMobileMenuOpen ? 'flex' : 'hidden'} md:flex h-full w-full md:w-auto md:min-w-[50%]`}>
+                <div className={`flex h-full w-full md:w-auto md:min-w-[50%] transition-all duration-300`}>
                     <nav className="flex items-center justify-center h-full w-full">
                         <ul className="flex flex-col md:flex-row items-center justify-center gap-4 h-full w-full md:w-[80%] py-4 md:py-0">
                             <li>

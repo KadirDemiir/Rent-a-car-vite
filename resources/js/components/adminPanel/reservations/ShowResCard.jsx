@@ -99,10 +99,10 @@ export default function ShowResCard({ res, updateData, closeModal, curr, past })
                                 <DetailItem label={t("adminpanel.reservation.reservation_modal.payment_method")} value={res.payment_type} />
                                 <DetailItem label={t("adminpanel.reservation.reservation_modal.extra_price")} value={res.extras_total} />
                                 <DetailItem label={t("adminpanel.reservation.reservation_modal.drop_price", "Drop Price")} value={res.drop_price} />
-                                <DetailItem label={t("adminpanel.reservation.reservation_modal.day*daily_price", "Day x fDaily Price")} value={`${res.rental_days} x ${calculateTotal(res.daily_price)} ${current.symbol}`} />
+                                <DetailItem label={t("adminpanel.reservation.reservation_modal.day*daily_price", "Day x fDaily Price")} value={`${res.rental_days} x ${calculateTotal(res.daily_price).toFixed(2)} ${current.symbol}`} />
                                 <div className="mt-auto pt-4 border-t border-gray-100">
                                     <dt className="text-xs font-medium text-gray-500 uppercase mb-1">{t("adminpanel.reservation.reservation_modal.total_price")}</dt>
-                                    <dd className="text-2xl font-bold text-gray-900">{`${calculateTotal(res.total_price)} ${current.symbol}`}</dd>
+                                    <dd className="text-2xl font-bold text-gray-900">{`${calculateTotal(res.total_price).toFixed(2)} ${current.symbol}`}</dd>
                                 </div>
                             </dl>
                         </div>
@@ -119,7 +119,7 @@ export default function ShowResCard({ res, updateData, closeModal, curr, past })
                                 {res.extras?.map((e, index) => {
                                     const names = JSON.parse(e.extra.name);
                                     return (
-                                        <DetailItem key={e.id || index} label={names[i18n.language] || names['tr']} value={`${e.quantity} x ${calculateTotal(e.price)} ${current.symbol}`}/>
+                                        <DetailItem key={e.id || index} label={names[i18n.language] || names['tr']} value={`${e.quantity} x ${calculateTotal(e.price).toFixed(2)} ${current.symbol}`}/>
                                     );
                                 })}
                             </dl>

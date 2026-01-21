@@ -17,9 +17,9 @@ export default function CarPhotoUpload({ car, closeModal, setCar, setSuccess }) 
     };
 
     return (
-        <div className="bg-white w-full max-h-[90vh] overflow-y-auto rounded-xl shadow-lg p-6">
+        <>
             <button onClick={closeModal} className="absolute top-3 right-3 text-2xl text-gray-500 hover:text-black">&times;</button>
             <CarForm mode="photo" car={car} onSubmit={submitHandler} />
-        </div>
+        </>
     );
 }
