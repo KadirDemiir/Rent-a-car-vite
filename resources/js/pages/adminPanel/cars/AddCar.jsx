@@ -2,13 +2,16 @@ import Navbar from "../../../components/adminPanel/navbar/Navbar";
 import CarForm from "../../../components/adminPanel/car/form/CarForm.jsx";
 import {useTranslation} from "react-i18next";
 import axios from "axios";
-import {useState} from "react";
+import {useState, useRef} from "react";
 import {reloadTranslations} from "../../../i18n.js";
 
 export default function AddCars() {
     const {t, i18n} = useTranslation();
     const [success, setSuccess] = useState();
     const [error, setError] = useState();
+    
+    const topRef = useRef(null);
+
     const onSubmit = (data) => {
         if (data instanceof FormData) {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -18,7 +21,6 @@ export default function AddCars() {
                 },
             })
                 .then(res => {
-                    window.scrollTo({ top: 0, behavior: "smooth" });
                     if (res.data.success) {
                         setSuccess("Added Succesfully");
                         setError(null);
@@ -27,8 +29,13 @@ export default function AddCars() {
                         setSuccess(null);
                     }
                     localStorage.removeItem('i18n_config_cache');
-                    reloadTranslations(i18n.language)
+                    reloadTranslations(i18n.language);
 
+                    setTimeout(() => {
+                        if (topRef.current) {
+                            topRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }
+                    }, 100);
                 })
                 .catch(err => {
                     if (err.response?.status === 422) {
@@ -39,14 +46,20 @@ export default function AddCars() {
                         setError(err.response?.data?.error || err.message);
                     }
                     setSuccess(null);
+                    
+                    setTimeout(() => {
+                        if (topRef.current) {
+                            topRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+                        }
+                    }, 100);
                 });
         }
     };
 
     return (
         <div className="w-full">
-            <Navbar >
-                <h3>{t("adminpanel.add_car.add_car")}</h3>
+            <Navbar>
+                <h3 ref={topRef}>{t("adminpanel.add_car.add_car")}</h3>
                 <hr />
                 {success && (
                     <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
