@@ -89,6 +89,7 @@ class  CarController extends Controller
             }
             $newCar = new Car();
             $newCar->location_id = 1;
+            $newCar->current_location_id = 1;
             $newCar->license_plate = $validated['license_plate'];
             $newCar->brand_translation_key_id = $brandTranslationKey->id;
             $newCar->model_translation_key_id = $modelTranslationKey->id;
