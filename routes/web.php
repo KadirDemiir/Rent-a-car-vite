@@ -237,7 +237,7 @@ Route::group([
     Route::inertia(dbTransRoute('carporateRental'), 'CorporateRental')->name('carporateRental');
     Route::inertia(dbTransRoute('about'), 'About')->name('about');
     Route::inertia(dbTransRoute('blog'), 'Blog')->name('blog');
-    Route::inertia(dbTransRoute('auth'), 'auth/Auth')->name('auth');
+    Route::inertia(dbTransRoute('auth'), 'auth/Auth')->name('showAuth');
     Route::get(dbTransRoute('searchReservations'), [ReservationController::class, 'searchReservations'])->name('searchReservations');
     Route::get(dbTransRoute('reservation-create'), [ReservationController::class, 'showDetailPage'])->name('reservation-create');
     Route::post('/auth', [AuthController::class, 'auth'])->name('auth');
