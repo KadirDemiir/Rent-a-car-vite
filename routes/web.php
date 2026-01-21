@@ -199,7 +199,7 @@ Route::patch('/reservation/reject/{id}', [ReservationController::class, 'rejectR
 Route::patch('/reservation/approve/{id}', [ReservationController::class, 'approveReservation'])->name('approveReservation');
 
 Route::post('/adminpanel/locations/add', [LocationsController::class, 'addLocation'])->name('adminAddLocation');
-Route::post('/adminpanel/locations/update/{id}', [LocationsController::class, 'updateLocation'])->name('adminAddLocation');
+Route::post('/adminpanel/locations/update/{id}', [LocationsController::class, 'updateLocation'])->name('adminUpdateLocation');
 
 Route::get('/get-locations', function () {
     return response()->json(['success' => true, 'locations' => Locations::where('is_active', 1)->get()], 200);
