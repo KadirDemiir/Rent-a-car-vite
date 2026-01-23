@@ -10,7 +10,7 @@ export default function PriceInformationCard({total_days, daily_price, extra_pri
                 <span>Car Price: </span>
                 {daily_price && total_days && current?.symbol && (
                     <span>
-                        {`${calculateTotal(total_days)} x ${calculateTotal(daily_price).toFixed(2)} ${current.symbol}`}
+                        {`${total_days} x ${calculateTotal(daily_price).toFixed(2)} ${current.symbol}`}
                     </span>
                 )}
             </div>

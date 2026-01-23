@@ -2,6 +2,7 @@ import ReservationCarPhoto from "../ReservationCarPhoto.jsx";
 import ReservationCarInfo from "../ReservationCarInfo.jsx";
 import {useTranslation} from "react-i18next";
 import {User, Users, Fuel, Shield, Settings2} from 'lucide-react';
+import {useCurrency} from "../../../../providers/CurrencyContext.jsx";
 
 export default function CarReview({car}){
     const {t} = useTranslation();
@@ -26,7 +27,7 @@ export default function CarReview({car}){
     const requirements = [
         {
             icon: <Shield />,
-            label: t("website.car_card.requirement.{amount}_{currency}_deposit", {amount: calculateTotal(car.deposit).toFixed(2), currency: current.symbol}),
+            label: t("website.car_card.requirement.{amount}_{currency}_deposit", {amount: Number(calculateTotal(car.deposit)).toFixed(2), currency: current?.symbol}),
         },
         {
             icon: <User/>,

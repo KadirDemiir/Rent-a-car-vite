@@ -1,10 +1,10 @@
 import { useState } from "react";
 
 
-const Input = ({type, elementName, labelName, validate, onChange, maxV, prefix}) =>
+const Input = ({type, elementName, labelName, validate, onChange, maxV, prefix, initialValue}) =>
     {
 
-        const [value, setValue] = useState('');
+        const [value, setValue] = useState(initialValue || '');
         const [error, setError] = useState('');
 
         const day = new Date();

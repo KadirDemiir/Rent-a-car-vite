@@ -86,9 +86,11 @@ class ReservationController extends Controller
         }
 
         $this->CalcPrice($car, $request->startDateTime, $request->finishDateTime, $request->PULocation, $request->RLocation);
+        $user = auth()->user();
 
         return Inertia::render('SelectExtras', [
             'car' => $car,
+            'auth_user' => $user ?? null,
             'params' => [
                 'startDateTime' => $validated['startDateTime'],
                 'finishDateTime' => $validated['finishDateTime'],

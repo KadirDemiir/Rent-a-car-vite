@@ -81,4 +81,27 @@ class Reservation extends Model
     {
         return $this->belongsTo(Currency::class);
     }
+
+    public function scopeReadyForPickup($query)
+    {
+        return $query->whereDate('pickup_datetime', '<=', \Carbon\Carbon::tomorrow())
+            ->where('status', 'confirmed');
+    }
+
+    public function scopeUpcoming($query)
+    {
+        return $query->where('pickup_datetime', '>=', now())
+            ->where('status', 'confirmed');
+    }
+
+    public function scopeActiveRentals($query)
+    {
+        return $query->where('status', 'active');
+    }
+
+    public function scopeLateReturns($query)
+    {
+        return $query->whereDate('return_datetime', '<', now())
+            ->where('status', 'active');
+    }
 }

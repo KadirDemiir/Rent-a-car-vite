@@ -252,7 +252,17 @@ Route::group([
     Route::post(dbTransRoute('checkReservation'), [ReservationController::class, 'checkReservation'])->name('checkReservation');
     Route::patch('/guest-reservation/{id}/cancel', [ReservationController::class, 'guestCancelReservation'])->name('guestCancelReservation');
 
-    Route::inertia(dbTransRoute('adminpanel'), 'adminPanel/Home')->name('adminHome');
+    Route::get(dbTransRoute('adminpanel'), function () {
+        $upcoming = Reservation::upcoming()->with(['car.brandKey', 'car.modelKey', 'user'])->orderBy('pickup_datetime')->get();
+        $active = Reservation::activeRentals()->with(['car.brandKey', 'car.modelKey', 'user'])->orderBy('return_datetime')->get();
+        $late = Reservation::lateReturns()->with(['car.brandKey', 'car.modelKey', 'user'])->orderBy('return_datetime')->get();
+
+        return Inertia::render('adminPanel/Home', [
+            'upcomingReservations' => $upcoming,
+            'activeReservations' => $active,
+            'lateReservations' => $late,
+        ]);
+    })->name('adminHome');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('cars'), [AdminCarController::class, 'showAll'])->name('adminCars');
     Route::inertia(dbTransRoute('adminpanel') . '/' . dbTransRoute('cars') . '/' . dbTransRoute('add'), 'adminPanel/cars/AddCar')->name('adminAddCarPage');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('cars') . '/{id}', [AdminCarController::class, 'showIndex'])->name('adminShowCar');
