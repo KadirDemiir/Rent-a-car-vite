@@ -76,7 +76,7 @@ export default function SortSearchReservations({availableCars = [], sortBy, segm
                 const requirements = [
                     {
                         icon: <Shield />,
-                        label: t("website.car_card.requirement.{amount}_{currency}_deposit", {amount: filteredCar.deposit, currency: "try"}),
+                        label: t("website.car_card.requirement.{amount}_{currency}_deposit", {amount: calculateTotal(filteredCar.deposit).toFixed(2), currency: current.symbol}),
                     },
                     {
                         icon: <User/>,

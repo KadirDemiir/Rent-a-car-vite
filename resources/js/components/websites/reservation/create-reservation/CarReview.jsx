@@ -5,6 +5,7 @@ import {User, Users, Fuel, Shield, Settings2} from 'lucide-react';
 
 export default function CarReview({car}){
     const {t} = useTranslation();
+    const {current, calculateTotal} = useCurrency();
     const coverPhoto = car.photos?.find(p => p.is_cover)?.photo_path;
     const photoSrc = coverPhoto ? `/storage/${coverPhoto}` : undefined;
     const title = `${t(car.brand_key.key)} ${t(car.model_key.key)} • ${t(`fuel.${car.fuel_id}`)} • ${t(`transmission.${car.transmission_id}`)}`;
@@ -25,7 +26,7 @@ export default function CarReview({car}){
     const requirements = [
         {
             icon: <Shield />,
-            label: t("website.car_card.requirement.{amount}_{currency}_deposit", {amount: car.deposit, currency: "try"}),
+            label: t("website.car_card.requirement.{amount}_{currency}_deposit", {amount: calculateTotal(car.deposit).toFixed(2), currency: current.symbol}),
         },
         {
             icon: <User/>,
