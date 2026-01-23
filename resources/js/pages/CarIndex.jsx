@@ -2,7 +2,7 @@ import { Link } from '@inertiajs/react';
 import Navbar from '../components/websites/Navbar.jsx';
 import CarIndexCard from '../components/websites/carIndex/CarIndexCard.jsx';
 
-export default function CarIndex({car}){
+export default function CarIndex({car, internalServices}){
     console.log('carIndex.jsx => ', car);
     return(
         <div>
@@ -12,7 +12,7 @@ export default function CarIndex({car}){
                     <Link href="/" className="hover:text-black ">Home</Link> / <Link href="/cars" className="hover:text-black">Cars</Link> / <span className="text-black">{car.brand} {car.model}</span>
                 </div>
                 <div className="font-bold text-[24px]">{car.brand} {car.model} {car.fuel_type} {car.transmission_type}</div><br />
-                < CarIndexCard car={car}/>
+                < CarIndexCard car={car} internalServices={internalServices} />
             </div>
         </div>
     );

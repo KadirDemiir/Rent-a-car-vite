@@ -3,8 +3,12 @@ import CarCardPhoto from './CarCardPhoto.jsx';
 import CarCardProperties from './CarCardProperties.jsx';
 import CarCardRequirements from './CarCardRequirements.jsx';
 import { useTranslation } from 'react-i18next';
+import { useCurrency } from '../../../providers/CurrencyContext.jsx';
 export default function CarCard({car}) {
+    console.log(car);
     const { t } = useTranslation();
+    const {calculateTotal, current} = useCurrency();
+    console.log('current currency in CarCard.jsx => ', current);
     const upperFirstLetter = (str) => {
         return str
             .split(' ')
@@ -43,7 +47,7 @@ export default function CarCard({car}) {
                 compName={upperFirstLetter(t('website.car_card.requirements.requirements_label'))}
                 min_age={`${upperFirstLetter(t('website.car_card.requirements.required_min_{age}', { age: 23 }))}`}
                 experience={`${upperFirstLetter(t('website.car_card.requirements.{year}_year_experience', {year: 2}))}`}
-                collateral={`${upperFirstLetter(t('website.car_card.requirement.{amount}_{currency}_deposit', {amount: 6000, currency: 'tl'}))}`}
+                collateral={`${upperFirstLetter(t('website.car_card.requirement.{amount}_{currency}_deposit', {amount: `${calculateTotal(car.deposit)}`, currency: `${current.symbol}`}))}`}
                 />
             </div>
         </div>

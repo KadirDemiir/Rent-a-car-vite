@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Car;
 use App\Models\Currency;
 use App\Models\Discount;
+use App\Models\InternalService;
 use App\Models\Language;
 use App\Models\Photo;
 use App\Models\Price;
@@ -31,8 +32,10 @@ class  CarController extends Controller
 
     public function showCar($id){
         $car = Car::where('id', $id)->with(['photos', 'modelKey', 'brandKey'])->first();
+        $internalServices = InternalService::all();
         return Inertia::render('CarIndex', [
-            'car' => $car
+            'car' => $car,
+            'internalServices' => $internalServices
         ]);
     }
     public function addCar(Request $request){
