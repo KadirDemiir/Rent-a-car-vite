@@ -29,41 +29,47 @@ export default function Car({ id }) {
         fetchData();
     }, [fetchData]);
 
-    if (loading) return <div className="p-4 text-center">Loading...</div>;
-    if (error) return <div className="p-4 text-center text-red-500">Error: {error}</div>;
-    if (!car) return <div className="p-4 text-center">Car not found</div>;
-
     return (
         <div className="w-full">
             <Navbar>
-                <div className="font-bold text-xl">
-                    {car.license_plate} - {car.brand} {car.model} {car.fuel_type} {car.transmission_type} {car.year} <span className="text-blue-600">({car.status})</span>
-                </div>
-                <hr className="my-4" />
+                {loading ? (
+                    <div className="p-4 text-center">Loading...</div>
+                ) : error ? (
+                    <div className="p-4 text-center text-red-500">Error: {error}</div>
+                ) : !car ? (
+                    <div className="p-4 text-center">Car not found</div>
+                ) : (
+                    <>
+                        <div className="font-bold text-xl">
+                            {car.license_plate} - {car.brand} {car.model} {car.fuel_type} {car.transmission_type} {car.year} <span className="text-blue-600">({car.status})</span>
+                        </div>
+                        <hr className="my-4" />
 
-                {success && (
-                    <div className="mb-4 p-3 rounded bg-green-100 text-green-800 border border-green-300">
-                        {success}
-                    </div>
+                        {success && (
+                            <div className="mb-4 p-3 rounded bg-green-100 text-green-800 border border-green-300">
+                                {success}
+                            </div>
+                        )}
+
+                        <div className="w-full flex flex-col gap-16">
+                            <ModifyCar car={car} setCar={setCar} setSuccess={setSuccess} />
+
+                            <div className="max-h-[40vh] overflow-y-hidden">
+                                <span className="font-bold">Araca Ait Rezervasyonlar </span>
+                                <span className="text-sm text-gray-500">(Detaylar İçin Tıklayınız)</span>
+                                <CarReservations updateData={fetchData} allReservations={reservations} past={false} />
+                            </div>
+
+                            <div className="max-h-[40vh] overflow-y-hidden">
+                                <span className="font-bold">Araca Ait Geçmiş Rezervasyonlar </span>
+                                <span className="text-sm text-gray-500">(Detaylar İçin Tıklayınız)</span>
+                                <CarReservations updateData={fetchData} allReservations={reservations} current={false} />
+                            </div>
+
+                            <IncomingGraph />
+                        </div>
+                    </>
                 )}
-
-                <div className="w-full flex flex-col gap-16">
-                    <ModifyCar car={car} setCar={setCar} setSuccess={setSuccess} />
-
-                    <div className="max-h-[40vh] overflow-y-hidden">
-                        <span className="font-bold">Araca Ait Rezervasyonlar </span>
-                        <span className="text-sm text-gray-500">(Detaylar İçin Tıklayınız)</span>
-                        <CarReservations updateData={fetchData} allReservations={reservations} past={false} />
-                    </div>
-
-                    <div className="max-h-[40vh] overflow-y-hidden">
-                        <span className="font-bold">Araca Ait Geçmiş Rezervasyonlar </span>
-                        <span className="text-sm text-gray-500">(Detaylar İçin Tıklayınız)</span>
-                        <CarReservations updateData={fetchData} allReservations={reservations} current={false} />
-                    </div>
-
-                    <IncomingGraph />
-                </div>
             </Navbar>
             <div className="w-full h-20"></div>
         </div>
