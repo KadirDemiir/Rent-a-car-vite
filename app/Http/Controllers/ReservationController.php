@@ -280,8 +280,8 @@ class ReservationController extends Controller
 
             $reservation = Reservation::create([
                 'car_id' => $validated['car_id'],
-                'pickup_datetime' => $validated['start_date_time'],
-                'return_datetime' => $validated['finish_date_time'],
+                'pickup_datetime' => Carbon::parse($validated['start_date_time'], 'Europe/Istanbul')->setTimezone('UTC'),
+                'return_datetime' => Carbon::parse($validated['finish_date_time'], 'Europe/Istanbul')->setTimezone('UTC'),
                 'currency_id' => $validated['currency_id'],
                 'pickup_location_id' => $validated['pick_up_location_id'],
                 'return_location_id' => $validated['return_location_id'],
@@ -352,7 +352,7 @@ class ReservationController extends Controller
             return false;
 
         $lastReservation = Reservation::where('car_id', $carId)
-            ->whereIn('status', ['cancelled', 'pending',  'confirmed', 'completed'])
+            ->whereIn('status', ['pending',  'confirmed', 'completed'])
             ->whereRaw("DATE_ADD(return_datetime, INTERVAL ? HOUR) <= ?", [$bufferHours, $reqStart])
             ->orderBy('return_datetime', 'desc')
             ->first();

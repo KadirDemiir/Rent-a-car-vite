@@ -47,7 +47,7 @@ export default function CarCard({car}) {
                 compName={upperFirstLetter(t('website.car_card.requirements.requirements_label'))}
                 min_age={`${upperFirstLetter(t('website.car_card.requirements.required_min_{age}', { age: 23 }))}`}
                 experience={`${upperFirstLetter(t('website.car_card.requirements.{year}_year_experience', {year: 2}))}`}
-                collateral={`${upperFirstLetter(t('website.car_card.requirement.{amount}_{currency}_deposit', {amount: `${calculateTotal(car.deposit).toFixed(2)}`, currency: `${current.symbol}`}))}`}
+                collateral={`${upperFirstLetter(t('website.car_card.requirement.{amount}_{currency}_deposit', {amount: Number(calculateTotal(car.deposit)).toFixed(2), currency: current?.symbol}))}`}
                 />
             </div>
         </div>

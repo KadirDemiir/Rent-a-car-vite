@@ -5,6 +5,7 @@ import ChevronNavigation from "../reservations/ChevronNavigation.jsx";
 import { useTranslation } from "react-i18next";
 
 export default function CarReservations({ allReservations, updateData, current = true, past = true }) {
+    console.log(allReservations);
     const reservations = useMemo(() => {
         if (!allReservations) return [];
         if (current && past) return allReservations;
@@ -64,16 +65,6 @@ export default function CarReservations({ allReservations, updateData, current =
         }
     };
 
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleString("tr-TR", {
-            day: "numeric",
-            month: "numeric",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-        }).replace(/\./g, " / ");
-    };
-
     return (
         <div className="relative">
             <table className="table-auto w-full border border-gray-500 border-collapse mt-2">
@@ -93,8 +84,8 @@ export default function CarReservations({ allReservations, updateData, current =
                                 cls={TDclass}
                                 contents={[
                                     `${r.name} ${r.surname}`,
-                                    formatDate(r.pickup_datetime),
-                                    formatDate(r.return_datetime),
+                                    new Date(r.pickup_datetime).toLocaleString("tr-TR", { timeZone: "Europe/Istanbul", dateStyle: "short", timeStyle: "short" }),
+                                    new Date(r.return_datetime).toLocaleString("tr-TR", { timeZone: "Europe/Istanbul", dateStyle: "short", timeStyle: "short" }),
                                     <span className={`${getPaymentStatusColor(r.payment_status)} font-semibold`} key="payment">
                                         {r.payment_status}
                                     </span>,
@@ -117,7 +108,7 @@ export default function CarReservations({ allReservations, updateData, current =
                 totalPages={totalPages}
                 length={reservations.length}
             />
-            
+
             {selectedReservation && (
                 <ShowResCard
                     res={selectedReservation}

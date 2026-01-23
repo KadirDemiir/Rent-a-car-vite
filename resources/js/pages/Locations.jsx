@@ -22,11 +22,16 @@ export default function Locations() {
         fetchData();
     }, []);
 
-    if (loading) return <p>Yükleniyor...</p>;
+    //if (loading) return <p>Yükleniyor...</p>;
 
     return (
         <div>
             < Navbar />
+            {loading ? (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+            ) : (
             <div className="p-4 w-full flex justify-center bg-gray-100">
                 <div className="w-[90%]">
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 sm:grid-col-1 gap-4">
@@ -36,6 +41,7 @@ export default function Locations() {
                     </div>
                 </div>
             </div>
+            )}
         </div>
     );
 }
