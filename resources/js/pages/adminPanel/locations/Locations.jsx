@@ -72,6 +72,7 @@ export default function Locations() {
             return false;
         }
     }
+    if(loading) return (<>Loading...</>)
     return (
         <div className="min-h-screen bg-slate-50 relative">
             <Navbar>

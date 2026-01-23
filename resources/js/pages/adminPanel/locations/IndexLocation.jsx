@@ -18,27 +18,29 @@ export default function IndexLocation({ id }) {
         fetchData();
     }, [id]);
 
-    useEffect(() => {
-        if (location) {
-            setFormData({
-                name: location.name || '',
-                city: location.city || '',
-                phone: location.phone || '',
-                email: location.email || '',
-                address: location.address || '',
-                image: location.photo_path ? `/storage/${location.photo_path}` : ''
-            });
-            setLatitude(Number(location.latitude) || 0);
-            setLongitude(Number(location.longitude) || 0);
-        }
-    }, [location]);
-
     const fetchData = async () => {
         try {
             setLoading(true);
             const response = await axios.get(`/adminpanel/get-info/locations/${id}`);
-            setLocation(response.data.location);
+            console.log("Lokasyon verisi:", response.data);
+            
+            const loc = response.data.location;
+            setLocation(loc);
             setLocations(response.data.locations);
+
+            if (loc) {
+                setFormData({
+                    name: loc.name || '',
+                    city: loc.city || '',
+                    phone: loc.phone || '',
+                    email: loc.email || '',
+                    address: loc.address || '',
+                    image: loc.photo_path ? `/storage/${loc.photo_path}` : ''
+                });
+                setLatitude(Number(loc.latitude) || 0);
+                setLongitude(Number(loc.longitude) || 0);
+            }
+
             setLoading(false);
         } catch (err) {
             console.error("Veri çekme hatası:", err);
