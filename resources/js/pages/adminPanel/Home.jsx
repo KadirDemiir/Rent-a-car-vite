@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import Navbar from '../../components/adminPanel/navbar/NavBar.jsx';
+import Navbar from '../../components/adminPanel/navbar/Navbar.jsx';
 import { useState, useEffect } from 'react';
 import Confirm from '../../components/Confirm.jsx';
 import axios from 'axios';
