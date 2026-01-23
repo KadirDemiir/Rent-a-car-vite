@@ -60,6 +60,9 @@ class AdminCarController extends Controller
             $car = Car::with(['photos', 'brandKey', 'modelKey', 'price' => fn($query) => $query->where('is_active', true)])->findOrFail($id);
 
             $car->price()->update(['is_active' => false]);
+            $car->update([
+                'deposit' => $validated['deposit'],
+            ]);
             $prices = json_decode($validated['price'], true);
             foreach ($prices as $item => $day_price_array) {
                 foreach ($day_price_array as $day_range => $priceValue) {
@@ -95,7 +98,7 @@ class AdminCarController extends Controller
             ]);
             DB::commit();
             $updatedCar = Car::with(['photos', 'brandKey', 'modelKey', 'price' => fn($query) => $query->where('is_active', true)])->findOrFail($id);
-            Log::info('Araç Fİyat GÜncellemesi Olumlu', ['car' => $updatedCar]);
+            Log::info('Araç Fİyat GÜncellemesi Olumlu', ['car' => $updatedCar->price->toArray()]);
             return response()->json([
                 'car' => $updatedCar,
                 'success' => 'Araç fiyatı başarıyla güncellendi.'
