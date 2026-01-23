@@ -503,4 +503,32 @@ class ReservationController extends Controller
 
         return back()->with('success', 'Reservation cancelled successfully.');
     }
+
+    public function startRental($id)
+{
+    $reservation = Reservation::findOrFail($id);
+
+    if ($reservation->status !== 'confirmed') {
+         return response()->json(['error' => 'Cannot start rental for this reservation.'], 422);
+    }
+
+    $reservation->status = 'active';
+    $reservation->save();
+
+    return response()->json(['success' => 'Rental started successfully.', 'data' => $reservation]);
+}
+
+    public function completeRental($id)
+    {
+        $reservation = Reservation::findOrFail($id);
+
+        if ($reservation->status !== 'active') {
+             return response()->json(['error' => 'Cannot complete rental for an inactive reservation.'], 422);
+        }
+
+        $reservation->status = 'completed';
+        $reservation->save();
+
+        return response()->json(['success' => 'Rental completed successfully.', 'data' => $reservation]);
+    }
 }

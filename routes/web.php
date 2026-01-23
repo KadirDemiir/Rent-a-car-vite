@@ -285,6 +285,8 @@ Route::group([
     })->name('adminIndexLocations');
     
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('reservations'), [ReservationController::class, 'showReservations'])->name('adminReservations');
+    Route::post('/adminpanel/reservations/{id}/start', [ReservationController::class, 'startRental'])->name('adminStartRental');
+    Route::post('/adminpanel/reservations/{id}/complete', [ReservationController::class, 'completeRental'])->name('adminCompleteRental');
     
     Route::inertia(dbTransRoute('adminpanel') . '/' . dbTransRoute('add'), 'adminPanel/users/Users')->name('adminUsers');
 
