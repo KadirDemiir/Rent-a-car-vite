@@ -39,6 +39,7 @@ const applySorting = (cars, sortBy) => {
 };
 
 export default function SortSearchReservations({availableCars = [], sortBy, segment, fuelType, transmissionType, reservation}) {
+    console.log(availableCars);
     const {t, i18n} = useTranslation();
     const [filteredCars, setFilteredCars] = useState([]);
     const {current, calculateTotal} = useCurrency();

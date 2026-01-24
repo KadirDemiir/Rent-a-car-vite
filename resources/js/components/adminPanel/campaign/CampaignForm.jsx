@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import AddCampaignInfo from "./AddCampaignInfo.jsx";
 import DiscountForm from "../price/DiscountForm.jsx";
-import SelectOptions from "../../websites/filterSelectors/SelectOptions.jsx";
 import DateTimePickerComp from "../price/DateTimePickerComp.jsx";
 import Confirm from "../../Confirm.jsx";
 import {router, usePage} from "@inertiajs/react";
@@ -12,8 +11,8 @@ export default function CampaignForm({languages, mode = "add", campaign = null, 
     const { url } = usePage();
     const params = new URLSearchParams(url.split('?')[1]);
     const lang = params.get('lang');
-    const supportedLangs = languages.map(lang => ({label: lang.name, value: lang.code}));
-    const [currentLang, setCurrentLang] = useState(lang ?? languages[0].code);
+    const supportedLangs = languages?.map(lang => ({label: lang.name, value: lang.code}));
+    const [currentLang, setCurrentLang] = useState(lang ?? languages?.[0].code);
     const [isDiscountOpen, setIsDiscountOpen] = useState(campaign?.discounts.length || false);
     const [title, setTitle] = useState(() =>
         languages.reduce((acc, lang) => {
@@ -175,13 +174,13 @@ export default function CampaignForm({languages, mode = "add", campaign = null, 
         setConfirmMessage({});
     };
 
-    const filledLanguageCount = languages.reduce((count, language) => {
+    const filledLanguageCount = languages?.reduce((count, language) => {
         const langCode = language.code;
         const isFilled = title[langCode] && content[langCode];
         return count + (isFilled ? 1 : 0);
     }, 0);
 
-    const progressPercentage = languages.length > 0 ? Math.round((filledLanguageCount / languages.length) * 100) : 0;
+    const progressPercentage = languages?.length > 0 ? Math.round((filledLanguageCount / languages.length) * 100) : 0;
 
     return (
         <div className="w-full p-4 shadow-lg rounded-md bg-white">
@@ -206,7 +205,7 @@ export default function CampaignForm({languages, mode = "add", campaign = null, 
                 </div>
 
                 <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-                    {languages.map((l) => {
+                    {languages?.map((l) => {
                         const isFilled = title[l.code] && content[l.code];
                         const isActive = currentLang === l.code;
                         return (
@@ -255,6 +254,7 @@ export default function CampaignForm({languages, mode = "add", campaign = null, 
                     setDayDiscount={setDayDiscount}
                     segmentId={discountTarget}
                     setSegmentId={setDiscountTarget}
+                    isDateTimeVisible={false}
                 />
             )}
 

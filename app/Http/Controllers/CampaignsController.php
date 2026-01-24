@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Campaigns;
 use App\Models\Discount;
 use App\Models\Language;
+use App\Models\Currency;
+use App\Models\Segment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -129,6 +131,7 @@ class CampaignsController extends Controller
         }
 
         $currentDate = Carbon::now();
+        $cur_id = Currency::where('code', $discount['currency'] ?? 'TRY')->first()->id ?? null;
 
         $discountModel = new Discount();
         $discountModel->campaign_id = $campaignId;
@@ -136,11 +139,17 @@ class CampaignsController extends Controller
         $discountModel->max_days = $discount['max_day'];
         $discountModel->discount_value = $discount['discount_amount'] ?? 0;
         $discountModel->discount_type = $discount['discount_type'];
-        $discountModel->currency = $discount['currency'] ?? null;
+        $discountModel->currency_id = $cur_id;
         $discountModel->target_type = $selectedDiscount;
+        
+        if($discount['discount_type'] === "percentage")
+            $discountModel->discount_value = (float) ($discount['discount_amount'] / 100);
+        else
+            $discountModel->discount_value = $discount['discount_amount'];
+        
 
         if ($selectedDiscount === 'segment') {
-            $discountModel->segment_name = $targetData;
+            $discountModel->segment_id = $targetData;
         }
 
         if ($selectedDiscount === 'car') {
