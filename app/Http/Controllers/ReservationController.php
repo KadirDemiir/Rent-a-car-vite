@@ -343,7 +343,7 @@ class ReservationController extends Controller
         $reqEnd = Carbon::parse($finishDateTime);
 
         $hasConflict = Reservation::where('car_id', $carId)
-            ->whereIn('status', ['confirmed', 'pending'])
+            ->whereIn('status', ['confirmed', 'pending', 'active'])
             ->where(function ($query) use ($reqStart, $reqEnd, $bufferHours) {
                 $query->where('pickup_datetime', '<', $reqEnd)
                     ->whereRaw("DATE_ADD(return_datetime, INTERVAL ? HOUR) > ?", [$bufferHours, $reqStart]);
@@ -354,7 +354,7 @@ class ReservationController extends Controller
             return false;
 
         $lastReservation = Reservation::where('car_id', $carId)
-            ->whereIn('status', ['pending',  'confirmed', 'completed'])
+            ->whereIn('status', ['pending',  'confirmed', 'completed', 'active'])
             ->whereRaw("DATE_ADD(return_datetime, INTERVAL ? HOUR) <= ?", [$bufferHours, $reqStart])
             ->orderBy('return_datetime', 'desc')
             ->first();
@@ -505,22 +505,28 @@ class ReservationController extends Controller
     }
 
     public function startRental($id)
-{
-    $reservation = Reservation::findOrFail($id);
+    {
+        $reservation = Reservation::findOrFail($id);
+        $car = Car::findOrFail($reservation->car_id);
 
-    if ($reservation->status !== 'confirmed') {
-         return response()->json(['error' => 'Cannot start rental for this reservation.'], 422);
+        if ($reservation->status !== 'confirmed') {
+            return response()->json(['error' => 'Cannot start rental for this reservation.'], 422);
+        }
+
+        $reservation->status = 'active';
+        $reservation->save();
+
+        $car->status = 'rented';
+        $car->save();
+
+
+        return response()->json(['success' => 'Rental started successfully.', 'data' => $reservation]);
     }
-
-    $reservation->status = 'active';
-    $reservation->save();
-
-    return response()->json(['success' => 'Rental started successfully.', 'data' => $reservation]);
-}
 
     public function completeRental($id)
     {
         $reservation = Reservation::findOrFail($id);
+        $car = Car::findOrFail($reservation->car_id);   
 
         if ($reservation->status !== 'active') {
              return response()->json(['error' => 'Cannot complete rental for an inactive reservation.'], 422);
@@ -528,6 +534,9 @@ class ReservationController extends Controller
 
         $reservation->status = 'completed';
         $reservation->save();
+
+        $car->status = 'available';
+        $car->save();
 
         return response()->json(['success' => 'Rental completed successfully.', 'data' => $reservation]);
     }

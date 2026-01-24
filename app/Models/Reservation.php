@@ -90,13 +90,13 @@ class Reservation extends Model
 
     public function scopeUpcoming($query)
     {
-        return $query->where('pickup_datetime', '>=', now())
+        return $query->where('status', 'confirmed')->where('pickup_datetime', '>=', now())->orWhereDate('return_datetime', '>=', now())
             ->where('status', 'confirmed');
     }
 
     public function scopeActiveRentals($query)
     {
-        return $query->where('status', 'active');
+        return $query->where('status', 'active')->whereDate('return_datetime', '>=', now());
     }
 
     public function scopeLateReturns($query)

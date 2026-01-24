@@ -13,7 +13,7 @@ export default function SelectExtras({car, auth_user, params}){
     console.log(car, auth_user, params);
     const {t} = useTranslation();
     const [selectedExtras, setSelectedExtras] = useState([]);
-    const [user, setUser] = useState({name: {value: auth_user.name ?? "", error: ""}, surname: {value: auth_user.surname ?? "", error: ""}, mail: {value: auth_user.email ?? "", error: ""}, phone: {value: auth_user.phone_number ?? "", error: ""}, address: {value: auth_user.address ?? "", error: ""}, birthday: {value: auth_user.birthday ?? "", error: ""}, identity: {value: auth_user.tc_number ?? "", error: ""}, arrivalFlightNo: {value: "", error: ""}, returnFlightNo: {value: "", error: ""}, notes: {value: "", error: ""}, isNative: true});
+    const [user, setUser] = useState({name: {value: auth_user?.name ?? "", error: ""}, surname: {value: auth_user?.surname ?? "", error: ""}, mail: {value: auth_user?.email ?? "", error: ""}, phone: {value: auth_user?.phone_number ?? "", error: ""}, address: {value: auth_user?.address ?? "", error: ""}, birthday: {value: auth_user?.birthday ?? "", error: ""}, identity: {value: auth_user?.tc_number ?? "", error: ""}, arrivalFlightNo: {value: "", error: ""}, returnFlightNo: {value: "", error: ""}, notes: {value: "", error: ""}, isNative: true});
     const [error, setError] = useState();
 
     const handleSubmit =  () => {
