@@ -26,17 +26,60 @@ export default function SegmentForm({langOptions, currentLang, setCurrentLang, f
             }
         }));
     }
+    
+    const progressPercentage = Math.round(langProgress());
+
     return(
         <div className={`w-full`}>
-            <div className={`w-[60%] flex flex-col items-center justify-center gap-4 mx-auto`}>
-                <div className={`w-[50%] flex flex-col items-center justify-center gap-2`}>
-                    <SelectOptions options={langOptions} value={currentLang} onChange={setCurrentLang} options_name={t("adminpanel.segments.add_segment.select_language")} />
-                    <div className="flex h-2 w-full bg-gray-300 rounded-full overflow-hidden">
-                        <div className="bg-green-500 transition-all duration-300" style={{ width: `${langProgress()}%` }}/>
-                        <div className="bg-red-500 transition-all duration-300" style={{ width: `${100 - langProgress()}%` }}/>
+            <div className={`w-[80%] md:w-[60%] flex flex-col items-center justify-center gap-6 mx-auto bg-white p-6 rounded-xl shadow-sm border border-gray-100`}>
+                <div className="w-full flex flex-col space-y-3">
+                    <div className="flex items-center justify-between text-sm text-gray-600">
+                        <span className="font-medium">{t("adminpanel.segments.add_segment.select_language")}</span>
+                        <span className={`font-bold ${progressPercentage === 100 ? 'text-green-600' : 'text-blue-600'}`}>
+                             %{progressPercentage}
+                        </span>
+                    </div>
+                    
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                            className={`h-2 rounded-full transition-all duration-300 ${progressPercentage === 100 ? 'bg-green-500' : 'bg-blue-500'}`} 
+                            style={{ width: `${progressPercentage}%` }}
+                        />
+                    </div>
+    
+                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent justify-center">
+                        {langOptions.map((l) => {
+                            const isFilled = formData.name[l.value]?.value?.trim() !== "";
+                            const isActive = currentLang === l.value;
+                            return (
+                                <button
+                                    key={l.value}
+                                    type="button"
+                                    onClick={() => setCurrentLang(l.value)}
+                                    className={`
+                                        whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all select-none
+                                        ${isActive 
+                                            ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-200' 
+                                            : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                                        }
+                                        ${!isFilled && !isActive ? 'border-red-200 text-red-600' : ''}
+                                    `}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        {l.label}
+                                        {isFilled && (
+                                            <span className={`flex items-center justify-center w-4 h-4 text-[10px] rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-green-100 text-green-600'}`}>
+                                                ✓
+                                            </span>
+                                        )}
+                                    </div>
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
-                <div className={`w-80  flex flex-col gap-2`}>
+
+                <div className={`w-full md:w-80 flex flex-col gap-2`}>
                     <div className={`flex justify-center`}>{t("adminpanel.segments.add_segment.segment_name")}:</div>
                     <input value={formData.name[currentLang].value}   onChange={(e) =>
                         setFormData(prev => ({

@@ -181,18 +181,51 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit }, ref) => {
                 </div>
             )}
 
-            <div className="col-span-2 flex items-center justify-center">
-                <div className="flex flex-col items-center gap-2 mb-4 md:w-[30%]">
-                    <SelectOptions
-                        options={supportedLangs}
-                        onChange={setCurrentLang}
-                        value={currentLang} // Burada [] yok
-                        options_name={t("adminpanel.pricing.add_campaign.select_language")}
+            <div className="col-span-2 flex flex-col space-y-3 mb-6 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div className="flex items-center justify-between text-sm text-gray-600">
+                    <span className="font-medium">{t("adminpanel.pricing.add_campaign.select_language")}</span>
+                    <span className={`font-bold ${progress() === 100 ? 'text-green-600' : 'text-blue-600'}`}>
+                         %{progress()}
+                    </span>
+                </div>
+                
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                        className={`h-2 rounded-full transition-all duration-300 ${progress() === 100 ? 'bg-green-500' : 'bg-blue-500'}`} 
+                        style={{ width: `${progress()}%` }}
                     />
-                    <div className="w-full h-2 flex bg-gray-200 rounded overflow-hidden">
-                        <div className="bg-green-500 transition-all duration-300" style={{ width: `${progress()}%` }}/>
-                    </div>
-                    <span className="text-xs text-gray-500">Çeviri Durumu: %{progress()}</span>
+                </div>
+
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent justify-center">
+                    {supportedLangs.map((l) => {
+                        // Check if both brand and model are filled for this language
+                        const isFilled = formData.brand[l.value]?.trim() && formData.model[l.value]?.trim();
+                        const isActive = currentLang === l.value;
+                        return (
+                            <button
+                                key={l.value}
+                                type="button"
+                                onClick={() => setCurrentLang(l.value)}
+                                className={`
+                                    whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all select-none
+                                    ${isActive 
+                                        ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-200' 
+                                        : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                                    }
+                                    ${!isFilled && !isActive ? 'border-red-200 text-red-600' : ''}
+                                `}
+                            >
+                                <div className="flex items-center gap-2">
+                                    {l.label}
+                                    {isFilled && (
+                                        <span className={`flex items-center justify-center w-4 h-4 text-[10px] rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-green-100 text-green-600'}`}>
+                                            ✓
+                                        </span>
+                                    )}
+                                </div>
+                            </button>
+                        );
+                    })}
                 </div>
             </div>
 

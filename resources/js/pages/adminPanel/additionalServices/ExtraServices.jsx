@@ -55,10 +55,10 @@ export default function ExtraServices({ extraServices, success, error }) {
                                     <Td
                                         contents={[
                                             name[i18n.language],
-                                            calculateTotal(es.extra_service_prices.find(e => e.min_days === 1 && e.max_days === 3).base_price).toFixed(2),
-                                            calculateTotal(es.extra_service_prices.find(e => e.min_days === 4 && e.max_days === 7).base_price).toFixed(2),
-                                            calculateTotal(es.extra_service_prices.find(e => e.min_days === 8 && e.max_days === 15).base_price).toFixed(2),
-                                            calculateTotal(es.extra_service_prices.find(e => e.min_days === 16 && e.max_days === 999).base_price).toFixed(2),
+                                            Number(calculateTotal(es.extra_service_prices.find(e => e.min_days === 1 && e.max_days === 3).base_price)).toFixed(2),
+                                            Number(calculateTotal(es.extra_service_prices.find(e => e.min_days === 4 && e.max_days === 7).base_price)).toFixed(2),
+                                            Number(calculateTotal(es.extra_service_prices.find(e => e.min_days === 8 && e.max_days === 15).base_price)).toFixed(2),
+                                            Number(calculateTotal(es.extra_service_prices.find(e => e.min_days === 16 && e.max_days === 999).base_price)).toFixed(2),
                                             es.stock,
                                             es.max_limit,
                                             es.current_stock ?? "-",

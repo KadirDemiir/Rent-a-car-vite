@@ -23,12 +23,7 @@ export default function ExternalServiceModal({ service, close}) {
 
     const handleSubmit = (data) => {
         setError(null);
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        axios.post('/adminpanel/external-services', data, {
-            headers: {
-                'X-CSRF-TOKEN': csrfToken,
-            }
-        })
+        axios.post('/adminpanel/external-services', data)
             .then( () => {
                 close();
                 router.visit(window.location.pathname, {preserveScroll: true});

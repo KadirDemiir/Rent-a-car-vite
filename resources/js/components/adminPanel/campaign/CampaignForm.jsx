@@ -174,14 +174,67 @@ export default function CampaignForm({languages, mode = "add", campaign = null, 
         if (confirmMessage.event === "delete") deleteCampaign();
         setConfirmMessage({});
     };
+
+    const filledLanguageCount = languages.reduce((count, language) => {
+        const langCode = language.code;
+        const isFilled = title[langCode] && content[langCode];
+        return count + (isFilled ? 1 : 0);
+    }, 0);
+
+    const progressPercentage = languages.length > 0 ? Math.round((filledLanguageCount / languages.length) * 100) : 0;
+
     return (
         <div className="w-full p-4 shadow-lg rounded-md bg-white">
             {formErrors && (
                 <><p className="bg-red-400 border-l-8 border-red-600 text-white p-4">{formErrors}</p><br /></>
             )}
             {isConfirmOpen && <Confirm message={confirmMessage.message} confirm={handleConfirm} />}
-            <div className="flex justify-between gap-2 mb-4 md:w-[30%]">
-                <SelectOptions options={supportedLangs} onChange={(e) => setCurrentLang(e)} value={currentLang} options_name={t("adminpanel.pricing.add_campaign.select_language")} />
+            
+            <div className="flex flex-col space-y-3 mb-6">
+                <div className="flex items-center justify-between text-sm text-gray-600">
+                    <span className="font-medium">{t("adminpanel.pricing.add_campaign.select_language")}</span>
+                    <span className={`font-bold ${progressPercentage === 100 ? 'text-green-600' : 'text-blue-600'}`}>
+                         %{progressPercentage}
+                    </span>
+                </div>
+                
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                        className={`h-2 rounded-full transition-all duration-300 ${progressPercentage === 100 ? 'bg-green-500' : 'bg-blue-500'}`} 
+                        style={{ width: `${progressPercentage}%` }}
+                    />
+                </div>
+
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                    {languages.map((l) => {
+                        const isFilled = title[l.code] && content[l.code];
+                        const isActive = currentLang === l.code;
+                        return (
+                            <button
+                                key={l.code}
+                                type="button"
+                                onClick={() => setCurrentLang(l.code)}
+                                className={`
+                                    whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all select-none
+                                    ${isActive 
+                                        ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-200' 
+                                        : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                                    }
+                                    ${!isFilled && !isActive ? 'border-red-200 text-red-600' : ''}
+                                `}
+                            >
+                                <div className="flex items-center gap-2">
+                                    {l.name}
+                                    {isFilled && (
+                                        <span className={`flex items-center justify-center w-4 h-4 text-[10px] rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-green-100 text-green-600'}`}>
+                                            ✓
+                                        </span>
+                                    )}
+                                </div>
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
 
             <AddCampaignInfo titleOnChange={titleOnChange} title={title[currentLang]} handleImageChange={handleImageChange} image={imagePreview} content={content[currentLang]} setOnChange={contentOnChange} currLan={currentLang}/>

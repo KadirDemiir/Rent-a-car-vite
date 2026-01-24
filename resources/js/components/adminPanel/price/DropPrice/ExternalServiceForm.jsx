@@ -100,12 +100,64 @@ export default function ExternalServiceForm({ service, close, onSubmit, language
         onSubmit(formData);
     }
 
+    const filledLanguageCount = languages.reduce((count, language) => {
+        const langCode = language.value;
+        const isFilled = name[langCode] && description[langCode];
+        return count + (isFilled ? 1 : 0);
+    }, 0);
+
+    const progressPercentage = languages.length > 0 ? Math.round((filledLanguageCount / languages.length) * 100) : 0;
+
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {formError && <div className={`border-l-12 border-red-600 bg-red-400 text-white col-span-2 p-2 text-sm`}>{formError}</div>}
 
-            <div className={`col-span-2`}>
-                <SelectOptions options={languages} options_name={t("adminpanel.pricing.adding_services.external_services.add_new_service_modal.select_language")} value={[lang]} onChange={(e) => setLang(e)} />
+            <div className="col-span-2 space-y-3">
+                <div className="flex items-center justify-between text-sm text-gray-600">
+                    <span className="font-medium">{t("adminpanel.pricing.adding_services.external_services.add_new_service_modal.select_language")}</span>
+                    <span className={`font-bold ${progressPercentage === 100 ? 'text-green-600' : 'text-blue-600'}`}>
+                         %{progressPercentage}
+                    </span>
+                </div>
+                
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                        className={`h-2 rounded-full transition-all duration-300 ${progressPercentage === 100 ? 'bg-green-500' : 'bg-blue-500'}`} 
+                        style={{ width: `${progressPercentage}%` }}
+                    />
+                </div>
+
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                    {languages.map((l) => {
+                        const isFilled = name[l.value] && description[l.value];
+                        const isActive = lang === l.value;
+                        return (
+                            <button
+                                key={l.value}
+                                type="button"
+                                onClick={() => setLang(l.value)}
+                                className={`
+                                    whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all select-none
+                                    ${isActive 
+                                        ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-200' 
+                                        : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                                    }
+                                    ${!isFilled && !isActive ? 'border-red-200 text-red-600' : ''}
+                                `}
+                            >
+                                <div className="flex items-center gap-2">
+                                    {l.label}
+                                    {isFilled && (
+                                        <span className={`flex items-center justify-center w-4 h-4 text-[10px] rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-green-100 text-green-600'}`}>
+                                            ✓
+                                        </span>
+                                    )}
+                                </div>
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
 
             <Input
