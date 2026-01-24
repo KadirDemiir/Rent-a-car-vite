@@ -1,22 +1,30 @@
 import React, { useState } from 'react';
 import NavBar from '../../components/websites/Navbar.jsx';
-import { usePage, useForm, Head } from '@inertiajs/react';
+import { useForm, Head } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
 
 export default function MyReservations({ reservations }) {
     const { t } = useTranslation();
-    const { flash } = usePage().props;
-    const { patch, processing } = useForm();
+    const { processing } = useForm();
     const [filter, setFilter] = useState('active'); // 'active' or 'past'
+    const [updatedReservations, setUpdatedReservations] = useState(reservations);
 
     const handleCancel = (id) => {
         if (confirm(t('Are you sure you want to cancel this reservation?'))) {
-            patch(`/my-reservations/${id}/cancel`);
+            axios.patch(`/my-reservations/${id}/cancel`)
+                .then(response => {
+                    console.log(response.data);
+                    setUpdatedReservations(response.data.reservations)
+                })
+                .catch(error => {
+                    console.error(error);
+                });
         }
     };
 
-    const activeReservations = reservations.filter(r => ['pending', 'confirmed'].includes(r.status));
-    const pastReservations = reservations.filter(r => ['cancelled', 'completed', 'failed'].includes(r.status));
+    const activeReservations = updatedReservations.filter(r => ['pending', 'confirmed', 'active'].includes(r.status));
+    const pastReservations = updatedReservations.filter(r => ['cancelled', 'completed'].includes(r.status));
 
     const displayedReservations = filter === 'active' ? activeReservations : pastReservations;
 
@@ -34,17 +42,6 @@ export default function MyReservations({ reservations }) {
             
             <div className="container mx-auto px-4 py-8 mt-5">
                 <h1 className="text-3xl font-bold mb-8 text-gray-800">{t('My Reservations')}</h1>
-
-                {flash && flash.success && (
-                    <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
-                        <p>{flash.success}</p>
-                    </div>
-                )}
-                {flash && flash.error && (
-                    <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
-                        <p>{flash.error}</p>
-                    </div>
-                )}
 
                 <div className="flex border-b border-gray-200 mb-6">
                     <button 
@@ -73,7 +70,7 @@ export default function MyReservations({ reservations }) {
                                     {reservation.car?.photos && reservation.car.photos.length > 0 && (
                                         <div className="w-full md:w-48 h-32 flex-shrink-0 mb-4 md:mb-0 bg-gray-100 rounded-md overflow-hidden text-center">
                                              <img 
-                                                src={`/storage/${reservation.car.photos[0].image_path}`} 
+                                                src={`/storage/${reservation.car.photos[0].photo_path}`} 
                                                 alt="Car" 
                                                 className="w-full h-full object-cover" 
                                                 onError={(e) => {e.target.onerror = null; e.target.src = '/placeholder.png'}} 

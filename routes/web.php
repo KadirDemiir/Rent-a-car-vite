@@ -248,7 +248,7 @@ Route::group([
     });
     Route::get('/location', [LocationsController::class, 'index']);
 
-    Route::get(dbTransRoute('checkReservation'), [ReservationController::class, 'checkReservationPage'])->name('checkReservationPage');
+    Route::get(dbTransRoute ('checkReservation'), [ReservationController::class, 'checkReservationPage'])->name('checkReservationPage');
     Route::post(dbTransRoute('checkReservation'), [ReservationController::class, 'checkReservation'])->name('checkReservation');
     Route::patch('/guest-reservation/{id}/cancel', [ReservationController::class, 'guestCancelReservation'])->name('guestCancelReservation');
 

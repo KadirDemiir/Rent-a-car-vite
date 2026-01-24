@@ -336,35 +336,35 @@ class ReservationController extends Controller
 
     public function isCarAvailable($carId, $startDateTime, $finishDateTime, $pickupLocationId){
 
-    if(Car::find($carId)->status === 'unavailable') return false;
-        $bufferHours = 4;
+        if(Car::find($carId)->status === 'unavailable') return false;
+            $bufferHours = 4;
 
-        $reqStart = Carbon::parse($startDateTime);
-        $reqEnd = Carbon::parse($finishDateTime);
+            $reqStart = Carbon::parse($startDateTime);
+            $reqEnd = Carbon::parse($finishDateTime);
 
-        $hasConflict = Reservation::where('car_id', $carId)
-            ->whereIn('status', ['confirmed', 'pending', 'active'])
-            ->where(function ($query) use ($reqStart, $reqEnd, $bufferHours) {
-                $query->where('pickup_datetime', '<', $reqEnd)
-                    ->whereRaw("DATE_ADD(return_datetime, INTERVAL ? HOUR) > ?", [$bufferHours, $reqStart]);
-            })
-            ->exists();
+            $hasConflict = Reservation::where('car_id', $carId)
+                ->whereIn('status', ['confirmed', 'pending', 'active'])
+                ->where(function ($query) use ($reqStart, $reqEnd, $bufferHours) {
+                    $query->where('pickup_datetime', '<', $reqEnd)
+                        ->whereRaw("DATE_ADD(return_datetime, INTERVAL ? HOUR) > ?", [$bufferHours, $reqStart]);
+                })
+                ->exists();
 
-        if ($hasConflict)
-            return false;
+            if ($hasConflict)
+                return false;
 
-        $lastReservation = Reservation::where('car_id', $carId)
-            ->whereIn('status', ['pending',  'confirmed', 'completed', 'active'])
-            ->whereRaw("DATE_ADD(return_datetime, INTERVAL ? HOUR) <= ?", [$bufferHours, $reqStart])
-            ->orderBy('return_datetime', 'desc')
-            ->first();
+            $lastReservation = Reservation::where('car_id', $carId)
+                ->whereIn('status', ['pending',  'confirmed', 'completed', 'active'])
+                ->whereRaw("DATE_ADD(return_datetime, INTERVAL ? HOUR) <= ?", [$bufferHours, $reqStart])
+                ->orderBy('return_datetime', 'desc')
+                ->first();
 
-        if ($lastReservation) {
-            return $lastReservation->return_location_id == $pickupLocationId;
-        } else {
-            $car = Car::find($carId);
-            return $car && $car->status == 'available' && $car->current_location_id == $pickupLocationId;
-        }
+            if ($lastReservation) {
+                return $lastReservation->return_location_id == $pickupLocationId;
+            } else {
+                $car = Car::find($carId);
+                return $car && $car->status == 'available' && $car->current_location_id == $pickupLocationId;
+            }
     }
 
     public function showReservations(){
@@ -396,7 +396,7 @@ class ReservationController extends Controller
     public function myReservations()
     {
         $user = auth()->user();
-        $reservations = Reservation::where('user_id', $user->id)
+        $reservations = Reservation::where('email', $user->email)
             ->with(['car.photos', 'pickupLocation', 'returnLocation', 'car.brandKey', 'car.modelKey', 'currency'])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -408,19 +408,29 @@ class ReservationController extends Controller
 
     public function cancelReservation($id){
         $user = auth()->user();
-        $reservation = Reservation::where('user_id', $user->id)->where('id', $id)->firstOrFail();
+        $reservation = Reservation::where('email', $user->email)->where('id', $id)->firstOrFail();
 
         if ($reservation->status !== 'pending') {
-            return back()->with('error', 'Only pending reservations can be cancelled.');
+            return response()->json(['error' => 'Only pending reservations can be cancelled.'], 422);
         }
 
         $reservation->status = 'cancelled';
         $reservation->save();
 
-        return back()->with('success', 'Reservation cancelled successfully.');
+            $reservations = Reservation::where('email', $user->email)
+                ->with(['car.photos', 'pickupLocation', 'returnLocation', 'car.brandKey', 'car.modelKey', 'currency'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+        return response()->json(['success' => 'Reservation cancelled successfully.', 'reservations' => $reservations], 200);
     }
 
     public function checkReservationPage(Request $request){
+
+        if (auth()->check() && !$request->filled('reservation_id') && !$request->filled('email')) {
+            return to_route('myReservations');
+        }   
+
         if ($request->filled('reservation_id') && $request->filled('email')) {
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
                 'email' => 'required|email',
@@ -453,8 +463,7 @@ class ReservationController extends Controller
         return Inertia::render('CheckReservation');
     }
 
-    public function checkReservation(Request $request)
-    {
+    public function checkReservation(Request $request){
         $validated = $request->validate([
             'email' => 'required|email',
             'reservation_id' => 'required|numeric',
@@ -473,8 +482,7 @@ class ReservationController extends Controller
         return to_route('checkReservationPage', $validated);
     }
 
-    public function guestCancelReservation(Request $request, $id)
-    {
+    public function guestCancelReservation(Request $request, $id){
         $request->validate([
             'email' => 'required|email'
         ]);
