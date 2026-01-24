@@ -32,10 +32,23 @@ class DiscountController extends Controller
         $start = $validated['startDate'];
         $end = $validated['endDate'];
 
-        $overlap = Discount::where(function ($q) use ($start, $end) {
-            $q->where('start_date', '<=', $end)
-                ->where('end_date', '>=', $start);
-        })->exists();
+        $overlap = Discount::query()
+            ->when(isset($id), fn($q) => $q->where('id', '!=', $id))
+            ->where('status', 'active')
+            ->where(function ($dateQuery) use ($start, $end) {
+                $dateQuery->where('start_date', '<=', $end)
+                        ->where('end_date', '>=', $start);
+            })
+            ->where(function ($scopeQuery) use ($request) {
+                $scopeQuery->where('target_type', $request->target_type);
+
+                if ($request->target_type === 'car') {
+                    $scopeQuery->where('car_id', $request->car_id);
+                } elseif ($request->target_type === 'segment') {
+                    $scopeQuery->where('segment_id', $request->segment_id);
+                }
+            })
+            ->exists();
 
         if ($overlap) {
             return response()->json([
