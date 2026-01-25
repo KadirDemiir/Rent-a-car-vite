@@ -113,6 +113,7 @@ Route::get('/get-supported-currencies', function () {
 });
 Route::get('/get-currencies', function () {
     $currencies = Cache::remember('active_currencies', 60*60*60, function () {
+        Log::info('CACHE ÇALIŞMADI! TCMB servisine gidiliyor: ' . now());
         $def = Currency::where('is_active', 1)->where('is_default', 1)->first();
         if (!$def) {
             throw new \Exception('Default currency not found');
