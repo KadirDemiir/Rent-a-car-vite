@@ -6,7 +6,7 @@ import {useTranslation} from "react-i18next";
 export default function Fuels({fuels}){
     const {i18n, t} = useTranslation();
     const handleVisit = (id) => {
-        router.visit(`/adminpanel/fuels/${id}`, {method: 'get'});
+        router.visit(`/${i18n.language}/${t("address.adminpanel")}/${t("address.fuels")}/${id}`, {method: 'get'});
     }
     return(
         <div className={`w-full`}>

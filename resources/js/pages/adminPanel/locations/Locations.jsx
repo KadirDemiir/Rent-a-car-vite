@@ -11,8 +11,8 @@ export default function Locations() {
     const [success, setSuccess] = useState();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [formData, setFormData] = useState({ name: '', city: '', phone: '', email: '', address: '', image: null });
-    const [latitude, setLatitude] = useState( 0);
-    const [longitude, setLongitude] = useState( 0);
+    const [latitude, setLatitude] = useState(0);
+    const [longitude, setLongitude] = useState(0);
 
     const fetchData = async () => {
         setLoading(true);
