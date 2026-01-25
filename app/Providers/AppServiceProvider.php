@@ -35,7 +35,7 @@ class AppServiceProvider extends ServiceProvider
             try {
                 $supported = Cache::store('file')->remember('supported_locales', 3600 * 24, function () {
                     // Veritabanı sorgusu SADECE cache yoksa çalışır
-                    $langs = Language::where('status', 'active')->get();
+                    $langs = getActiveLanguages();
 
                     return $langs->mapWithKeys(fn($lang) => [
                         $lang->code => [

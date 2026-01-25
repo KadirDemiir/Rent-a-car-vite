@@ -35,6 +35,7 @@ class TransmissionController extends Controller
                 $updateTranslations[$language->id] = ['value' => $value['value']];
             }
             DB::commit();
+            clearTranslationCache();
             return response()->json([
                 'success' => true,
                 'transmission_id' => $transmission->id,
@@ -75,6 +76,7 @@ class TransmissionController extends Controller
             }
 
             DB::commit();
+            clearTranslationCache();
 
             return response()->json([
                 'success' => true,

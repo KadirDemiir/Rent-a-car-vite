@@ -45,7 +45,7 @@ class CampaignsController extends Controller
     public function showIndexAdminPanel($id)
     {
         $campaign = Campaigns::with('discounts')->findOrFail($id);
-        $languages = Language::where('status', 'active')->get();
+        $languages = getActiveLanguages();
 
         return Inertia::render('adminPanel/campaigns/Campaign', [
             'languages' => $languages,
@@ -106,7 +106,7 @@ class CampaignsController extends Controller
             DB::commit();
 
             return Inertia::render('adminPanel/campaigns/AddCampaign', [
-                'languages' => Language::where('status', 'active')->get(),
+                'languages' => getActiveLanguages(),
                 'success' => 'Kampanya ve indirimler başarıyla eklendi!',
             ]);
         } catch (\Exception $e) {

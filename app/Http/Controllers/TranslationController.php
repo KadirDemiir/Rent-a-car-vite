@@ -41,6 +41,7 @@ class TranslationController extends Controller
                 ]);
             }
             DB::commit();
+            clearTranslationCache();
                 return response()->json(['success' => 'New Language Add Successfully', 'id' => $language->id]);
         }catch (\Exception $exception){
             DB::rollBack();
@@ -58,6 +59,7 @@ class TranslationController extends Controller
             $language = Language::with('translations')->findOrFail($id);
             $language->status = $validated['status'];
             $language->save();
+            clearTranslationCache();
 
             $message = $language->status == "active"
                 ? 'Language activated successfully.'
@@ -87,6 +89,7 @@ class TranslationController extends Controller
                 $lang->flag_photo_path =  $validated['flag']->store('flags', 'public');
             $lang->save();
             DB::commit();
+            clearTranslationCache();
             return response()->json(['success' => 'Language Updated Successfully']);
         }catch (\Exception $exception){
             DB::rollBack();
@@ -103,6 +106,7 @@ class TranslationController extends Controller
                 Storage::disk('public')->delete($language->flag_photo_path);
             }
             $language->delete();
+            clearTranslationCache();
             return response()->json(['success' => 'Language deleted successfully.']);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to delete language: ' . $e->getMessage()], 500);
@@ -129,6 +133,7 @@ class TranslationController extends Controller
                 );
             }
             DB::commit();
+            clearTranslationCache();
             return response()->json(['success' => 'Language updated successfully.']);
         }catch (\Exception $exception){
             DB::rollBack();

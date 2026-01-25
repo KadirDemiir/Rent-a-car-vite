@@ -53,11 +53,11 @@ Route::get('/get-car-information/{id}', function ($id) {
     return response()->json(['car' => $car]);
 });
 Route::get('/supported-languages', function () {
-    $languages = Language::where('status', 'active')->pluck('code');
+    $languages = getActiveLanguages()->pluck('code');
     return response()->json($languages);
 });
 Route::get('/get-supported-languages', function () {
-    $languages = Language::where('status', 'active')->get();
+    $languages = getActiveLanguages();
     return response()->json(['languages' => $languages]);
 });
 Route::get('/translations/{lang}', function ($lang) {
@@ -166,23 +166,17 @@ Route::get('get-session', function () {
 Route::post('/adminpanel/car/add', [CarController::class, 'addCar'])->name('adminAddCar');
 Route::get('/adminpanel/get-all-cars-info', function () {
     try {
-        $segments = Segment::with('translationKey')->get();
-        $bodyTypes = BodyType::with('translationKey')->get();
-        $fuels = Fuel::with('translationKey')->get();
-        $transmissions = Transmission::with('translationKey')->get();
-        $languages = Language::where('status', 'active')->get();
-        return response()->json(['segments' => $segments, 'bodyTypes' => $bodyTypes, 'fuels' => $fuels, 'transmissions' => $transmissions, 'languages' => $languages]);
+        $allInfo = getAllCarPropertiesInfo();
+        $languages = getActiveLanguages();
+        return response()->json(['segments' => $allInfo['segments'], 'bodyTypes' => $allInfo['bodyTypes'], 'fuels' => $allInfo['fuels'], 'transmissions' => $allInfo['transmissions'], 'languages' => $languages]);
     } catch (Exception $e) {
         return response()->json($e);
     }
 });
 Route::get('/get-all-cars-info', function () {
     try {
-        $segments = Segment::with('translationKey')->get();
-        $bodyTypes = BodyType::with('translationKey')->get();
-        $fuels = Fuel::with('translationKey')->get();
-        $transmissions = Transmission::with('translationKey')->get();
-        return response()->json(['segments' => $segments, 'bodyTypes' => $bodyTypes, 'fuels' => $fuels, 'transmissions' => $transmissions]);
+        $allInfo = getAllCarPropertiesInfo();
+        return response()->json(['segments' => $allInfo['segments'], 'bodyTypes' => $allInfo['bodyTypes'], 'fuels' => $allInfo['fuels'], 'transmissions' => $allInfo['transmissions']]);
     } catch (Exception $e) {
         return response()->json($e);
     }
@@ -273,7 +267,7 @@ Route::group([
     Route::post('/adminpanel/campaigns', [CampaignsController::class, 'deleteCampaign'])->name('adminDeleteCampaign');
     Route::post('/adminpanel/campaigns/{id}', [CampaignsController::class, 'updateCampaign'])->name('adminUpdateCampaign');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('campaigns') . '/' . dbTransRoute('add'), function () {
-        $languages = Language::where('status', 'active')->get();
+        $languages = getActiveLanguages();
         return Inertia::render('adminPanel/campaigns/AddCampaign', ['languages' => $languages]);
     })->name('adminAddCampaignPage');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('campaigns') . '/{id}', [CampaignsController::class, 'showIndexAdminPanel'])->name('showIndexAdminPanel');
@@ -300,7 +294,7 @@ Route::group([
         return Inertia::render('adminPanel/price/Discounts', ['data' => $discounts]);
     })->name('adminShowDiscounts');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('discounts') . '/' . dbTransRoute('add'), function () {
-        $segments = Segment::with('translationKey')->get();
+        $segments = getSegmentsWithTranslations();
         $currencies = Currency::where('is_active', 1)->get();
         return Inertia::render('adminPanel/price/AddDiscount', ['segments' => $segments, 'currencies' => $currencies]);
     })->name('adminAddDiscountForm');
@@ -342,11 +336,11 @@ Route::group([
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('segments') . '/{id}', function ($id) {
         $segment = Segment::find($id);
         $translations = Translation::where('translation_key_id', $segment->translation_key_id)->get();
-        $lngs = Language::where('status', 'active')->get();
+        $lngs = getActiveLanguages();
         return Inertia::render('adminPanel/carProperties/segments/IndexSegment', ['segment' => $segment, 'lngs' => $lngs, 'translations' => $translations]);
     })->name('adminCarIndexSegment')->where('id', '[0-9]+');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('segments') . '/' . dbTransRoute('add'), function () {
-        $lngs = Language::where('status', 'active')->get();
+        $lngs = getActiveLanguages();
         return Inertia::render('adminPanel/carProperties/segments/AddSegment', ['lngs' => $lngs]);
     })->name('adminAddSegmentPage');
     Route::put('/adminpanel/segments/{id}', [SegmentController::class, 'updateSegment'])->name('adminUpdateSegment')->where('id', '[0-9]+');
@@ -363,7 +357,7 @@ Route::group([
     })->name('adminIndexBodyType')->where('id', '[0-9]+');
     Route::put('/adminpanel/body_types/{id}', [BodyTypeController::class, 'updateBodyType'])->name('adminUpdateBodyType')->where('id', '[0-9]+');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('body_types') . '/' . dbTransRoute('add'), function () {
-        $lngs = Language::where('status', 'active')->get();
+        $lngs = getActiveLanguages();
         return Inertia::render('adminPanel/carProperties/bodyTypes/AddBodyType', ['lngs' => $lngs]);
     })->name('adminAddBodyTypePage');
     Route::post('/adminpanel/body_types/add', [BodyTypeController::class, 'addBodyType'])->name('adminAddBodyType');
@@ -379,7 +373,7 @@ Route::group([
     })->name('adminIndexFuel')->where('id', '[0-9]+');
     Route::put('/adminpanel/fuels/{id}', [FuelController::class, 'updateFuel'])->name('adminUpdateFuel')->where('id', '[0-9]+');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('fuels') . '/' . dbTransRoute('add'), function () {
-        $lngs = Language::where('status', 'active')->get();
+        $lngs = getActiveLanguages();
         return Inertia::render('adminPanel/carProperties/fuels/AddFuels', ['lngs' => $lngs]);
     })->name('adminAddFuelsPage');
     Route::post('/adminpanel/fuels/add', [FuelController::class, 'addFuel'])->name('adminAddFuel');
@@ -395,7 +389,7 @@ Route::group([
     })->name('adminIndexTransmission')->where('id', '[0-9]+');
     Route::put('/adminpanel/transmissions/{id}', [TransmissionController::class, 'updateTransmission'])->name('adminUpdateTransmission')->where('id', '[0-9]+');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('transmissions') . '/' . dbTransRoute('add'), function () {
-        $lngs = Language::where('status', 'active')->get();
+        $lngs = getActiveLanguages();
         return Inertia::render('adminPanel/carProperties/transmissions/AddTransmission', ['lngs' => $lngs]);
     })->name('adminAddTransmissionPage');
     Route::post('/adminpanel/transmissions/add', [TransmissionController::class, 'addTransmission'])->name('adminAddTransmission');

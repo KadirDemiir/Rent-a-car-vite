@@ -40,8 +40,7 @@ class BodyTypeController extends Controller
                 ]);
                 $updatedTranslations[$language->id] = ['value' => $value['value']];
             }
-            DB::commit();
-            Log::info('bt', ['deger' => $updatedTranslations]);
+            DB::commit();            clearTranslationCache();            Log::info('bt', ['deger' => $updatedTranslations]);
             return response()->json([
                 'success' => true,
                 'body_type_id' => $bodyType->id,
@@ -82,6 +81,7 @@ class BodyTypeController extends Controller
             }
 
             DB::commit();
+            clearTranslationCache();
 
             return response()->json([
                 'success' => true,

@@ -1,23 +1,32 @@
-name: Production Deploy
+name: Deploy to Production
+
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to DigitalOcean via SSH
+        uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.DO_HOST }}
-          username: ${{ secrets.DO_USERNAME }}
-          key: ${{ secrets.DO_SSH_KEY }}
+          host: ${{ secrets.DC_HOST }}
+          username: ${{ secrets.DC_USERNAME }}
+          key: ${{ secrets.DC_SSH_KEY }}
+          port: 22
           script: |
-            export NVM_DIR=~/.nvm
-            source ~/.nvm/nvm.sh
             cd /var/www/Rent-a-car-vite
             git pull origin main
+            php artisan down
+            composer install --no-dev --optimize-autoloader
+            php artisan migrate --force
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
             npm install
             npm run build
-            pm2 reload all
+            php artisan up

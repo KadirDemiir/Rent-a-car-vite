@@ -41,6 +41,7 @@ class FuelController extends Controller
                 $updatedTranslations[$language->id] = $value['value'];
             }
             DB::commit();
+            clearTranslationCache();
             return response()->json([
                 'success' => true,
                 'transmissions' => $updatedTranslations,
@@ -92,6 +93,7 @@ class FuelController extends Controller
                 $updatedTranslations[$language->id] = ['value' => $translation->value];
             }
             DB::commit();
+            clearTranslationCache();
 
             return response()->json([
                 'success' => true,

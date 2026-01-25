@@ -19,6 +19,10 @@ class Car extends Model
         return \Database\Factories\CarFactory::new();
     }
 
+    /**
+     * Relationships to eager load by default to prevent N+1 queries
+     */
+    protected $with = ['brandKey', 'modelKey', 'location', 'bodyType', 'segment', 'currency', 'fuel', 'transmission'];
 
     protected $fillable = [
         'location_id',
@@ -38,7 +42,6 @@ class Car extends Model
         'license_plate'
     ];
 
-
     public function reservations() {
         return $this->hasMany(Reservation::class, 'car_id')->with(['extras', 'pickupLocation', 'returnLocation']);
     }
@@ -47,10 +50,12 @@ class Car extends Model
     {
         return $this->belongsTo(Locations::class);
     }
+
     public function photos(): HasMany
     {
         return $this->hasMany(Photo::class);
     }
+
     public function discount(): HasMany{
         return $this->hasMany(Discount::class);
     }
@@ -58,6 +63,16 @@ class Car extends Model
     public function bodyType()
     {
         return $this->belongsTo(BodyType::class);
+    }
+
+    public function fuel()
+    {
+        return $this->belongsTo(Fuel::class, 'fuel_id');
+    }
+
+    public function transmission()
+    {
+        return $this->belongsTo(Transmission::class, 'transmission_id');
     }
 
     public function brandKey()
@@ -81,5 +96,4 @@ class Car extends Model
     public function segment(){
         return $this->belongsTo(Segment::class, 'segment_id');
     }
-
 }

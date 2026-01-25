@@ -43,6 +43,7 @@ class SegmentController extends Controller
                 $updatedTranslations[$language->id] = ['value' => $value['value']];
             }
             DB::commit();
+            clearTranslationCache();
             return response()->json([
                 'success' => true,
                 'segment_id' => $segment->id,
@@ -85,6 +86,7 @@ class SegmentController extends Controller
             }
 
             DB::commit();
+            clearTranslationCache();
             return response()->json([
                 'success' => true,
                 'segment_id' => $segment->id,
