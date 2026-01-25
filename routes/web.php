@@ -112,7 +112,7 @@ Route::get('/get-supported-currencies', function () {
     return response()->json(['currencies' => Currency::where('is_active', true)->get()]);
 });
 Route::get('/get-currencies', function () {
-    $currencies = Cache::remember('active_currencies', 0, function () {
+    $currencies = Cache::remember('active_currencies', 60*60*60, function () {
         $def = Currency::where('is_active', 1)->where('is_default', 1)->first();
         if (!$def) {
             throw new \Exception('Default currency not found');
