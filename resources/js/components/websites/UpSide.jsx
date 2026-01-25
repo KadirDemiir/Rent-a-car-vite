@@ -6,8 +6,8 @@ import CurrencyDropDown from "../CurrencyDropDown.jsx";
 import {User, CarFront, ClipboardCheck} from 'lucide-react';
 
 export default function UpSide({ isMobileMenuOpen }) {
-    const { auth } = usePage().props;
-    const user = auth.user;
+    //const { auth } = usePage().props;
+    const user = null;
     const { post } = useForm();
     const {i18n, t } = useTranslation();
     const upperFirstLetter = (str) => {

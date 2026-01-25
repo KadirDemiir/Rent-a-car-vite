@@ -3,13 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Language;
-use Illuminate\Auth\Middleware\Authenticate;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
-use Inertia\Inertia;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,35 +22,37 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Inertia::share([
-            'auth' => [
-                'user' => fn () => Auth::check() ? Auth::user() : null,
-            ],
-        ]);
-
         $this->configureSupportedLocales();
     }
 
     /**
+     * Dil ayarlarını yapılandırır ve önbelleğe alır.
      */
     protected function configureSupportedLocales(): void
     {
-        if (!$this->app->runningInConsole() && Schema::hasTable('languages')) {
+        if (!$this->app->runningInConsole()) {
+            
+            try {
+                $supported = Cache::store('file')->remember('supported_locales', 3600 * 24, function () {
+                    // Veritabanı sorgusu SADECE cache yoksa çalışır
+                    $langs = Language::where('status', 'active')->get();
 
-            $supported = Cache::remember('supported_locales', 60 * 60 * 24, function () {
-                $langs = Language::where('status', 'active')->get();
+                    return $langs->mapWithKeys(fn($lang) => [
+                        $lang->code => [
+                            'name'     => $lang->name,
+                            'script'   => 'Latn',
+                            'native'   => $lang->native ?? $lang->name,
+                            'regional' => $lang->code . '_' . strtoupper($lang->code),
+                        ]
+                    ])->toArray();
+                });
 
-                return $langs->mapWithKeys(fn($lang) => [
-                    $lang->code => [
-                        'name'     => $lang->name,
-                        'script'   => 'Latn',
-                        'native'   => $lang->native ?? $lang->name,
-                        'regional' => $lang->code . '_' . strtoupper($lang->code),
-                    ]
-                ])->toArray();
-            });
+                config(['laravellocalization.supportedLocales' => $supported]);
 
-            config(['laravellocalization.supportedLocales' => $supported]);
+            } catch (\Exception $e) {
+                // Eğer henüz tablolar oluşmamışsa (ilk kurulumda) uygulama patlamasın diye sessizce geç.
+                // Log::error('Dil yapılandırma hatası: ' . $e->getMessage());
+            }
         }
     }
 }

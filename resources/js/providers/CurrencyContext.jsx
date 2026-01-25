@@ -1,74 +1,64 @@
-import { createContext, useContext, useState, useEffect, useMemo } from "react";
-import axios from "axios";
+import { createContext, useContext, useState, useMemo } from "react";
+import { usePage } from "@inertiajs/react";
 
 const CurrencyContext = createContext();
 export const useCurrency = () => useContext(CurrencyContext);
 
 export const CurrencyProvider = ({ children }) => {
-    const [currencies, setCurrencies] = useState([]);
-    const [current, setCurrent] = useState(null);
+    const { currencies } = usePage().props;
 
-    useEffect(() => {
-        const stored = localStorage.getItem("curr-currency");
-        if (stored) {
-            const cachedList = localStorage.getItem("currencies-cache");
-            if (cachedList) {
-                try {
-                    const parsed = JSON.parse(cachedList);
-                    setCurrencies(parsed);
-                    const found = parsed.find(c => c.code.toLowerCase() === stored.toLowerCase());
-                    if (found) setCurrent(found);
-                } catch {}
+    const [current, setCurrent] = useState(() => {
+        const availableCurrencies = Array.isArray(currencies) ? currencies : [];
+        
+        if (availableCurrencies.length === 0) return null;
+
+        if (typeof window !== "undefined") {
+            const stored = localStorage.getItem("curr-currency");
+            
+            if (stored) {
+                const found = availableCurrencies.find(c => c.code === stored);
+                if (found) return found;
+            }
+
+            const lang = navigator.language.toLowerCase();
+            
+            if (lang.includes("tr")) {
+                const tryC = availableCurrencies.find(c => c.code.toLowerCase() === "try");
+                if (tryC) {
+                    localStorage.setItem("curr-currency", tryC.code);
+                    return tryC;
+                }
+            }
+            
+            const eurC = availableCurrencies.find(c => c.code.toLowerCase() === "eur");
+            if (eurC) {
+                localStorage.setItem("curr-currency", eurC.code);
+                return eurC;
             }
         }
-        const fetchCurrencies = async () => {
-            try {
-                const { data } = await axios.get("/get-currencies");
-                if (!Array.isArray(data) || !data.length) return;
-                localStorage.setItem("currencies-cache", JSON.stringify(data));
-                let selected = stored;
-                if (!selected) {
-                    const lang = navigator.language.toLowerCase();
-                    const tryC = data.find(c => c.code.toLowerCase() === "try");
-                    const eurC = data.find(c => c.code.toLowerCase() === "eur");
 
-                    if (lang.includes("tr") && tryC) selected = tryC.code;
-                    else if (eurC) selected = eurC.code;
-                    else selected = data[0].code;
-
-                    localStorage.setItem("curr-currency", selected);
-                }
-
-                setCurrencies(data);
-                setCurrent(data.find(c => c.code.toLowerCase() === selected?.toLowerCase()) || data[0]);
-            } catch (err) {
-                console.error("Currency fetch error:", err);
-            }
-        };
-
-        fetchCurrencies();
-    }, []);
+        return availableCurrencies[0];
+    });
 
     const changeCurrency = (curr) => {
         setCurrent(curr);
-        localStorage.setItem("curr-currency", curr.code);
+        if (typeof window !== "undefined") {
+            localStorage.setItem("curr-currency", curr.code);
+        }
     };
 
     const calculateTotal = useMemo(() => {
-        return (a = 0, curr = current, convertToBase = true) => {
-            if (!current) return a;
-            let result = a;
-            if(convertToBase)
-                result *= curr.exchange_rate;
-            else
-                 result /= curr.exchange_rate;
-            return result;
+        return (amount = 0, convertToBase = true) => {
+            if (!current || !current.exchange_rate) return amount;
+            
+            return convertToBase 
+                ? amount * current.exchange_rate 
+                : amount / current.exchange_rate;
         };
     }, [current]);
 
-
     const value = useMemo(
-        () => ({ currencies, current, changeCurrency, calculateTotal }),
+        () => ({ currencies: currencies || [], current, changeCurrency, calculateTotal }),
         [currencies, current, calculateTotal]
     );
 
