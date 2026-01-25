@@ -10,18 +10,19 @@ const EDIT_SECTION = [
     {label: "Related Campaigns", value: "related_camp"},
     {label: "Cars", value: "cars"}
 ];
-export default function LanguageForm({ language  , keys, campaigns}) {
+
+export default function LanguageForm({ language, keys, campaigns}) {
     const {t} = useTranslation();
     const [activeSection, setActiveSection] = useState(EDIT_SECTION[0].value);
     const [lang, setLang] = useState(language);
     const [error, setError] = useState();
     const [success, setSuccess] = useState();
+
     const siteVariableStats = useMemo(() => {
         let errors = 0;
         keys.forEach(key => {
             const kk = lang.translations.find(a => a.translation_key_id === key.id);
             if (!kk || !kk.value?.trim()) {
-                console.log(kk);
                 errors++
             }
         });
@@ -46,29 +47,78 @@ export default function LanguageForm({ language  , keys, campaigns}) {
         };
     }, [campaigns, lang.code]);
 
+    const renderTabButton = (section) => {
+        const isActive = activeSection === section.value;
+        const hasError = (section.value === "site_variable" && siteVariableStats.hasError) || 
+                        (section.value === "related_camp" && hasCampaignError);
+
+        return (
+            <button
+                key={section.value}
+                onClick={() => setActiveSection(section.value)}
+                className={`relative flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
+                    isActive
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+            >
+                {section.label}
+                {hasError && (
+                    <span className="absolute top-1 right-2 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
+                )}
+            </button>
+        );
+    };
+
     return (
-        <div className="space-y-8">
-            <div className="flex items-center justify-center">
-                <div className="w-[60%] h-16 flex items-center justify-evenly gap-4 py-2 text-white">
-                    {EDIT_SECTION.map(section => (
-                        <button key={section.value} onClick={() => setActiveSection(section.value)} className={`relative w-full h-16 px-2 rounded-lg hover:bg-blue-600 ${activeSection === section.value ? "bg-blue-600" : "bg-blue-400"}`}>
-                            {section.label}
-                            {section.value === "site_variable" && siteVariableStats.hasError && (
-                                <span className="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full"></span>
-                            )}
-                            {section.value === "related_camp" && hasCampaignError && (
-                                <span className="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full"></span>
-                            )}
-                        </button>
-                    ))}
+        <div className="w-full space-y-6">
+            {/* Navigation Tabs */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                    {EDIT_SECTION.map(renderTabButton)}
                 </div>
             </div>
-            {success && <div className={`w-full border-l-12 border-green-600 bg-green-500 text-white p-2`}>{success}</div>}
-            {error && <div className={`w-full border-l-12 border-red-600 bg-red-500 text-white p-2`}>{error}</div>}
 
-            {activeSection === 'lang_info' && <LanguageInformationForm lang={lang} setLang={setLang} totalCmpCount={totalCampaign} cmpErrorCount={campaignErrorCount} totalVariableCount={siteVariableStats.total} variableErrorCount={siteVariableStats.errorCount}/>}
-            {activeSection === 'site_variable' && <SiteVariableForm keys={keys} language={lang} setLang={setLang}/>}
-            {activeSection === 'related_camp' && <CampaignLanguage campaigns={campaigns} lang={lang}/>}
+            {/* Alert Messages */}
+            <div className="space-y-3">
+                {success && (
+                    <div className="px-4 py-3 rounded-lg bg-green-50 border border-green-200 text-green-800">
+                        {success}
+                    </div>
+                )}
+                {error && (
+                    <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-800">
+                        {error}
+                    </div>
+                )}
+            </div>
+
+            {/* Content Sections */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                {activeSection === 'lang_info' && (
+                    <LanguageInformationForm 
+                        lang={lang} 
+                        setLang={setLang} 
+                        totalCmpCount={totalCampaign} 
+                        cmpErrorCount={campaignErrorCount} 
+                        totalVariableCount={siteVariableStats.total} 
+                        variableErrorCount={siteVariableStats.errorCount}
+                    />
+                )}
+                {activeSection === 'site_variable' && (
+                    <SiteVariableForm 
+                        keys={keys} 
+                        language={lang} 
+                        setLang={setLang}
+                    />
+                )}
+                {activeSection === 'related_camp' && (
+                    <CampaignLanguage 
+                        campaigns={campaigns} 
+                        lang={lang}
+                    />
+                )}
+            </div>
         </div>
     );
 }

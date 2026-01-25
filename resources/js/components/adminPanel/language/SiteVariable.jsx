@@ -12,10 +12,6 @@ const SECTION_CONFIG = [
 export default function SiteVariable({ keys, formData, setFormData }) {
     const {t} = useTranslation();
     const [search, setSearch] = useState("");
-    const [error, setError] = useState();
-    const [success, setSuccess] = useState();
-
-
     const [activeSection, setActiveSection] = useState(SECTION_CONFIG[0].key);
 
     const sections = useMemo(
@@ -26,7 +22,6 @@ export default function SiteVariable({ keys, formData, setFormData }) {
         }),
         [keys]
     );
-
 
     const createHandle = () => {
         setFormData(
@@ -41,24 +36,51 @@ export default function SiteVariable({ keys, formData, setFormData }) {
     };
 
     const handleSearch = (e) => {
-            setSearch(e.target.value);
+        setSearch(e.target.value);
+    };
 
-    }
     return (
-        <>
-            {success && (<div className="w-full border-l-12 border-green-600 bg-green-500 text-white p-2">{success}</div>)}
-            {error && (<div className="w-full border-l-12 border-red-600 bg-red-500 text-white p-2">{error}</div>)}
-            <div className="flex justify-center gap-8">
-                <SiteVariableSection activeSection={activeSection} setActiveSection={setActiveSection} sections={sections} formData={formData} section_config={SECTION_CONFIG}/>
-                <div onClick={createHandle} className="px-8 bg-blue-500 hover:bg-blue-600 rounded-xl text-white cursor-pointer flex items-center">
-                    Üret
+        <div className="w-full space-y-4 md:space-y-6">
+            {/* Sections Navigation */}
+            <SiteVariableSection 
+                activeSection={activeSection} 
+                setActiveSection={setActiveSection} 
+                sections={sections} 
+                formData={formData} 
+                section_config={SECTION_CONFIG}
+            />
+
+            {/* Controls Bar */}
+            <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
+                <input 
+                    value={search} 
+                    onChange={handleSearch}
+                    placeholder={t("adminpanel.add_languages.input.search")}
+                    type="text" 
+                    className="flex-1 px-4 py-2 md:py-3 border border-gray-300 rounded-lg outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm md:text-base"
+                />
+                <div className="flex gap-2 md:gap-3">
+                    <button 
+                        onClick={createHandle}
+                        className="flex-1 sm:flex-none px-4 md:px-6 py-2 md:py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm md:text-base active:scale-95"
+                    >
+                        Üret
+                    </button>
+                    <button 
+                        onClick={deleteHandle}
+                        className="flex-1 sm:flex-none px-4 md:px-6 py-2 md:py-3 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors duration-200 text-sm md:text-base active:scale-95"
+                    >
+                        Sil
+                    </button>
                 </div>
-                <div onClick={deleteHandle} className="px-8 bg-blue-500 hover:bg-blue-600 rounded-xl text-white cursor-pointer flex items-center">
-                    Sil
-                </div>
-                <input value={search} onChange={(e) => handleSearch(e)} placeholder={t("adminpanel.add_languages.input.search")} type="text" className={`border border-gray-500 rounded-xl pl-2 outline-none`}/>
-            </div><br/>
-            <SiteVariableList keys={sections[activeSection].filter(k => k.key.toLowerCase().includes(search.toLowerCase()))} formData={formData} setFormData={setFormData} />
-        </>
+            </div>
+
+            {/* Site Variables List */}
+            <SiteVariableList 
+                keys={sections[activeSection].filter(k => k.key.toLowerCase().includes(search.toLowerCase()))} 
+                formData={formData} 
+                setFormData={setFormData}
+            />
+        </div>
     );
 }

@@ -1,7 +1,8 @@
 import {useTranslation} from "react-i18next";
 
 export default function SiteVariableList({keys, formData, setFormData}){
-        const {t} = useTranslation();
+    const {t} = useTranslation();
+
     const handleChange = (value, keyObj) => {
         const keyName = keyObj.key;
         const placeholders = keyObj.key.match(/{\w+}/g) || keyObj.description?.match(/{\w+}/g) || [];
@@ -16,44 +17,80 @@ export default function SiteVariableList({keys, formData, setFormData}){
     };
 
     const applyAll = (tKey, value) => {
-        console.log(tKey.key.split('.').reverse()[0] === keys[0].key.split('.').reverse()[0]);
         if(formData[tKey.key]?.error)
             return;
         const filteredKeys = keys.filter(k => k.key.split('.').reverse()[0] === tKey.key.split('.').reverse()[0]);
-        console.log(filteredKeys);
         filteredKeys.forEach(fk => {
-            console.log(fk, value);
             if(!formData[fk.key].value)
                 handleChange(value, fk);
         })
     }
+
     return(
-        <div className={`space-y-4 space-x-4 grid grid-cols-2 `}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
             {keys.map((key, index) => (
-                <div key={key.key} className={`p-4 bg-white shadow-sm rounded-lg border border-gray-200 hover:shadow-md transition ${formData[key.key]?.error ? 'border-12 border-red-500' : ''}`}>
-                    <div className="text-sm text-gray-500 mb-1">#{index + 1}</div>
-                    <div className="mb-2">
-                        <label className="block text-sm font-medium text-gray-700">Key:</label>
-                        <div className="mt-1 text-gray-900 font-mono text-sm break-all font-bold">{key.key}</div>
+                <div 
+                    key={key.key} 
+                    className={`p-4 md:p-5 bg-white shadow-sm rounded-lg border transition-all duration-200 ${
+                        formData[key.key]?.error 
+                            ? 'border-red-500 ring-1 ring-red-200' 
+                            : 'border-gray-200 hover:shadow-md hover:border-gray-300'
+                    }`}
+                >
+                    {/* Index */}
+                    <div className="text-xs md:text-sm text-gray-500 mb-3 font-medium">
+                        #{index + 1}
                     </div>
-                    <div className="mb-2">
-                        <label className="block text-sm font-medium text-gray-700">Description:</label>
-                        <div className="mt-1 text-gray-700 font-semibold break-all">{key.description}</div>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Translation</label>
-                        <input onChange={(e) => handleChange(e.target.value, key)} type="text" name={key.key} value={formData[key.key]?.value || ""}
-                               className={`mt-1 w-full h-8 rounded-md border ${formData[key.key]?.error ? "border-red-500" : "border-gray-300"} shadow-sm sm:text-otline-none p-2 outline-none`}
-                        />
-                        {formData[key.key]?.error && (
-                            <p className="mt-1 text-sm text-red-600">{formData[key.key].error}</p>
-                        )}
-                    </div><br/>
-                    <div>
-                        <div className={`rounded-xl `}>
-                            <button onClick={() => applyAll(key, formData[key.key].value)} className={`py-1 px-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600`}>{t("adminpanel.add_languages.apply_all")} '.{ key.key.split('.').reverse()[0] }'</button>
+
+                    {/* Key */}
+                    <div className="mb-3 md:mb-4">
+                        <label className="block text-xs md:text-sm font-semibold text-gray-700 mb-1">Key:</label>
+                        <div className="text-xs md:text-sm text-gray-900 font-mono break-all bg-gray-50 p-2 rounded border border-gray-200">
+                            {key.key}
                         </div>
                     </div>
+
+                    {/* Description */}
+                    <div className="mb-3 md:mb-4">
+                        <label className="block text-xs md:text-sm font-semibold text-gray-700 mb-1">Description:</label>
+                        <div className="text-xs md:text-sm text-gray-700 break-words">
+                            {key.description}
+                        </div>
+                    </div>
+
+                    {/* Translation Input */}
+                    <div className="mb-3 md:mb-4">
+                        <label className="block text-xs md:text-sm font-semibold text-gray-700 mb-2">Translation</label>
+                        <input 
+                            onChange={(e) => handleChange(e.target.value, key)} 
+                            type="text" 
+                            name={key.key} 
+                            value={formData[key.key]?.value || ""}
+                            className={`w-full px-3 py-2 md:py-2.5 rounded-lg border outline-none focus:ring-1 transition-all text-xs md:text-sm ${
+                                formData[key.key]?.error 
+                                    ? "border-red-500 focus:border-red-500 focus:ring-red-200" 
+                                    : "border-gray-300 focus:border-blue-500 focus:ring-blue-200"
+                            }`}
+                        />
+                        {formData[key.key]?.error && (
+                            <p className="mt-1 md:mt-2 text-xs md:text-sm text-red-600 font-medium">
+                                {formData[key.key].error}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Apply All Button */}
+                    <button 
+                        onClick={() => applyAll(key, formData[key.key].value)} 
+                        disabled={!!formData[key.key]?.error}
+                        className={`w-full px-3 py-2 rounded-lg font-medium text-xs md:text-sm transition-all duration-200 active:scale-95 ${
+                            formData[key.key]?.error
+                                ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                                : 'bg-blue-600 text-white hover:bg-blue-700'
+                        }`}
+                    >
+                        {t("adminpanel.add_languages.apply_all")} '{key.key.split('.').reverse()[0]}'
+                    </button>
                 </div>
             ))}
         </div>

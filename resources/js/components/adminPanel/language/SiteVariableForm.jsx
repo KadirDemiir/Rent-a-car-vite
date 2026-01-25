@@ -19,7 +19,6 @@ export default function SiteVariableForm({keys, language}){
     );
     const {i18n} = useTranslation();
 
-
     const handleSubmit = () => {
         const hasError = Object.entries(formData).some(([, value]) => value.value.trim() === "" || value.error !== "");
 
@@ -46,19 +45,37 @@ export default function SiteVariableForm({keys, language}){
             reloadTranslations(i18n.language);
         })
         .catch(err => {
-            console.log(err);
             setError(err.response?.data?.error || "Kaydetme sırasında bir hata oluştu.");
         });
     };
 
     return(
-        <div>
-            {success && <div className={`w-full border-l-12 border-green-600 bg-green-500 text-white p-2`}>{success}</div>}
-            {error   && <div className={`w-full border-l-12 border-red-600 bg-red-600 text-white p-2`}>{error}</div>}
-            <br/>
-            <div className={`w-full flex justify-end pr-16`}>
-                <button onClick={handleSubmit} className={` bg-blue-500 text-white py-1 px-4 rounded-lg hover:bg-blue-600 cursor-pointer`}>Save</button>
+        <div className="w-full space-y-4 md:space-y-6">
+            {/* Alert Messages */}
+            <div className="space-y-2 md:space-y-3">
+                {success && (
+                    <div className="px-4 py-3 rounded-lg bg-green-50 border border-green-200 text-green-800 text-sm md:text-base">
+                        {success}
+                    </div>
+                )}
+                {error && (
+                    <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm md:text-base">
+                        {error}
+                    </div>
+                )}
             </div>
+
+            {/* Submit Button */}
+            <div className="flex justify-end">
+                <button 
+                    onClick={handleSubmit}
+                    className="px-6 md:px-8 py-2 md:py-3 bg-blue-600 text-white font-medium text-sm md:text-base rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm active:scale-95"
+                >
+                    Save
+                </button>
+            </div>
+
+            {/* Site Variables */}
             <SiteVariable keys={keys} formData={formData} setFormData={setFormData}/>
         </div>
     );
