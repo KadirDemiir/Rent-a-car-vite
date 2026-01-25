@@ -14,9 +14,9 @@ jobs:
       - name: Deploy to DigitalOcean via SSH
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.DC_HOST }}
-          username: ${{ secrets.DC_USERNAME }}
-          key: ${{ secrets.DC_SSH_KEY }}
+          host: ${{ DO_HOST }}
+          username: ${{ DO_USERNAME }}
+          key: ${{ DO_SSH_KEY }}
           port: 22
           script: |
             cd /var/www/Rent-a-car-vite
