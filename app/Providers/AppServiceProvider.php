@@ -22,6 +22,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Inertia::share([
+            'auth' => [
+                'user' => fn () => Auth::check() ? Auth::user() : null,
+            ],
+        ]);
         $this->configureSupportedLocales();
     }
 
