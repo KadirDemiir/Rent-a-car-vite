@@ -35,46 +35,6 @@ use App\Http\Controllers\ReservationController;
 use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
-use Illuminate\Support\Facades\DB;
-//use Illuminate\Support\Facades\Http;
-
-Route::get('/server-benchmark', function () {
-    $results = [];
-    $startTotal = microtime(true);
-
-    // 1. Dosya Yazma Hızı (Disk I/O Testi)
-    $start = microtime(true);
-    file_put_contents(storage_path('benchmark.txt'), str_repeat('0', 1024 * 1024)); // 1MB yaz
-    $results['disk_write_1mb'] = number_format(microtime(true) - $start, 5) . ' sec';
-    unlink(storage_path('benchmark.txt'));
-
-    // 2. Veritabanı BAĞLANTI Hızı (Sorgu değil, tokalaşma süresi)
-    $start = microtime(true);
-    try {
-        DB::connection()->getPdo(); // Sadece connect olur
-        $results['db_connection'] = number_format(microtime(true) - $start, 5) . ' sec';
-    } catch (\Exception $e) {
-        $results['db_connection'] = 'ERROR: ' . $e->getMessage();
-    }
-
-    // 3. Basit Sorgu Hızı
-    $start = microtime(true);
-    DB::table('users')->first(); // Veya var olan herhangi bir hafif tablo
-    $results['db_query'] = number_format(microtime(true) - $start, 5) . ' sec';
-
-    // 4. DNS Çözümleme Hızı (Dış dünyaya çıkış)
-    $start = microtime(true);
-    $ip = gethostbyname('www.google.com');
-    $results['dns_resolution'] = number_format(microtime(true) - $start, 5) . ' sec';
-
-    // 5. Framework Toplam Yüklenme Süresi
-    // (Laravel başlatıldı - Şu anki zamana kadar geçen süre)
-    $results['laravel_boot_time'] = number_format(microtime(true) - LARAVEL_START, 5) . ' sec';
-    
-    $results['TOTAL_RESPONSE_TIME'] = number_format(microtime(true) - $startTotal, 5) . ' sec';
-
-    return $results;
-});
 
 Route::get('/get-reservations-informations', function () {
     return response(['reservations' => Reservation::with(['extras', 'car', 'pickupLocation', 'returnLocation'])->get()], 200);
