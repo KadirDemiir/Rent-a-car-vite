@@ -36,6 +36,8 @@ use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
+Route::post('/adminpanel/cars/update-sort', [AdminCarController::class, 'updateSortOrder'])->name('adminUpdateCarSort');
+
 Route::get('/get-reservations-informations', function () {
     return response(['reservations' => Reservation::with(['extras', 'car', 'pickupLocation', 'returnLocation'])->get()], 200);
 });

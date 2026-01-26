@@ -24,18 +24,14 @@ const applyFilters = (cars, segment, fuelType, transmissionType) => {
 };
 
 const applySorting = (cars, sortBy) => {
-    const sorted = [...cars];
     switch (sortBy) {
         case "increase":
-            sorted.sort((a, b) => resolveComparablePrice(a) - resolveComparablePrice(b));
-            break;
+            return [...cars].sort((a, b) => resolveComparablePrice(a) - resolveComparablePrice(b));
         case "decrease":
-            sorted.sort((a, b) => resolveComparablePrice(b) - resolveComparablePrice(a));
-            break;
+            return [...cars].sort((a, b) => resolveComparablePrice(b) - resolveComparablePrice(a));
         default:
-            break;
+            return cars;
     }
-    return sorted;
 };
 
 export default function SortSearchReservations({ availableCars = [], sortBy, segment, fuelType, transmissionType, reservation }) {

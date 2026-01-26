@@ -19,7 +19,7 @@ class AdminCarController extends Controller
 {
     public function showAll()
     {
-        $cars = Car::with(['price', 'brandKey', 'modelKey'])->get();
+        $cars = Car::with(['price', 'brandKey', 'modelKey'])->orderBy('sort_order', 'asc')->get();
 
         return Inertia::render('adminPanel/cars/Cars', [
             'cars' => $cars
@@ -222,5 +222,30 @@ class AdminCarController extends Controller
         $updatedCar = Car::with(['photos'])->findOrFail($id);
 
         return response()->json( ['car' => $updatedCar,]);
+    }
+
+    public function updateSortOrder(Request $request)
+    {
+        Log::info('Update Sort Order Request', ['request' => $request->all()]);
+        $validated = $request->validate([
+            'cars' => 'required|array',
+            'cars.*.id' => 'required|integer|exists:cars,id',
+            'cars.*.sort_order' => 'required|integer'
+        ]);
+
+        try {
+            DB::transaction(function () use ($validated) {
+                foreach ($validated['cars'] as $carData) {
+                    Car::where('id', $carData['id'])
+                        ->update(['sort_order' => $carData['sort_order']]);
+                }
+            });
+
+            return response()->json(['success' => true, 'message' => 'Car order updated successfully']);
+
+        } catch (\Exception $e) {
+            Log::error('Sort Order Update Failed', ['error' => $e->getMessage()]);
+            return response()->json(['success' => false, 'message' => 'Database error'], 500);
+        }
     }
 }

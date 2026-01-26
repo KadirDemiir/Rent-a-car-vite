@@ -14,6 +14,7 @@ export default function SortSelector({ value, onChange }) {
           value={value}
           onChange={(e) => onChange(e.target.value)}
         >
+          <option value="increase">{t("website.searchReservation.filter.sort.default", "Default")}</option>
           <option value="increase">{t("website.searchReservation.filter.sort.price_increase")}</option>
           <option value="decrease">{t("website.searchReservation.filter.sort.price_decrease")}</option>
         </select>

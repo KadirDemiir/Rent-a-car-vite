@@ -9,7 +9,7 @@ import { Filter, X } from 'lucide-react';
 
 export default function FilterReservations({ onFilterChange }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [sort, setSort] = useState("increase");
+  const [sort, setSort] = useState("default");
   const [fuel, setFuel] = useState("");
   const [fuelOpt, setFuelOpt] = useState([]);
   const [transmission, setTransmission] = useState("");

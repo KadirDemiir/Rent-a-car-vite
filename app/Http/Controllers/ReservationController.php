@@ -35,7 +35,7 @@ class ReservationController extends Controller
         if($request->startDateTime >= $request->finishDateTime || $request->startDateTime < Carbon::now() || $request->finishDateTime < Carbon::now())
             return to_route('home');
 
-        $cars = Car::with('location', 'photos', 'brandKey', 'modelKey', 'price')->get();
+        $cars = Car::with('location', 'photos', 'brandKey', 'modelKey', 'price')->orderBy('sort_order', 'asc')->get();
         $availableCars = [];
 
         $reqStart = Carbon::parse($request->startDateTime);

@@ -39,7 +39,8 @@ class Car extends Model
         'fuel_id',
         'transmission_id',
         'status',
-        'license_plate'
+        'license_plate',
+        'sort_order'
     ];
 
     public function reservations() {
