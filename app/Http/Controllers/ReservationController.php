@@ -12,8 +12,10 @@ use App\Models\ReservationExtra;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class ReservationController extends Controller
 {
@@ -63,42 +65,59 @@ class ReservationController extends Controller
         ]);
     }
 
-    public function showDetailPage(Request $request){
-        $validated = $request->validate([
-            'car_id' => 'required|exists:cars,id',
-            'startDateTime' => 'required|date',
-            'finishDateTime' => 'required|date|after:startDateTime',
-            'PULocation' => 'required|exists:locations,id',
-            'RLocation' => 'required|exists:locations,id',
-        ]);
 
-        $car = Car::with('brandKey', 'modelKey', 'photos', 'location')->findOrFail($request->car_id);
-        $start = Carbon::parse($request->startDateTime);
-        $end = Carbon::parse($request->finishDateTime);
+public function initiateDraft(Request $request)
+{
+    $validated = $request->validate([
+        'car_id' => 'required|exists:cars,id',
+        'startDateTime' => 'required|date',
+        'finishDateTime' => 'required|date|after:startDateTime',
+        'PULocation' => 'required|exists:locations,id',
+        'RLocation' => 'required|exists:locations,id',
+    ]);
 
-        if($start >= $end || $start < Carbon::now() || $end < Carbon::now())
-        {
-            return Inertia::render('Home');
-        }
-
-        if (!$this->isCarAvailable($car->id, $request->startDateTime, $request->finishDateTime, $request->PULocation)) {
-            return Inertia::render('Home');
-        }
-
-        $this->CalcPrice($car, $request->startDateTime, $request->finishDateTime, $request->PULocation, $request->RLocation);
-        $user = auth()->user();
-
-        return Inertia::render('SelectExtras', [
-            'car' => $car,
-            'auth_user' => $user ?? null,
-            'params' => [
-                'startDateTime' => $validated['startDateTime'],
-                'finishDateTime' => $validated['finishDateTime'],
-                'PULocation' => Locations::find($validated['PULocation']),
-                'RLocation' => Locations::find($validated['RLocation']),
-            ]
-        ]);
+    $start = Carbon::parse($validated['startDateTime']);
+    
+    if ($start < now()) {
+        throw ValidationException::withMessages(['startDateTime' => 'Geçmiş tarih seçilemez.']);
     }
+
+    $key = 'res_draft_' . Str::random(40);
+    
+    Cache::put($key, $validated, now()->addMinutes(30));
+
+    return to_route('reservation-create', ['ref' => $key]);
+}
+
+public function showExtras(Request $request)
+{
+    $ref = $request->input('ref');
+    $validated = $ref ? Cache::get($ref) : null;
+
+    if (!$validated) {
+        return to_route('home')->with('error', 'Oturum süreniz doldu.');
+    }
+
+    $car = Car::with(['brandKey', 'modelKey', 'photos', 'location'])->findOrFail($validated['car_id']);
+
+    if (!$this->isCarAvailable($car->id, $validated['startDateTime'], $validated['finishDateTime'], $validated['PULocation'])) {
+        return to_route('home')->with('error', 'Araç artık uygun değil.');
+    }
+
+    $this->CalcPrice($car, $validated['startDateTime'], $validated['finishDateTime'], $validated['PULocation'], $validated['RLocation']);
+
+    return Inertia::render('SelectExtras', [
+        'car' => $car,
+        'auth_user' => auth()->user(),
+        'params' => [
+            'startDateTime' => $validated['startDateTime'],
+            'finishDateTime' => $validated['finishDateTime'],
+            'PULocation' => Locations::find($validated['PULocation']),
+            'RLocation' => Locations::find($validated['RLocation']),
+            'ref' => $ref 
+        ]
+    ]);
+}
 
     public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, $rLocationId){
         $start = new DateTime($startDateTime);

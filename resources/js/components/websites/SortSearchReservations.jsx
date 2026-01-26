@@ -1,26 +1,26 @@
-import {useState, useEffect} from "react";
-import {useTranslation} from "react-i18next";
-import {useCurrency} from "../../providers/CurrencyContext.jsx";
+import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { router } from "@inertiajs/react";
+import { useCurrency } from "../../providers/CurrencyContext.jsx";
 import ReservationCarPhoto from "./reservation/ReservationCarPhoto.jsx";
 import ReservationCarInfo from "./reservation/ReservationCarInfo.jsx";
 import ReservationCarPayment from "./reservation/ReservationCarPayment.jsx";
-import {router} from "@inertiajs/react";
-import {Fuel, Settings2, Shield, User, Users} from "lucide-react";
-
-const applyFilters = (cars, segment, fuelType, transmissionType) => {
-    return cars.filter(car => {
-        const segmentMatch = segment === "" || segment[0] === "" || segment.includes(`${car.segment_id}`);
-        const fuelMatch = fuelType === "" || fuelType[0] === "" || fuelType.includes(`${car.fuel_id}`);
-        const transmissionMatch = transmissionType === "" || transmissionType[0] === "" || transmissionType.includes(`${car.transmission_id}`);
-        return segmentMatch && fuelMatch && transmissionMatch;
-    });
-};
+import { Fuel, Settings2, Shield, User, Users } from "lucide-react";
 
 const resolveComparablePrice = (car) => {
     if (car.calculated_price?.final_daily_price) {
         return Number(car.calculated_price.final_daily_price);
     }
     return Number(car?.daily_price ?? car?.price ?? 0);
+};
+
+const applyFilters = (cars, segment, fuelType, transmissionType) => {
+    return cars.filter(car => {
+        const segmentMatch = !segment || segment === "" || segment[0] === "" || segment.includes(`${car.segment_id}`);
+        const fuelMatch = !fuelType || fuelType === "" || fuelType[0] === "" || fuelType.includes(`${car.fuel_id}`);
+        const transmissionMatch = !transmissionType || transmissionType === "" || transmissionType[0] === "" || transmissionType.includes(`${car.transmission_id}`);
+        return segmentMatch && fuelMatch && transmissionMatch;
+    });
 };
 
 const applySorting = (cars, sortBy) => {
@@ -38,19 +38,49 @@ const applySorting = (cars, sortBy) => {
     return sorted;
 };
 
-export default function SortSearchReservations({availableCars = [], sortBy, segment, fuelType, transmissionType, reservation}) {
-    console.log(availableCars);
-    const {t, i18n} = useTranslation();
-    const [filteredCars, setFilteredCars] = useState([]);
-    const {current, calculateTotal} = useCurrency();
+export default function SortSearchReservations({ availableCars = [], sortBy, segment, fuelType, transmissionType, reservation }) {
+    const { t, i18n } = useTranslation();
+    const { current, calculateTotal } = useCurrency();
+    const [processingId, setProcessingId] = useState(null);
 
-    useEffect(() => {
+    const filteredCars = useMemo(() => {
         const filtered = applyFilters(availableCars, segment, fuelType, transmissionType);
-        const sorted = applySorting(filtered, sortBy);
-        setFilteredCars(sorted);
+        return applySorting(filtered, sortBy);
     }, [availableCars, sortBy, segment, fuelType, transmissionType]);
 
     const currencySymbol = current?.symbol ?? "";
+
+    const handleRentNow = async(car) => {
+        if (processingId) return;
+
+        setProcessingId(car.id);
+
+        const combinedStart = `${reservation.startDate} ${reservation.startTime}`;
+        const combinedFinish = `${reservation.finishDate} ${reservation.finishTime || reservation.endTime}`;
+
+        try {
+        const url = `/${i18n.language}/${t('address.reservation-create')}`;
+
+        router.post(url, {
+            car_id: car.id,
+            startDateTime: combinedStart,
+            finishDateTime: combinedFinish,
+            PULocation: reservation.selectedPULocation.id,
+            RLocation: reservation.selectedRLocation.id
+        }, {
+            preserveScroll: true,
+            onFinish: () => setProcessingId(null),
+            onError: (errors) => {
+                console.error(errors);
+                setProcessingId(null);
+            }
+        });
+
+    } catch (error) {
+        console.error(error);
+        setProcessingId(null);
+    }
+    };
 
     return (
         <div className="space-y-4">
@@ -60,18 +90,9 @@ export default function SortSearchReservations({availableCars = [], sortBy, segm
                 const title = `${t(filteredCar.brand_key.key)} ${t(filteredCar.model_key.key)} • ${t(`fuel.${filteredCar.fuel_id}`)} • ${t(`transmission.${filteredCar.transmission_id}`)}`;
 
                 const features = [
-                    {
-                        icon: <Fuel/>,
-                        label: t(`fuel.${filteredCar.fuel_id}`),
-                    },
-                    {
-                        icon: <Settings2/>,
-                        label: t(`transmission.${filteredCar.transmission_id}`),
-                    },
-                    {
-                        icon: <Users />,
-                        label: t("website.car_card.properties.seat_count_{count}", {count: filteredCar.seat_count}),
-                    },
+                    { icon: <Fuel/>, label: t(`fuel.${filteredCar.fuel_id}`) },
+                    { icon: <Settings2/>, label: t(`transmission.${filteredCar.transmission_id}`) },
+                    { icon: <Users />, label: t("website.car_card.properties.seat_count_{count}", {count: filteredCar.seat_count}) },
                 ];
 
                 const requirements = [
@@ -81,11 +102,11 @@ export default function SortSearchReservations({availableCars = [], sortBy, segm
                     },
                     {
                         icon: <User/>,
-                        label: t("website.car_card.requirements.required_min_{age}", {age: 22}),
+                        label: t("website.car_card.requirements.required_min_{age}", {age: filteredCar.min_age ?? 22}), 
                     },
                     {
                         icon: <User/>,
-                        label: t("website.car_card.requirements.{year}_year_experience", {year: 2}),
+                        label: t("website.car_card.requirements.{year}_year_experience", {year: filteredCar.min_license_year ?? 2}),
                     },
                 ];
 
@@ -99,15 +120,12 @@ export default function SortSearchReservations({availableCars = [], sortBy, segm
                 const rawTotal = priceData.grand_total ??
                     ((Number(rawDrop) + (Number(rawFinalDaily) * Number(totalDays))));
 
-                const baseDailyPrice = calculateTotal(rawBaseDaily);
-                const finalDailyPrice = calculateTotal(rawFinalDaily);
-                const dropPrice = calculateTotal(rawDrop);
-                const totalPrice = calculateTotal(rawTotal);
+                const isProcessing = processingId === filteredCar.id;
 
                 return (
                     <div
                         key={filteredCar.id}
-                        className="bg-white w-full rounded-2xl grid grid-cols-1 md:grid-cols-10 gap-4 p-6 shadow-md"
+                        className={`bg-white w-full rounded-2xl grid grid-cols-1 md:grid-cols-10 gap-4 p-6 shadow-md transition-opacity ${isProcessing ? 'opacity-70 pointer-events-none' : ''}`}
                     >
                         <ReservationCarPhoto
                             photoSrc={photoSrc}
@@ -122,29 +140,16 @@ export default function SortSearchReservations({availableCars = [], sortBy, segm
                         />
 
                         <ReservationCarPayment
-                            baseDailyPrice={baseDailyPrice.toFixed(2)}
-                            dailyPrice={finalDailyPrice.toFixed(2)}
+                            baseDailyPrice={calculateTotal(rawBaseDaily).toFixed(2)}
+                            dailyPrice={calculateTotal(rawFinalDaily).toFixed(2)}
                             hasDiscount={hasDiscount}
-                            dropPrice={dropPrice.toFixed(2)}
+                            dropPrice={calculateTotal(rawDrop).toFixed(2)}
                             totalDays={totalDays}
-                            totalPrice={totalPrice.toFixed(2)}
+                            totalPrice={calculateTotal(rawTotal).toFixed(2)}
                             currencySymbol={currencySymbol}
-                            rentLabel={t("website.searchReservation.rent_now")}
-                            onRentNow={() => {
-                                const combinedStart = `${reservation.startDate} ${reservation.startTime}`;
-                                const combinedFinish = `${reservation.finishDate} ${reservation.finishTime || reservation.endTime}`;
-                                router.visit(`/${i18n.language}/${t('address.reservation-create')}`, {
-                                    method: "get",
-                                    data: {
-                                        car_id: filteredCar.id,
-                                        startDateTime: combinedStart,
-                                        finishDateTime: combinedFinish,
-                                        PULocation: reservation.selectedPULocation.id,
-                                        RLocation: reservation.selectedRLocation.id
-                                    },
-                                });
-                            }}
-
+                            rentLabel={isProcessing ? t("website.general.processing") : t("website.searchReservation.rent_now")}
+                            disabled={isProcessing}
+                            onRentNow={() => handleRentNow(filteredCar)}
                         />
                     </div>
                 );
