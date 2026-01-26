@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { router } from "@inertiajs/react";
+import axios from "axios";
 import { useCurrency } from "../../providers/CurrencyContext.jsx";
 import ReservationCarPhoto from "./reservation/ReservationCarPhoto.jsx";
 import ReservationCarInfo from "./reservation/ReservationCarInfo.jsx";
@@ -59,27 +59,36 @@ export default function SortSearchReservations({ availableCars = [], sortBy, seg
         const combinedFinish = `${reservation.finishDate} ${reservation.finishTime || reservation.endTime}`;
 
         try {
-        const url = `/${i18n.language}/${t('address.reservation-create')}`;
+            const url = `/${i18n.language}/${t('address.reservation-create')}`;
 
-        router.post(url, {
-            car_id: car.id,
-            startDateTime: combinedStart,
-            finishDateTime: combinedFinish,
-            PULocation: reservation.selectedPULocation.id,
-            RLocation: reservation.selectedRLocation.id
-        }, {
-            preserveScroll: true,
-            onFinish: () => setProcessingId(null),
-            onError: (errors) => {
-                console.error(errors);
+            const response = await axios.post(url, {
+                car_id: car.id,
+                startDateTime: combinedStart,
+                finishDateTime: combinedFinish,
+                PULocation: reservation.selectedPULocation.id,
+                RLocation: reservation.selectedRLocation.id
+            }, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            let targetUrl = response.data.redirect_url;
+
+            if (targetUrl && targetUrl.startsWith('http://')) {
+                targetUrl = targetUrl.replace('http://', 'https://');
+            }
+
+            if (targetUrl) {
+                window.location.href = targetUrl;
+            } else {
                 setProcessingId(null);
             }
-        });
 
-    } catch (error) {
-        console.error(error);
-        setProcessingId(null);
-    }
+        } catch (error) {
+            console.error(error);
+            setProcessingId(null);
+        }
     };
 
     return (

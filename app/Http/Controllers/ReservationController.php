@@ -86,7 +86,10 @@ public function initiateDraft(Request $request)
     
     Cache::put($key, $validated, now()->addMinutes(30));
 
-    return to_route('reservation-create', ['ref' => $key]);
+    return response()->json([
+    'status' => 'success',
+    'redirect_url' => route('reservation-create', ['ref' => $key])
+]);
 }
 
 public function showExtras(Request $request)
