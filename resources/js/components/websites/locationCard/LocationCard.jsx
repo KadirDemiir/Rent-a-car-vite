@@ -1,5 +1,7 @@
 import {Plane, Phone, Mail, MapPin} from 'lucide-react';
 export default function LocationCard({location}){
+    const googleMapsUrl = `https://www.google.com/maps/search/${location.latitude},${location.longitude}`;
+    
     return(
         <div className="col-span-1 rounded-2xl bg-white shadow-md">
             {location.photo_path ?
@@ -26,6 +28,15 @@ export default function LocationCard({location}){
                     <Mail/>
                     <div className="font-medium text-gray-700">{location.email}</div>
                 </div>
+                <a 
+                    href={googleMapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex gap-4 h-8 items-center text-blue-600 hover:text-blue-800 font-medium"
+                >
+                    <MapPin size={20}/>
+                    <div>View on Google Maps</div>
+                </a>
             </div>
         </div>
     );
