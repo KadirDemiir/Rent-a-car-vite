@@ -1,4 +1,5 @@
-import { router } from '@inertiajs/react'
+import axios from 'axios';
+import {router} from '@inertiajs/react';
 import {useState} from 'react'
 import Input from '../../components/websites/formElement/Input.jsx';
 import {useTranslation} from "react-i18next";
@@ -29,10 +30,28 @@ export default function LogInForm() {
       }
 
       const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-      router.post('/auth', formData, {
+      axios.post('/auth', formData, {
           headers: {
               'X-CSRF-TOKEN': csrfToken,
           },
+          withCredentials: true,
+      }).then(response => {
+        console.log('Login response:', response.data);
+        console.log('Login response headers:', response.headers);
+        console.log('Cookies after login:', document.cookie);
+          if(response.data.success){
+            // Wait a moment for session to be saved, then redirect
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 100);
+          }else{
+            setErrors({
+              ...errors,
+              general: response.data.message
+            });
+          }
+      }).catch(error => {
+          console.error('There was an error!', error);
       });
 
   };

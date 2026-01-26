@@ -36,12 +36,20 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-
-            return redirect('/');
-        }else{
-            return Inertia::render('auth/Auth', [
-                'errorMessage' => 'Credentials do not match our records.',
+            
+            // Log to verify user is authenticated
+            \Illuminate\Support\Facades\Log::info('User authenticated:', [
+                'user_id' => Auth::id(),
+                'user_email' => Auth::user()->email,
+                'session_id' => $request->session()->getId()
             ]);
+            
+            return response()->json([
+                'success' => true,
+                'user' => Auth::user()
+            ]);
+        }else{
+            return response()->json(['success' => false, 'message' => 'Credentials do not match our records.']);
         }
 
     }

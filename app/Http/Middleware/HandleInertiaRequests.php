@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Middleware;
 
 use App\Services\CurrencyService;
@@ -21,7 +20,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            'currencies' => (new CurrencyService())->getActiveCurrencies(),
+            'currencies' => fn () => (new CurrencyService())->getActiveCurrencies(),
         ]);
     }
 }
