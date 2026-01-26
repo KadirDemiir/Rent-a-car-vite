@@ -27,7 +27,7 @@ export default function UpSide({ isMobileMenuOpen }) {
         <div className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:flex md:min-h-[15vh] w-full items-center justify-center bg-gray-100 p-2`}>
             <div className="w-[95%] md:w-[80%] flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
                 <div className="hidden md:flex w-full md:w-auto items-center justify-center md:justify-start">
-                    <Link href="/"><CarFront/></Link>
+                    <Link href={`/`}><CarFront/></Link>
                 </div>
                 <div className={`flex h-full w-full md:w-auto md:min-w-[50%] transition-all duration-300`}>
                     <nav className="flex items-center justify-center h-full w-full">

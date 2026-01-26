@@ -75,15 +75,13 @@ export default function SortSearchReservations({ availableCars = [], sortBy, seg
 
             let targetUrl = response.data.redirect_url;
 
-            if (targetUrl && targetUrl.startsWith('http://')) {
+/*             if (targetUrl && targetUrl.startsWith('http://')) {
                 targetUrl = targetUrl.replace('http://', 'https://');
-            }
+            } */
 
-            if (targetUrl) {
-                window.location.href = targetUrl;
-            } else {
-                setProcessingId(null);
-            }
+            if (targetUrl) 
+                window.location.href = targetUrl; 
+            setProcessingId(null);
 
         } catch (error) {
             console.error(error);
