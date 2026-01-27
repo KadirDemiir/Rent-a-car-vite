@@ -22,7 +22,7 @@ export default function UserInfo({setUser, user, userErrors, setUserErrors, show
     };
 
     return(
-        <div className={`bg-white p-6 rounded-xl shadow-sm border border-gray-100 mt-4`}>
+        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
             <div className="flex items-center gap-3 mb-6 border-b border-gray-100 pb-4">
                 <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -32,7 +32,7 @@ export default function UserInfo({setUser, user, userErrors, setUserErrors, show
                 <h3 className="text-xl font-bold text-gray-800">{t('website.reservation.user_info.title', 'Sürücü Bilgileri')}</h3>
             </div>
 
-            <div className={`grid grid-cols-1 md:grid-cols-2 gap-4`}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                     type={`text`}
                     elementName={"name"}
@@ -143,10 +143,11 @@ export default function UserInfo({setUser, user, userErrors, setUserErrors, show
                     showErrors={showErrors}
                 />
                 <div className="col-span-1 md:col-span-2">
-                    <span>Not:</span>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">...</label>
                     <textarea 
                         onChange={(e) => handleUserChange('notes', e.target.value, "")} 
-                        className={`w-full outline-none border-1 border-gray-700 rounded-lg pl-2`}
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors resize-none h-24"
+                        placeholder="..."
                         defaultValue={user?.notes}
                     />
                 </div>
