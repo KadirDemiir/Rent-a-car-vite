@@ -1,61 +1,119 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { router } from "@inertiajs/react";
 import axios from "axios";
 import { GripVertical } from "lucide-react";
 import FilterCar from "./FilterCar.jsx";
 
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+const SortableRow = ({ car, index, t, handleClick }) => {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging
+    } = useSortable({ id: car.id });
+
+    const style = {
+        transform: CSS.Translate.toString(transform),
+        transition,
+        zIndex: isDragging ? 50 : "auto",
+        position: "relative",
+        opacity: isDragging ? 0.8 : 1,
+    };
+
+    return (
+        <tr
+            ref={setNodeRef}
+            style={style}
+            className={`
+                transition-colors border-b last:border-b-0 group
+                ${isDragging ? "bg-blue-100 shadow-xl ring-2 ring-blue-500 border-none" : "hover:bg-gray-50 bg-white"}
+            `}
+        >
+            <td 
+                {...attributes} 
+                {...listeners} 
+                className="px-4 py-3 w-10 text-gray-400 group-hover:text-gray-600 cursor-grab active:cursor-grabbing touch-none"
+            >
+                <GripVertical size={20} className={isDragging ? "text-blue-700" : ""} />
+            </td>
+            
+            <td className="px-4 py-3 font-bold text-gray-500 w-12 text-center select-none">
+                {index + 1}
+            </td>
+
+            <td className="px-6 py-3 font-semibold text-gray-900 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{car.license_plate}</td>
+            <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{t(car.brand_key.key)}</td>
+            <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{t(car.model_key.key)}</td>
+            <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{car.year}</td>
+            <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{t(`transmission.${car.transmission_id}`)}</td>
+            <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{t(`segment.${car.segment_id}`)}</td>
+            <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{t(`body_type.${car.body_type_id}`)}</td>
+            <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{t(`fuel.${car.fuel_id}`)}</td>
+            <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{car.trunk_capacity}</td>
+        </tr>
+    );
+};
+
 export default function CarTable({ cars }) {
     const [filteredCars, setFilteredCars] = useState(cars);
-    const [carsToSave, setCarsToSave] = useState(cars.map(car => ({ id: car.id, sort_order: car.sort_order || 0 })));
+    const [carsToSave, setCarsToSave] = useState(cars);
     const [isSaving, setIsSaving] = useState(false);
-    
-    const dragItem = useRef(null);
-    const dragOverItem = useRef(null);
     
     const { i18n, t } = useTranslation();
 
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        }),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
     useEffect(() => {
         setFilteredCars(cars);
-        setCarsToSave(cars.map(car => ({ id: car.id, sort_order: car.sort_order || 0 })));
+        setCarsToSave(cars);
     }, [cars]);
 
     const handleClick = (id) => {
         router.visit(`/${i18n.language}/${t("address.adminpanel")}/${t("address.cars")}/${id}`);
     };
 
-    const handleDragStart = (e, index) => {
-        dragItem.current = index;
-        e.dataTransfer.effectAllowed = "move";
-        const row = e.target.closest('tr');
-        e.dataTransfer.setDragImage(row, 0, 0);
-    };
+    const handleDragEnd = (event) => {
+        const { active, over } = event;
 
-    const handleDragEnter = (e, index) => {
-        dragOverItem.current = index;
-        const dragIndex = dragItem.current;
-        const overIndex = dragOverItem.current;
-
-        if (dragIndex === null || dragIndex === overIndex) return;  
-
-        const newCars = [...carsToSave];
-        const draggedCar = newCars[dragIndex];
-
-        newCars.splice(dragIndex, 1);
-        newCars.splice(overIndex, 0, draggedCar);
-
-        dragItem.current = overIndex;
-
-        newCars.forEach((car, idx) => {
-            car.sort_order = idx;
-        });
-
-        setCarsToSave(newCars);
-    };
-
-    const handleDragEnd = () => {
-        dragItem.current = null;
-        dragOverItem.current = null;
+        if (active.id !== over.id) {
+            setCarsToSave((items) => {
+                const oldIndex = items.findIndex(item => item.id === active.id);
+                const newIndex = items.findIndex(item => item.id === over.id);
+                
+                const newOrder = arrayMove(items, oldIndex, newIndex);
+                
+                return newOrder.map((item, index) => ({...item, sort_order: index}));
+            });
+        }
     };
 
     const saveSortOrder = async () => {
@@ -63,7 +121,7 @@ export default function CarTable({ cars }) {
         const formData = new FormData();
         carsToSave.forEach((car, index) => {
             formData.append(`cars[${index}][id]`, car.id);
-            formData.append(`cars[${index}][sort_order]`, car.sort_order);
+            formData.append(`cars[${index}][sort_order]`, index);
         });
 
         try {
@@ -72,16 +130,10 @@ export default function CarTable({ cars }) {
                     if (prev.data.success) {
                         router.reload({ only: ['cars'] });
                     }
-                })
-                .catch(error => {
-                    if (error.response && error.response.status === 422) {
-                        console.log(error.response.data.errors);
-                    }
-                    alert('Sıralama kaydedilemedi.');
                 });
         } catch (error) {
             console.error(error);
-            alert('Bir hata oluştu.');
+            alert('Error saving sort order');
         } finally {
             setIsSaving(false);
         }
@@ -95,7 +147,7 @@ export default function CarTable({ cars }) {
                 <button
                     onClick={saveSortOrder}
                     disabled={isSaving}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 font-semibold"
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 font-semibold transition-colors shadow-sm"
                 >
                     {isSaving ? 'Saving...' : 'Save Sort Order'}
                 </button>
@@ -103,59 +155,53 @@ export default function CarTable({ cars }) {
 
             <section className="bg-white border border-gray-200 rounded-2xl shadow-sm">
                 <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-100 text-left text-sm font-semibold text-gray-600 uppercase tracking-wide">
-                            <tr>
-                                <th className="px-6 py-3 w-12"></th>
-                                <th className="px-6 py-3">{t("adminpanel.car.list.license_plate")}</th>
-                                <th className="px-6 py-3">{t("adminpanel.car.list.brand")}</th>
-                                <th className="px-6 py-3">{t("adminpanel.car.list.model")}</th>
-                                <th className="px-6 py-3">{t("adminpanel.car.list.year")}</th>
-                                <th className="px-6 py-3">{t("adminpanel.car.list.transmission_type")}</th>
-                                <th className="px-6 py-3">{t("adminpanel.car.list.segment")}</th>
-                                <th className="px-6 py-3">{t("adminpanel.car.list.body_type")}</th>
-                                <th className="px-6 py-3">{t("adminpanel.car.list.fuel_type")}</th>
-                                <th className="px-6 py-3">{t("adminpanel.car.list.trunk_capacity")}</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200 bg-white text-sm text-gray-700">
-                            {carsToSave && carsToSave.map((carSort, index) => {
-                                const car = cars.find(c => c.id === carSort.id);
-                                if (!car) return null;
-                                return (
-                                    <tr
-                                        key={car.id}
-                                        draggable
-                                        onDragStart={(e) => handleDragStart(e, index)}
-                                        onDragEnter={(e) => handleDragEnter(e, index)}
-                                        onDragEnd={handleDragEnd}
-                                        onDragOver={(e) => e.preventDefault()}
-                                        className="transition hover:bg-gray-50 border-b last:border-b-0 cursor-default group"
-                                    >
-                                        <td className="px-6 py-3 cursor-grab active:cursor-grabbing w-12 text-gray-400 group-hover:text-gray-600">
-                                            <GripVertical size={20} />
-                                        </td>
-                                        <td className="px-6 py-3 font-semibold text-gray-900 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{car.license_plate}</td>
-                                        <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{t(car.brand_key.key)}</td>
-                                        <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{t(car.model_key.key)}</td>
-                                        <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{car.year}</td>
-                                        <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{t(`transmission.${car.transmission_id}`)}</td>
-                                        <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{t(`segment.${car.segment_id}`)}</td>
-                                        <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{t(`body_type.${car.body_type_id}`)}</td>
-                                        <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{t(`fuel.${car.fuel_id}`)}</td>
-                                        <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{car.trunk_capacity}</td>
-                                    </tr>
-                                );
-                            })}
-                            {(!carsToSave || carsToSave.length === 0) && (
+                    <DndContext 
+                        sensors={sensors} 
+                        collisionDetection={closestCenter} 
+                        onDragEnd={handleDragEnd}
+                    >
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-100 text-left text-sm font-semibold text-gray-600 uppercase tracking-wide">
                                 <tr>
-                                    <td colSpan={10} className="px-6 py-10 text-center text-gray-500">
-                                        {t("adminpanel.car.list.empty_state") ?? "No cars match your filters."}
-                                    </td>
+                                    <th className="px-4 py-3 w-10"></th>
+                                    <th className="px-4 py-3 w-12 text-center">#</th>
+                                    <th className="px-6 py-3">{t("adminpanel.car.list.license_plate")}</th>
+                                    <th className="px-6 py-3">{t("adminpanel.car.list.brand")}</th>
+                                    <th className="px-6 py-3">{t("adminpanel.car.list.model")}</th>
+                                    <th className="px-6 py-3">{t("adminpanel.car.list.year")}</th>
+                                    <th className="px-6 py-3">{t("adminpanel.car.list.transmission_type")}</th>
+                                    <th className="px-6 py-3">{t("adminpanel.car.list.segment")}</th>
+                                    <th className="px-6 py-3">{t("adminpanel.car.list.body_type")}</th>
+                                    <th className="px-6 py-3">{t("adminpanel.car.list.fuel_type")}</th>
+                                    <th className="px-6 py-3">{t("adminpanel.car.list.trunk_capacity")}</th>
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200 bg-white text-sm text-gray-700">
+                                <SortableContext 
+                                    items={carsToSave.map(c => c.id)} 
+                                    strategy={verticalListSortingStrategy}
+                                >
+                                    {carsToSave.map((car, index) => (
+                                        <SortableRow 
+                                            key={car.id} 
+                                            car={car} 
+                                            index={index} 
+                                            t={t} 
+                                            handleClick={handleClick} 
+                                        />
+                                    ))}
+                                </SortableContext>
+                                
+                                {(!carsToSave || carsToSave.length === 0) && (
+                                    <tr>
+                                        <td colSpan={11} className="px-6 py-10 text-center text-gray-500">
+                                            {t("adminpanel.car.list.empty_state") ?? "No cars match your filters."}
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </DndContext>
                 </div>
             </section>
         </div>
