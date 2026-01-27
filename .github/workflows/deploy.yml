@@ -17,10 +17,10 @@ jobs:
           port: 22
           script: |
             export NVM_DIR=~/.nvm
-            git reset --hard HEAD
             source ~/.nvm/nvm.sh
             cd /var/www/Rent-a-car-vite
             php artisan down
+            git reset --hard HEAD 
             git pull origin main
             composer install --no-dev --optimize-autoloader
             php artisan migrate --force
