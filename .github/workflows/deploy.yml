@@ -20,8 +20,8 @@ jobs:
             source ~/.nvm/nvm.sh
             cd /var/www/Rent-a-car-vite
             php artisan down
-            git fetch origin main
             git reset --hard origin/main
+            git fetch origin main
             composer install --no-dev --optimize-autoloader
             php artisan migrate --force
             php artisan config:clear
