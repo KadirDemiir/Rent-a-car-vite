@@ -1,7 +1,7 @@
 import Input from "../../formElement/Input.jsx";
 import {useTranslation} from "react-i18next";
 
-export default function UserInfo({setUser, user}){
+export default function UserInfo({setUser, user, userErrors, setUserErrors, showErrors = false}){
     const {t} = useTranslation();
 
     const validateName = (value) => value.trim() === '' ? '*'+t("website.auth.signup.this_area_cannot_be_empty") : '';
@@ -13,7 +13,11 @@ export default function UserInfo({setUser, user}){
     const handleUserChange = (field, value, error) => {
         setUser(prev => ({
             ...prev,
-            [field]: { value, error }
+            [field]: value
+        }));
+        setUserErrors(prev => ({    
+            ...prev,
+            [field]: error
         }));
     };
 
@@ -35,7 +39,11 @@ export default function UserInfo({setUser, user}){
                     labelName={t('website.auth.signup.name')}
                     onChange={(val, err) => handleUserChange('name', val, err)}
                     validate={validateName}
-                    initialValue={user?.name?.value}
+                    formData={user}
+                    errors={userErrors}
+                    setFormData={setUser}
+                    setErrors={setUserErrors}
+                    showErrors={showErrors}
                 />
                 <Input
                     type={`text`}
@@ -43,7 +51,11 @@ export default function UserInfo({setUser, user}){
                     labelName={t('website.auth.signup.surname')}
                     onChange={(val, err) => handleUserChange('surname', val, err)}
                     validate={validateName}
-                    initialValue={user?.surname?.value}
+                    formData={user}
+                    errors={userErrors}
+                    setFormData={setUser}
+                    setErrors={setUserErrors}
+                    showErrors={showErrors}
                 />
                 <Input
                     type={`email`}
@@ -51,7 +63,11 @@ export default function UserInfo({setUser, user}){
                     labelName={t('website.auth.signup.email', 'E-posta')}
                     onChange={(val, err) => handleUserChange('mail', val, err)}
                     validate={validateEmail}
-                    initialValue={user?.mail?.value}
+                    formData={user}
+                    errors={userErrors}
+                    setFormData={setUser}
+                    setErrors={setUserErrors}
+                    showErrors={showErrors}
                 />
                 <Input
                     type={`tel`}
@@ -59,7 +75,11 @@ export default function UserInfo({setUser, user}){
                     labelName={t('website.auth.signup.phone', 'Telefon')}
                     onChange={(val, err) => handleUserChange('phone', val, err)}
                     validate={validatePhone}
-                    initialValue={user?.phone?.value}
+                    formData={user}
+                    errors={userErrors}
+                    setFormData={setUser}
+                    setErrors={setUserErrors}
+                    showErrors={showErrors}
                 />
                 <Input
                     type={`text`}
@@ -68,7 +88,11 @@ export default function UserInfo({setUser, user}){
                     onChange={(val, err) => handleUserChange('identity', val, err)}
                     validate={validateIdentity}
                     maxV={11}
-                    initialValue={user?.identity?.value}
+                    formData={user}
+                    errors={userErrors}
+                    setFormData={setUser}
+                    setErrors={setUserErrors}
+                    showErrors={showErrors}
                 />
                 <Input
                     type={`date`}
@@ -76,7 +100,11 @@ export default function UserInfo({setUser, user}){
                     labelName={t('website.auth.signup.birthday', 'Doğum Tarihi')}
                     onChange={(val, err) => handleUserChange('birthday', val, err)}
                     validate={validateRequired}
-                    initialValue={user?.birthday?.value}
+                    formData={user}
+                    errors={userErrors}
+                    setFormData={setUser}
+                    setErrors={setUserErrors}
+                    showErrors={showErrors}
                 />
                 <div className="col-span-1 md:col-span-2">
                     <Input
@@ -85,7 +113,11 @@ export default function UserInfo({setUser, user}){
                         labelName={t('website.auth.signup.address', 'Adres')}
                         onChange={(val, err) => handleUserChange('address', val, err)}
                         validate={validateRequired}
-                        initialValue={user?.address?.value}
+                        formData={user}
+                        errors={userErrors}
+                        setFormData={setUser}
+                        setErrors={setUserErrors}
+                        showErrors={showErrors}
                     />
                 </div>
                 <Input
@@ -93,21 +125,29 @@ export default function UserInfo({setUser, user}){
                     elementName={"arrivalFlightNo"}
                     labelName={t('website.reservation.user_info.arrival_flight', 'Geliş Uçuş No (Opsiyonel)')}
                     onChange={(val, err) => handleUserChange('arrivalFlightNo', val, err)}
-                    initialValue={user?.arrivalFlightNo?.value}
+                    formData={user}
+                    errors={userErrors}
+                    setFormData={setUser}
+                    setErrors={setUserErrors}
+                    showErrors={showErrors}
                 />
                 <Input
                     type={`text`}
                     elementName={"returnFlightNo"}
                     labelName={t('website.reservation.user_info.return_flight', 'Dönüş Uçuş No (Opsiyonel)')}
                     onChange={(val, err) => handleUserChange('returnFlightNo', val, err)}
-                    initialValue={user?.returnFlightNo?.value}
+                    formData={user}
+                    errors={userErrors}
+                    setFormData={setUser}
+                    setErrors={setUserErrors}
+                    showErrors={showErrors}
                 />
                 <div className="col-span-1 md:col-span-2">
                     <span>Not:</span>
                     <textarea 
                         onChange={(e) => handleUserChange('notes', e.target.value, "")} 
                         className={`w-full outline-none border-1 border-gray-700 rounded-lg pl-2`}
-                        defaultValue={user?.notes?.value}
+                        defaultValue={user?.notes}
                     />
                 </div>
             </div>

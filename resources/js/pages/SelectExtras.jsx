@@ -13,33 +13,74 @@ export default function SelectExtras({car, auth_user, params}){
     console.log(car, auth_user, params);
     const {t} = useTranslation();
     const [selectedExtras, setSelectedExtras] = useState([]);
-    const [user, setUser] = useState({name: {value: auth_user?.name ?? "", error: ""}, surname: {value: auth_user?.surname ?? "", error: ""}, mail: {value: auth_user?.email ?? "", error: ""}, phone: {value: auth_user?.phone_number ?? "", error: ""}, address: {value: auth_user?.address ?? "", error: ""}, birthday: {value: auth_user?.birthday ?? "", error: ""}, identity: {value: auth_user?.tc_number ?? "", error: ""}, arrivalFlightNo: {value: "", error: ""}, returnFlightNo: {value: "", error: ""}, notes: {value: "", error: ""}, isNative: true});
+    const [showErrors, setShowErrors] = useState(false);
+    const [user, setUser] = useState({
+        name: auth_user?.name ?? "",
+        surname: auth_user?.surname ?? "",
+        mail: auth_user?.email ?? "",
+        phone: auth_user?.phone_number ?? "",
+        address: auth_user?.address ?? "",
+        birthday: auth_user?.birthday ?? "",
+        identity: auth_user?.tc_number ?? "",
+        arrivalFlightNo: "",
+        returnFlightNo: "",
+        notes: "",
+        isNative: true
+    });
+    const [userErrors, setUserErrors] = useState({
+        name: "",
+        surname: "",
+        mail: "",
+        phone: "",
+        address: "",
+        birthday: "",
+        identity: "",
+        arrivalFlightNo: "",
+        returnFlightNo: "",
+        notes: ""
+    });
     const [error, setError] = useState();
+
+    // Validation functions
+    const validateName = (value) => value.trim() === '' ? '*'+t("website.auth.signup.this_area_cannot_be_empty") : '';
+    const validateEmail = (value) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? '*'+t("website.auth.signup.invalid_email") : '';
+    const validatePhone = (value) => value.length < 10 ? '*'+t("website.auth.signup.invalid_phone") : '';
+    const validateIdentity = (value) => value.length !== 11 ? '*'+t("website.auth.signup.invalid_identity") : '';
+    const validateRequired = (value) => value.trim() === '' ? '*'+t("website.auth.signup.this_area_cannot_be_empty") : '';
 
     const handleSubmit =  () => {
         console.log(user.birthday);
         setError("");
+        setShowErrors(true);
+        
+        // Validate all fields and set errors
+        const validationErrors = {
+            name: validateName(user.name || ''),
+            surname: validateName(user.surname || ''),
+            mail: validateEmail(user.mail || ''),
+            phone: validatePhone(user.phone || ''),
+            address: validateRequired(user.address || ''),
+            birthday: validateRequired(user.birthday || ''),
+            identity: validateIdentity(user.identity || ''),
+            arrivalFlightNo: '',
+            returnFlightNo: '',
+            notes: ''
+        };
+        
+        setUserErrors(validationErrors);
+        
         const requiredFields = ['name', 'surname', 'mail', 'phone', 'address', 'birthday', 'identity'];
         let hasError = false;
         let firstErrorMessage = "";
 
-        for (const key in user) {
-            if (user[key].error) {
+        for (const field of requiredFields) {
+            if (validationErrors[field]) {
                 hasError = true;
-                firstErrorMessage = user[key].error;
+                firstErrorMessage = validationErrors[field];
                 break;
             }
         }
 
-        if (!hasError) {
-            for (const field of requiredFields) {
-                if (!user[field].value || user[field].value.trim() === "") {
-                    hasError = true;
-                    firstErrorMessage = t("website.auth.signup.fill_all_required_fields", "Lütfen tüm zorunlu alanları doldurunuz.");
-                    break;
-                }
-            }
-        }
         console.log(hasError);
         if (hasError) {
             setError(firstErrorMessage);
@@ -58,16 +99,16 @@ export default function SelectExtras({car, auth_user, params}){
             finish_date_time: params.finishDateTime,
             extras: JSON.stringify(selectedExtras),
             user_info: {
-                name: user.name.value,
-                surname: user.surname.value,
-                email: user.mail.value,
-                notes: user.notes.value,
-                phone: user.phone.value,
-                address: user.address.value,
-                birthday: user.birthday.value,
-                id: user.identity.value,
-                arrival_flight_no: user.arrivalFlightNo.value,
-                return_flight_no: user.returnFlightNo.value,
+                name: user.name,
+                surname: user.surname,
+                email: user.mail,
+                notes: user.notes,
+                phone: user.phone,
+                address: user.address,
+                birthday: user.birthday,
+                id: user.identity,
+                arrival_flight_no: user.arrivalFlightNo,
+                return_flight_no: user.returnFlightNo,
             }
         };
         console.log(submissionData);
@@ -100,7 +141,7 @@ export default function SelectExtras({car, auth_user, params}){
                         <IncludedServices />
 
                         <Extras car={car} selectedExtras={selectedExtras} setSelectedExtras={setSelectedExtras}/>
-                        <UserInfo user={user} setUser={setUser}/>
+                        <UserInfo user={user} setUser={setUser} userErrors={userErrors} setUserErrors={setUserErrors} showErrors={showErrors}/>
                     </div>
                     <div className={`w-full lg:basis-3/10`}>
                         <ReservationDatePreview pickupDate={params.startDateTime} returnDate={params.finishDateTime} pickupLocation={params.PULocation.name} returnLocation={params.RLocation.name}/>
