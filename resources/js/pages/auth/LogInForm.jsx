@@ -1,13 +1,13 @@
 import axios from 'axios';
-import {router} from '@inertiajs/react';
 import {useState} from 'react'
 import Input from '../../components/websites/formElement/Input.jsx';
 import {useTranslation} from "react-i18next";
 
-export default function LogInForm() {
+export default function LogInForm({ onMessage }) {
     const {t} = useTranslation();
       const [formData, setFormData] = useState({});
       const [errors, setErrors] = useState({});
+      const [showErrors, setShowErrors] = useState(false);
 
       const handleInputChange = (name, value, error) => {
           setFormData({
@@ -22,36 +22,39 @@ export default function LogInForm() {
           });
       };
 
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      const hasErrors = Object.values(errors).some(   error => typeof error === 'string' && error !== '');
+    const handleSubmit = () => {
+      // Validate all fields
+      const emailError = validateEmail(formData.email || '');
+      const passwordError = validatePassword(formData.password || '');
+      
+      const validationErrors = {
+        email: emailError,
+        password: passwordError
+      };
+      
+      setErrors(validationErrors);
+      setShowErrors(true);
+      
+      const hasErrors = Object.values(validationErrors).some(error => typeof error === 'string' && error !== '');
       if (hasErrors) {
           return;
       }
-
+      
       const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
       axios.post('/auth', formData, {
-          headers: {
-              'X-CSRF-TOKEN': csrfToken,
-          },
           withCredentials: true,
       }).then(response => {
-        console.log('Login response:', response.data);
-        console.log('Login response headers:', response.headers);
-        console.log('Cookies after login:', document.cookie);
           if(response.data.success){
-            // Wait a moment for session to be saved, then redirect
+            onMessage({ type: 'success', text: response.data.message });
             setTimeout(() => {
               window.location.href = '/';
             }, 100);
           }else{
-            setErrors({
-              ...errors,
-              general: response.data.message
-            });
+            onMessage({ type: 'error', text: response.data.message });
           }
       }).catch(error => {
           console.error('There was an error!', error);
+          onMessage({ type: 'error', text: error.response?.data?.message || 'An error occurred' });
       });
 
   };
@@ -63,32 +66,51 @@ export default function LogInForm() {
             value.length < 6 ? t("website.auth.login.he_password_must_be_at_least_6_characters_long") : '';
 
           return (
-            <div className="mt-4 border w-full">
-              <form onSubmit={handleSubmit} className="w-full flex flex-col items-center justify-center gap-4 p-4">
+            <div className="bg-white rounded-b-2xl shadow-lg border border-gray-100 border-t-0">
+              <div className="px-8 py-8 space-y-6 flex flex-col gap-2">
+                  {errors.general && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start gap-2">
+                      <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
+                      </svg>
+                      <span className="text-sm">{errors.general}</span>
+                    </div>
+                  )}
 
-                <Input
-                  type="email"
-                  elementName="email"
-                  labelName={t("website.auth.login.email_label")}
-                  validate={validateEmail}
-                  onChange={(val, err) => handleInputChange('email', val, err)}
-                />
+                  <Input
+                    type="email"
+                    elementName="email"
+                    labelName={t("website.auth.login.email_label")}
+                    validate={validateEmail}
+                    onChange={(val, err) => handleInputChange('email', val, err)}
+                    formData={formData}
+                    errors={errors}
+                    setFormData={setFormData}
+                    setErrors={setErrors}
+                    showErrors={showErrors}
+                  />
 
-                <Input
-                  type="password"
-                  elementName="password"
-                  labelName={t("website.auth.login.password_label")}
-                  validate={validatePassword}
-                  onChange={(val, err) => handleInputChange('password', val, err)}
-                />
+                  <Input
+                    type="password"
+                    elementName="password"
+                    labelName={t("website.auth.login.password_label")}
+                    validate={validatePassword}
+                    onChange={(val, err) => handleInputChange('password', val, err)}
+                    formData={formData}
+                    errors={errors}
+                    setFormData={setFormData}
+                    setErrors={setErrors}
+                    showErrors={showErrors}
+                  />
 
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
-                >
+                  <button
+                    type="button"
+                    onClick={handleSubmit}
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3.5 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md transform hover:scale-[1.02] active:scale-[0.98]"
+                  >
                     {t("website.auth.login.button.save")}
-                </button>
-              </form>
+                  </button>
+              </div>
             </div>
           );
     }

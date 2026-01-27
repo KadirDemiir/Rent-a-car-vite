@@ -77,15 +77,15 @@ class AuthController extends Controller
         ]);
 
         if($user){
-            return Inertia::render('auth/Auth', [
+            return response()->json([
                 'message' => 'You have successfully registered!',
-                'page' => 'Login'
+                'success' => true
             ]);
         }
 
-        return Inertia::render('auth/Auth', [
+        return response()->json([
             'errorMessage' => 'An error have occured!',
-            'page' => 'Signup'
+            'success' => false
         ]);
     }
 
@@ -97,7 +97,7 @@ class AuthController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return response()->json(['success' => true, 'auth' => Auth::user()] );
     }
 
 }

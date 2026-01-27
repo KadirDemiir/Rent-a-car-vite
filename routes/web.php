@@ -211,6 +211,7 @@ Route::get('/adminpanel/get-locations', function () {
 });
 
 Route::get('/adminpanel/get-info/locations/{id}', [LocationsController::class, 'getIndexLocationInfo']);
+Route::post('/auth', [AuthController::class, 'auth'])->name('auth.login');
 
 Route::group([
     'prefix' => LaravelLocalization::setLocale(),
@@ -238,7 +239,6 @@ Route::group([
     Route::post(dbTransRoute('reservation-create'), [ReservationController::class, 'initiateDraft'])->name('reservation.init');
     Route::get(dbTransRoute('reservation-create'), [ReservationController::class, 'showExtras'])->name('reservation-create');   
     
-    Route::post('/auth', [AuthController::class, 'auth'])->name('auth.login');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::middleware('auth')->group(function () {

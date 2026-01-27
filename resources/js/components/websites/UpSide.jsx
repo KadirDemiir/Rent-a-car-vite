@@ -4,10 +4,12 @@ import { useTranslation } from 'react-i18next';
 import LanguageDropdown from './LanguageDropdown.jsx';
 import CurrencyDropDown from "../CurrencyDropDown.jsx";
 import { User, CarFront, ClipboardCheck, LogOut } from 'lucide-react';
+import axios from 'axios';
+import { useState } from 'react';
 
 export default function UpSide({ isMobileMenuOpen }) {
     const { auth } = usePage().props;
-    const user = auth?.user;
+    const [user, setUser] = useState(auth?.user);
     const { post } = useForm();
     const { i18n, t } = useTranslation();
 
@@ -20,7 +22,16 @@ export default function UpSide({ isMobileMenuOpen }) {
 
     const handleLogout = (e) => {
         e.preventDefault();
-        post('/logout');
+        axios.post('/logout')
+        .then((prev) => {
+            if(prev.data.success){
+                console.log(prev.data);
+                setUser(prev.data.auth);
+            }
+        })
+        .catch((err) => {
+            console.error(err);
+        });
     };
 
     return (
