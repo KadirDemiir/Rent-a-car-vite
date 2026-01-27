@@ -5,6 +5,7 @@ export default function Home({locations}) {
     return(
         <div className="">
             <NavBar />
+            try try try
             <SearchReservationForm locations={locations}/>
         </div>
     )
