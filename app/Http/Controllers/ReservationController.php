@@ -83,7 +83,7 @@ public function initiateDraft(Request $request)
     }
 
     $key = 'res_draft_' . Str::random(40);
-    
+        
     Cache::put($key, $validated, now()->addMinutes(30));
 
     return response()->json([

@@ -20,13 +20,13 @@ export default function SearchReservations(){
         setSegment(segment);
     };
     return(
-        <div>
+        <div >
             <Navbar />
-
+            <br />
             <div className="flex flex-col items-center justify-center">
                 <div className="w-[90%]">
                 {reservation && (
-                    <SearchReservationsFrom defPickupLocation={reservation.selectedPULocation} defReturnLocation={reservation.selectedRLocation} defPickupDate= {reservation.startDate} defPickupClock ={reservation.startTime} defReturnDate={reservation.finishDate} defReturnClock={reservation.finishTime} locations={locations}/>
+                    <SearchReservationsFrom defPickupLocation={reservation.selectedPULocation} defReturnLocation={reservation.selectedRLocation} defPickupDate= {reservation.startDate} defPickupClock ={reservation.startTime} defReturnDate={reservation.finishDate} defReturnClock={reservation.finishTime} locations={locations} home={false}/>
                 )}
 
                     <div className="w-full m-4 mt-8">

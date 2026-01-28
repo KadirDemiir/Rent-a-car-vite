@@ -7,6 +7,7 @@
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.14",
+        "@types/react-datepicker": "^6.2.0",
         "@vitejs/plugin-react": "^4.3.4",
         "axios": "^1.13.2",
         "concurrently": "^9.1.2",

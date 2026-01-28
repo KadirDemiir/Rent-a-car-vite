@@ -1,58 +1,149 @@
 import { useState } from 'react';
-import { Link } from '@inertiajs/react'; // Add Link
-import UpSide from './UpSide.jsx';
-import DownSide from './DownSide.jsx';
-import { Menu, X, User, CarFront } from 'lucide-react'; // Add User, CarFront
+import { Link, usePage } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
+import { Menu, X, User, CarFront, ClipboardCheck, LogOut } from 'lucide-react';
+import LanguageDropdown from './LanguageDropdown.jsx';
+import CurrencyDropDown from '../CurrencyDropDown.jsx';
+import axios from 'axios';
 
 const Navbar = () => {
-    // Separate states for left (nav) and right (user) menus
-    const [isNavOpen, setIsNavOpen] = useState(false);
-    const [isUserOpen, setIsUserOpen] = useState(false);
+    const { auth } = usePage().props;
+    const [user, setUser] = useState(auth?.user);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { i18n, t } = useTranslation();
+    const lang = i18n.language.split('-')[0];
 
-    const toggleNav = () => {
-        setIsNavOpen(!isNavOpen);
-        if (!isNavOpen) setIsUserOpen(false); // Close user menu if opening nav
-    };
+    const upperFirstLetter = (str) => {
+        return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    }
 
-    const toggleUser = () => {
-        setIsUserOpen(!isUserOpen);
-        if (!isUserOpen) setIsNavOpen(false); // Close nav menu if opening user
+    const handleLogout = (e) => {
+        e.preventDefault();
+        axios.post('/logout')
+            .then((prev) => {
+                if(prev.data.success){
+                    setUser(prev.data.auth);
+                }
+            })
+            .catch((err) => console.error(err));
     };
 
     return (
-        <div className="flex flex-col w-full relative">
-            {/* Mobile Header Bar */}
-            <div className="md:hidden flex items-center justify-between p-4 bg-gray-100 border-b border-gray-200">
-                {/* Left: DownSide Toggle */}
-                <button 
-                    onClick={toggleNav}
-                    className="p-2 text-gray-700 hover:text-blue-800 transition-colors"
-                    aria-label="Toggle Navigation"
-                >
-                    {isNavOpen ? <X size={24} /> : <Menu size={24} />}
-                </button>
+        <nav className="bg-white shadow-md sticky top-0 z-50">
+            <div className="container mx-auto px-4">
+                {/* Desktop Navigation */}
+                <div className="hidden lg:flex items-center justify-between h-16">
+                    {/* Logo */}
+                    <Link href="/" className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors">
+                        <CarFront size={28} strokeWidth={2} />
+                    </Link>
 
-                {/* Center: Logo */}
-                <Link href="/" className="text-blue-800">
-                    <CarFront size={32}/>
-                </Link>
+                    {/* Main Navigation Links */}
+                    <div className="flex items-center gap-1">
+                        <Link href={`/${lang}/${t('address.cars')}`} className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                            {upperFirstLetter(t('website.navigator.cars'))}
+                        </Link>
+                        <Link href={`/${lang}/${t('address.locations')}`} className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                            {upperFirstLetter(t('website.navigator.locations'))}
+                        </Link>
+                        <Link href={`/${lang}/${t('address.campaigns')}`} className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                            {upperFirstLetter(t('website.navigator.campaigns'))}
+                        </Link>
+                        <Link href={`/${lang}/${t('address.carporateRental')}`} className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                            {upperFirstLetter(t('website.navigator.car_porte_car_rental'))}
+                        </Link>
+                        <Link href={`/${lang}/${t('address.about')}`} className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                            {upperFirstLetter(t('website.navigator.about_us'))}
+                        </Link>
+                    </div>
 
-                {/* Right: UpSide Toggle */}
-                <button 
-                    onClick={toggleUser}
-                    className={`p-2 transition-colors ${isUserOpen ? 'text-blue-800' : 'text-gray-700 hover:text-blue-800'}`}
-                    aria-label="Toggle User Menu"
-                >
-                    <User size={24} />
-                </button>
+                    {/* Right Actions */}
+                    <div className="flex items-center gap-2">
+                        <Link href={`/${i18n.language}/${t('address.checkReservation')}`} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title={upperFirstLetter(t("website.navigator.check_reservation"))}>
+                            <ClipboardCheck size={20} />
+                        </Link>
+                        
+                        {user ? (
+                            <button onClick={handleLogout} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title={upperFirstLetter(t('logout'))}>
+                                <LogOut size={20} />
+                            </button>
+                        ) : (
+                            <Link href={`/${i18n.language}/${t('address.auth')}`} className="p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors" title={upperFirstLetter(t("website.auth.login.login_label"))}>
+                                <User size={20} />
+                            </Link>
+                        )}
+                        
+                        <div className="h-6 w-px bg-gray-300 mx-1"></div>
+                        
+                        <LanguageDropdown />
+                        <CurrencyDropDown />
+                    </div>
+                </div>
+
+                {/* Mobile Navigation */}
+                <div className="lg:hidden">
+                    <div className="flex items-center justify-between h-14">
+                        <Link href="/" className="text-blue-600">
+                            <CarFront size={26} strokeWidth={2} />
+                        </Link>
+                        
+                        <button
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            className="p-2 text-gray-700 hover:text-blue-600 transition-colors"
+                        >
+                            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                        </button>
+                    </div>
+
+                    {/* Mobile Menu */}
+                    {isMobileMenuOpen && (
+                        <div className="py-4 border-t border-gray-200">
+                            <div className="space-y-1">
+                                <Link href={`/${lang}/${t('address.cars')}`} className="block px-4 py-2.5 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
+                                    {upperFirstLetter(t('website.navigator.cars'))}
+                                </Link>
+                                <Link href={`/${lang}/${t('address.locations')}`} className="block px-4 py-2.5 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
+                                    {upperFirstLetter(t('website.navigator.locations'))}
+                                </Link>
+                                <Link href={`/${lang}/${t('address.campaigns')}`} className="block px-4 py-2.5 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
+                                    {upperFirstLetter(t('website.navigator.campaigns'))}
+                                </Link>
+                                <Link href={`/${lang}/${t('address.carporateRental')}`} className="block px-4 py-2.5 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
+                                    {upperFirstLetter(t('website.navigator.car_porte_car_rental'))}
+                                </Link>
+                                <Link href={`/${lang}/${t('address.about')}`} className="block px-4 py-2.5 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
+                                    {upperFirstLetter(t('website.navigator.about_us'))}
+                                </Link>
+                            </div>
+                            
+                            <div className="mt-4 pt-4 border-t border-gray-200 space-y-2">
+                                <Link href={`/${i18n.language}/${t('address.checkReservation')}`} className="flex items-center gap-2 px-4 py-2.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                    <ClipboardCheck size={18} />
+                                    {upperFirstLetter(t("website.navigator.check_reservation"))}
+                                </Link>
+                                
+                                {user ? (
+                                    <button onClick={handleLogout} className="w-full flex items-center gap-2 px-4 py-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                        <LogOut size={18} />
+                                        {upperFirstLetter(t('logout'))}
+                                    </button>
+                                ) : (
+                                    <Link href={`/${i18n.language}/${t('address.auth')}`} className="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                                        <User size={18} />
+                                        {upperFirstLetter(t("website.auth.login.login_label"))}
+                                    </Link>
+                                )}
+                                
+                                <div className="flex items-center gap-2 px-4 py-2">
+                                    <LanguageDropdown />
+                                    <CurrencyDropDown />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
-
-            {/* UpSide (User Actions) - Controlled by isUserOpen on mobile */}
-            <UpSide isMobileMenuOpen={isUserOpen} />
-
-            {/* DownSide (Navigation) - Controlled by isNavOpen on mobile */}
-            <DownSide isMobileMenuOpen={isNavOpen} />
-        </div>
+        </nav>
     );
 };
 
