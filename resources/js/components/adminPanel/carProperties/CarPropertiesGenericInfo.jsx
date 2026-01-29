@@ -1,5 +1,5 @@
-    import SelectOptions from "../../websites/filterSelectors/SelectOptions.jsx";
-    import {useTranslation} from "react-i18next";
+import {useTranslation} from "react-i18next";
+import LanguageProgress from "../LanguageProgress.jsx";
 
     export default function CarPropertiesGenericInfo({title, name, langOptions, currentLang, setCurrentLang, formData, setFormData}){
         const {t} = useTranslation();
@@ -11,73 +11,36 @@
 
         const progressPercentage = Math.round(langProgress());
 
-        return(
-            <div className={`w-full`}>
-                <div className={`w-[80%] md:w-[60%] flex flex-col items-center justify-center gap-6 mx-auto bg-white p-6 rounded-xl shadow-sm border border-gray-100`}>
-                    <div className="w-full flex flex-col space-y-3">
-                        <div className="flex items-center justify-between text-sm text-gray-600">
-                            <span className="font-medium">{title}</span>
-                            <span className={`font-bold ${progressPercentage === 100 ? 'text-green-600' : 'text-blue-600'}`}>
-                                 %{progressPercentage}
-                            </span>
-                        </div>
-                        
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div 
-                                className={`h-2 rounded-full transition-all duration-300 ${progressPercentage === 100 ? 'bg-green-500' : 'bg-blue-500'}`} 
-                                style={{ width: `${progressPercentage}%` }}
-                            />
-                        </div>
-        
-                        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent justify-center">
-                            {langOptions.map((l) => {
-                                const isFilled = formData.name[l.value]?.value?.trim() !== "";
-                                const isActive = currentLang === l.value;
-                                return (
-                                    <button
-                                        key={l.value}
-                                        type="button"
-                                        onClick={() => setCurrentLang(l.value)}
-                                        className={`
-                                            whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all select-none
-                                            ${isActive 
-                                                ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-200' 
-                                                : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
-                                            }
-                                            ${!isFilled && !isActive ? 'border-red-200 text-red-600' : ''}
-                                        `}
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            {l.label}
-                                            {isFilled && (
-                                                <span className={`flex items-center justify-center w-4 h-4 text-[10px] rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-green-100 text-green-600'}`}>
-                                                    ✓
-                                                </span>
-                                            )}
-                                        </div>
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
+    return(
+        <div className="w-full">
+            <div className="max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200">
+                <LanguageProgress langOpt={langOptions} calculateProgress={langProgress} isLanguageFilled={(langValue) => formData.name[langValue]?.value.trim() !== ""} lang={currentLang} setLang={setCurrentLang} />
 
-                    <div className={`w-full md:w-80 flex flex-col gap-2`}>
-                        <div className={`flex justify-center`}>{name}:</div>
-                        <input value={formData.name[currentLang].value}   onChange={(e) =>
-                            setFormData(prev => ({
-                                ...prev,
-                                name: {
-                                    ...prev.name,
-                                    [currentLang]: {
-                                        ...prev.name[currentLang],
-                                        value: e.target.value
+                <div className="space-y-6 mt-6">
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">{name}:</label>
+                        <input 
+                            value={formData.name[currentLang].value}   
+                            onChange={(e) =>
+                                setFormData(prev => ({
+                                    ...prev,
+                                    name: {
+                                        ...prev.name,
+                                        [currentLang]: {
+                                            ...prev.name[currentLang],
+                                            value: e.target.value
+                                        }
                                     }
-                                }
-                            }))
-                        } type="text" className={`outline-none border border-gray-500 rounded-lg pl-2 py-1`}/>
-                        {formData.name[currentLang].error && <span className={`p-1 border-l-12 border-red-600 bg-red-200 text-red-700 break-all`}>*{formData.name[currentLang].error}</span>}
+                                }))
+                            } 
+                            type="text" 
+                            placeholder={name}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                        />
+                        {formData.name[currentLang].error && <span className="mt-2 block p-3 border-l-4 border-red-500 bg-red-50 text-red-700 text-sm rounded">*{formData.name[currentLang].error}</span>}
                     </div>
                 </div>
             </div>
-        );
+        </div>
+    );
     }

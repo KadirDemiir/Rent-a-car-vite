@@ -13,8 +13,7 @@ class InternalServiceController extends Controller
         $internalServices = InternalService::all();
         return Inertia::render('adminPanel/additionalServices/InternalServices', [
             'services' => $internalServices,
-            'success' => session('success'),
-            'error' => session('error')
+            'languages' => \App\Models\Language::where('status', 'active')->get(),  
         ]);
     }
     public function addInternalService(Request $request)

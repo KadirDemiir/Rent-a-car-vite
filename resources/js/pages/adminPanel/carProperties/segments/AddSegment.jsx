@@ -9,7 +9,7 @@ export default function AddSegment({ lngs }) {
             <Navbar >
                 <h4>{t("adminpanel.segments.add_segment.add_segment")}</h4><hr /><br />
                 < SegmentFormModal lngs={lngs} segment={null} translations={null}/>
-            </Navbar>s
+            </Navbar>
         </div>
     );
 }

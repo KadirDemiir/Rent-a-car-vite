@@ -5,6 +5,7 @@ import DateTimePickerComp from "../price/DateTimePickerComp.jsx";
 import Confirm from "../../Confirm.jsx";
 import {router, usePage} from "@inertiajs/react";
 import {useTranslation} from "react-i18next";
+import LanguageProgress from "../LanguageProgress.jsx";
 
 export default function CampaignForm({languages, mode = "add", campaign = null, onSubmit }) {
     const {t} = useTranslation();
@@ -189,52 +190,7 @@ export default function CampaignForm({languages, mode = "add", campaign = null, 
             )}
             {isConfirmOpen && <Confirm message={confirmMessage.message} confirm={handleConfirm} />}
             
-            <div className="flex flex-col space-y-3 mb-6">
-                <div className="flex items-center justify-between text-sm text-gray-600">
-                    <span className="font-medium">{t("adminpanel.pricing.add_campaign.select_language")}</span>
-                    <span className={`font-bold ${progressPercentage === 100 ? 'text-green-600' : 'text-blue-600'}`}>
-                         %{progressPercentage}
-                    </span>
-                </div>
-                
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                        className={`h-2 rounded-full transition-all duration-300 ${progressPercentage === 100 ? 'bg-green-500' : 'bg-blue-500'}`} 
-                        style={{ width: `${progressPercentage}%` }}
-                    />
-                </div>
-
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-                    {languages?.map((l) => {
-                        const isFilled = title[l.code] && content[l.code];
-                        const isActive = currentLang === l.code;
-                        return (
-                            <button
-                                key={l.code}
-                                type="button"
-                                onClick={() => setCurrentLang(l.code)}
-                                className={`
-                                    whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all select-none
-                                    ${isActive 
-                                        ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-200' 
-                                        : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
-                                    }
-                                    ${!isFilled && !isActive ? 'border-red-200 text-red-600' : ''}
-                                `}
-                            >
-                                <div className="flex items-center gap-2">
-                                    {l.name}
-                                    {isFilled && (
-                                        <span className={`flex items-center justify-center w-4 h-4 text-[10px] rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-green-100 text-green-600'}`}>
-                                            ✓
-                                        </span>
-                                    )}
-                                </div>
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
+            <LanguageProgress langOpt={supportedLangs} calculateProgress={() => progressPercentage} isLanguageFilled={(langValue) => title[langValue]?.trim() && content[langValue]?.trim()} lang={currentLang} setLang={setCurrentLang} />
 
             <AddCampaignInfo titleOnChange={titleOnChange} title={title[currentLang]} handleImageChange={handleImageChange} image={imagePreview} content={content[currentLang]} setOnChange={contentOnChange} currLan={currentLang}/>
 
