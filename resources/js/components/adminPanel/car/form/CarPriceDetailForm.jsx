@@ -110,10 +110,10 @@ export default function CarPriceDetailForm({ data, setData, errors, setErrors })
 
     return (
         <div className="w-full shadow-lg overflow-x-auto bg-white rounded-lg">
-            <div className="m-4 flex items-center gap-4">
+            <div className="p-3 md:p-4 flex items-center gap-2 md:gap-4">
                 <button
                     type="button"
-                    className="px-4 py-1 text-sm bg-green-500 rounded-md text-white hover:bg-green-600 transition-colors"
+                    className="px-3 md:px-4 py-2 text-xs md:text-sm bg-green-500 rounded-md text-white hover:bg-green-600 transition-colors whitespace-nowrap"
                     onClick={() => {
                         setData(prev => ({
                             ...prev,
@@ -125,30 +125,30 @@ export default function CarPriceDetailForm({ data, setData, errors, setErrors })
                 </button>
             </div>
 
-            <div className="p-4">
-                <table className="w-full table-fixed border-separate border-spacing-4">
+            <div className="p-3 md:p-4 overflow-x-auto">
+                <table className="border-separate border-spacing-4 md:border-spacing-4" style={{minWidth: 'max-content'}}>
                     <thead>
                     <tr>
-                        <th className="w-32"></th>
+                        <th className="min-w-16 md:min-w-32"></th>
                         {dayKeys.map((dayKey, index) => (
-                            <th key={dayKey} className="relative min-w-35">
+                            <th key={dayKey} className="relative min-w-20 md:min-w-36">
                                 <div className="group relative">
-                                    <div className="absolute -top-6 left-0 right-0 flex justify-between px-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                                    <div className="absolute -top-6 left-0 right-0 flex justify-between px-1 opacity-0 group-hover:opacity-100 transition-all duration-200 z-20">
                                         <button type="button" onClick={() => copyColumn(dayKey)} className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-[10px] hover:bg-blue-600 shadow-sm" title="Sütunu Kopyala">C</button>
                                         <button type="button" onClick={() => removeColumn(dayKey)} className="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 shadow-sm" title="Sütunu Sil">&times;</button>
                                     </div>
                                     <input
                                         defaultValue={dayKey}
                                         onBlur={(e) => handleDayKeyChange(dayKey, e.target.value, index)}
-                                        className={`outline-none bg-blue-100 rounded-md w-full text-center px-2 py-1.5 transition-all font-medium ${errors.month?.[index] ? 'ring-2 ring-red-500' : 'focus:ring-2 focus:ring-blue-400'}`}
+                                        className={`outline-none bg-blue-100 rounded-md w-full text-center px-1 md:px-2 py-1 md:py-1.5 transition-all font-medium text-xs md:text-sm ${errors.month?.[index] ? 'ring-2 ring-red-500' : 'focus:ring-2 focus:ring-blue-400'}`}
                                     />
                                 </div>
                                 {errors.month?.[index] && (
-                                    <p className="text-red-500 text-[10px] absolute -bottom-5 left-0 right-0 font-bold">{errors.month[index]}</p>
+                                    <p className="text-red-500 text-[9px] md:text-[10px] absolute -bottom-4 md:-bottom-5 left-0 right-0 font-bold whitespace-nowrap overflow-hidden text-ellipsis">{errors.month[index]}</p>
                                 )}
                             </th>
                         ))}
-                        <th className="w-10">
+                        <th className="min-w-8 md:min-w-10">
                             <button type="button" onClick={addColumn} className="w-8 h-8 bg-green-500 rounded-full text-white hover:bg-green-600 transition-transform active:scale-90 shadow-md">+</button>
                         </th>
                     </tr>
@@ -156,13 +156,12 @@ export default function CarPriceDetailForm({ data, setData, errors, setErrors })
                     <tbody>
                     {months.map((month, i) => (
                         <tr key={month}>
-                            <th className="bg-blue-200 rounded-md px-4 py-2 text-sm font-bold text-blue-900">{month}</th>
+                            <th className="bg-blue-200 rounded-md px-2 md:px-4 py-1 md:py-2 text-xs md:text-sm font-bold text-blue-900 min-w-16 md:min-w-32">{month}</th>
                             {dayKeys.map((dayKey) => {
                                 const rawVal = data.price[i + 1]?.[dayKey];
                                 const selectedCurr = currencies.find(c => c.id === data.currency);
-                                /*const initialFormatted = calculateTotal(rawVal, selectedCurr)?.toFixed(2) || '';*/
                                 return (
-                                    <td key={dayKey}>
+                                    <td key={dayKey} className="min-w-20 md:min-w-36">
                                         <PriceInput
                                             initialValue={rawVal}
                                             error={errors?.price?.[i + 1]?.[dayKey]}
@@ -181,7 +180,7 @@ export default function CarPriceDetailForm({ data, setData, errors, setErrors })
                                     </td>
                                 );
                             })}
-                            <td></td>
+                            <td className="min-w-8 md:min-w-10"></td>
                         </tr>
                     ))}
                     </tbody>

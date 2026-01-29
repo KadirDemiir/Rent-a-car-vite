@@ -87,7 +87,15 @@ const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen = false }, ref) 
 
     return (
         <form className="max-w-full grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={e => e.preventDefault()}>
-            <div className={`col-span-1`}>
+            <div className="col-span-1 md:col-span-2">
+                <SelectOptions
+                    options={currencyTypeOptions?.map(c => ({label: c.code, value: c.id}))}
+                    options_name={t("adminpanel.car.car_modify.edit_price_information.daily_price_currency")}
+                    onChange={e => setFormData(p => ({ ...p, currency: e }))}
+                    value={formData.currency ? [formData.currency] : currencyTypeOptions?.[0]?.id ? [currencyTypeOptions?.[0]?.id] : "" }
+                />
+            </div>
+            <div className={`col-span-1 md:col-span-2`}>
                 <FormInput name="deposit" label={t("adminpanel.add_car.deposit")} type="number" value={formData.deposit}
                            onChange={e => {
                                setError(p => ({
@@ -99,14 +107,6 @@ const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen = false }, ref) 
                            error={error.deposit}
                 />
             </div>
-            <div className="col-span-1 ">
-                <SelectOptions
-                    options={currencyTypeOptions?.map(c => ({label: c.code, value: c.id}))}
-                    options_name={t("adminpanel.car.car_modify.edit_price_information.daily_price_currency")}
-                    onChange={e => setFormData(p => ({ ...p, currency: e }))}
-                    value={formData.currency ? [formData.currency] : currencyTypeOptions?.[0]?.id ? [currencyTypeOptions?.[0]?.id] : "" }
-                />
-            </div>
 
             {error?.price && Object.values(error.price).some(m => Object.values(m).some(v => v)) && (
                 <p className="p-2 col-span-2 border-l-8 border-red-500 bg-red-100 text-red-600 font-semibold">
@@ -114,7 +114,7 @@ const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen = false }, ref) 
                 </p>
             )}
 
-            <div className="col-span-2">
+            <div className="col-span-1 md:col-span-2">
                 <CarPriceDetailForm data={formData} setData={setFormData} errors={error} setErrors={setError}/>
             </div>
         </form>

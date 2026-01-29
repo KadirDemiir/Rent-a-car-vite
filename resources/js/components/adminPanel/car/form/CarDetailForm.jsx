@@ -177,54 +177,76 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit }, ref) => {
                     <ul className="list-disc pl-5 space-y-1 text-sm">{Object.entries(error).map(([f, m]) => <li key={f}>{typeof m === 'string' ? m : JSON.stringify(m)}</li>)}</ul>
                 </div>
             )}
-            <div className="col-span-2">
+            <div className="col-span-1 md:col-span-2">
                 <LanguageProgress langOpt={supportedLangs} calculateProgress={progress} isLanguageFilled={(langValue) => formData.brand[langValue]?.trim() && formData.model[langValue]?.trim()} lang={currentLang} setLang={setCurrentLang} />
             </div>
 
-            <FormInput name={`brand.${currentLang}`} label={t("adminpanel.car.car_modify.edit_car_information.brand")} value={formData.brand[currentLang] || ""} onChange={handleChange} error={error.brand} />
-            <FormInput name={`model.${currentLang}`} label={t("adminpanel.car.car_modify.edit_car_information.model")} value={formData.model[currentLang] || ""} onChange={handleChange} error={error.model} />
+            <div className="col-span-1 md:col-span-2">
+                <FormInput name={`brand.${currentLang}`} label={t("adminpanel.car.car_modify.edit_car_information.brand")} value={formData.brand[currentLang] || ""} onChange={handleChange} error={error.brand} />
+            </div>
+            <div>
+                <FormInput name={`model.${currentLang}`} label={t("adminpanel.car.car_modify.edit_car_information.model")} value={formData.model[currentLang] || ""} onChange={handleChange} error={error.model} />
+            </div>
 
-            <FormInput name="license_plate" label={t("adminpanel.car.car_modify.edit_car_information.license_plate")} value={formData.license_plate} onChange={handleChange} error={error.license_plate} />
-            <FormInput name="year" label={t("adminpanel.car.car_modify.edit_car_information.year")} type="number" value={formData.year} onChange={handleChange} error={error.year} />
-            <FormInput name="seat_count" label={t("adminpanel.car.car_modify.edit_car_information.seat_count")} type="number" value={formData.seat_count} onChange={handleChange} error={error.seat_count} />
-            <FormInput name="trunk_capacity" label={t("adminpanel.car.car_modify.edit_car_information.trunk_capacity")} type="number" value={formData.trunk_capacity} onChange={handleChange} error={error.trunk_capacity} />
+            <div>
+                <FormInput name="license_plate" label={t("adminpanel.car.car_modify.edit_car_information.license_plate")} value={formData.license_plate} onChange={handleChange} error={error.license_plate} />
+            </div>
+            <div>
+                <FormInput name="year" label={t("adminpanel.car.car_modify.edit_car_information.year")} type="number" value={formData.year} onChange={handleChange} error={error.year} />
+            </div>
+            <div>
+                <FormInput name="seat_count" label={t("adminpanel.car.car_modify.edit_car_information.seat_count")} type="number" value={formData.seat_count} onChange={handleChange} error={error.seat_count} />
+            </div>
+            <div>
+                <FormInput name="trunk_capacity" label={t("adminpanel.car.car_modify.edit_car_information.trunk_capacity")} type="number" value={formData.trunk_capacity} onChange={handleChange} error={error.trunk_capacity} />
+            </div>
 
             {/* SelectOptions Düzeltildi: Value artık array [] içinde değil ve options label/value maplendi */}
-            <SelectOptions
-                options={segments.map(s => ({ label: t(s.translation_key.key), value: s.id }))}
-                options_name={t("adminpanel.car.car_modify.edit_car_information.segment")}
-                onChange={e => handleSelectChange("segment", e)}
-                value={[formData.segment]}
-            />
-            <SelectOptions
-                options={bodyTypes.map(b => ({ label: t(b.translation_key.key), value: b.id }))}
-                options_name={t("adminpanel.car.car_modify.edit_car_information.body_type")}
-                onChange={e => handleSelectChange("bodyType", e)}
-                value={[formData.bodyType]}
-            />
-            <SelectOptions
-                options={fuels.map(f => ({ label: t(f.translation_key.key), value: f.id }))}
-                options_name={t("adminpanel.car.car_modify.edit_car_information.fuel_type")}
-                onChange={e => handleSelectChange("fuelType", e)}
-                value={[formData.fuelType]}
-            />
-            <SelectOptions
-                options={transmissions.map(tn => ({ label: t(tn.translation_key.key), value: tn.id }))}
-                options_name={t("adminpanel.car.car_modify.edit_car_information.transmission_type")}
-                onChange={e => handleSelectChange("transmissionType", e)}
-                value={[formData.transmissionType]}
-            />
+            <div>
+                <SelectOptions
+                    options={segments.map(s => ({ label: t(s.translation_key.key), value: s.id }))}
+                    options_name={t("adminpanel.car.car_modify.edit_car_information.segment")}
+                    onChange={e => handleSelectChange("segment", e)}
+                    value={[formData.segment]}
+                />
+            </div>
+            <div>
+                <SelectOptions
+                    options={bodyTypes.map(b => ({ label: t(b.translation_key.key), value: b.id }))}
+                    options_name={t("adminpanel.car.car_modify.edit_car_information.body_type")}
+                    onChange={e => handleSelectChange("bodyType", e)}
+                    value={[formData.bodyType]}
+                />
+            </div>
+            <div>
+                <SelectOptions
+                    options={fuels.map(f => ({ label: t(f.translation_key.key), value: f.id }))}
+                    options_name={t("adminpanel.car.car_modify.edit_car_information.fuel_type")}
+                    onChange={e => handleSelectChange("fuelType", e)}
+                    value={[formData.fuelType]}
+                />
+            </div>
+            <div>
+                <SelectOptions
+                    options={transmissions.map(tn => ({ label: t(tn.translation_key.key), value: tn.id }))}
+                    options_name={t("adminpanel.car.car_modify.edit_car_information.transmission_type")}
+                    onChange={e => handleSelectChange("transmissionType", e)}
+                    value={[formData.transmissionType]}
+                />
+            </div>
 
-            <SelectOptions
-                options={[
-                    { label: "Available", value: "available" },
-                    { label: "Rented", value: "rented" },
-                    { label: "Unavailable", value: "unavailable" }
-                ]}
-                options_name={"Status"}
-                onChange={e => handleSelectChange("status", e)}
-                value={[formData.status]}
-            />
+            <div>
+                <SelectOptions
+                    options={[
+                        { label: "Available", value: "available" },
+                        { label: "Rented", value: "rented" },
+                        { label: "Unavailable", value: "unavailable" }
+                    ]}
+                    options_name={"Status"}
+                    onChange={e => handleSelectChange("status", e)}
+                    value={[formData.status]}
+                />
+            </div>
         </form>
     );
 });
