@@ -8,6 +8,11 @@ export default function LogInForm({ onMessage }) {
       const [formData, setFormData] = useState({});
       const [errors, setErrors] = useState({});
       const [showErrors, setShowErrors] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotData, setForgotData] = useState({ email: '' });
+  const [forgotErrors, setForgotErrors] = useState({});
+  const [showForgotErrors, setShowForgotErrors] = useState(false);
+  const [sendingReset, setSendingReset] = useState(false);
 
       const handleInputChange = (name, value, error) => {
           setFormData({
@@ -59,6 +64,45 @@ export default function LogInForm({ onMessage }) {
 
   };
 
+    const handleForgotChange = (name, value, error) => {
+      setForgotData({
+        ...forgotData,
+        [name]: value,
+      });
+
+      setForgotErrors({
+        ...forgotErrors,
+        [name]: error
+      });
+    };
+
+    const handleForgotSubmit = () => {
+      const emailError = validateEmail(forgotData.email || '');
+      const validationErrors = { email: emailError };
+
+      setForgotErrors(validationErrors);
+      setShowForgotErrors(true);
+
+      const hasErrors = Object.values(validationErrors).some(error => typeof error === 'string' && error !== '');
+      if (hasErrors) return;
+
+      setSendingReset(true);
+      axios.post('/forgot-password', { email: forgotData.email }, { withCredentials: true })
+        .then(response => {
+          if (response.data?.success) {
+            onMessage({ type: 'success', text: response.data.message });
+            setForgotOpen(false);
+          } else {
+            onMessage({ type: 'error', text: response.data?.message || 'An error occurred' });
+          }
+        })
+        .catch(error => {
+          console.error('There was an error!', error);
+          onMessage({ type: 'error', text: error.response?.data?.message || 'An error occurred' });
+        })
+        .finally(() => setSendingReset(false));
+    };
+
         const validateEmail = (value) =>
             !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? t("website.auth.login.invalid_email") : '';
 
@@ -102,6 +146,41 @@ export default function LogInForm({ onMessage }) {
                     setErrors={setErrors}
                     showErrors={showErrors}
                   />
+
+                  <div className="flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={() => setForgotOpen(p => !p)}
+                      className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      {t("website.auth.login.forgot_password", "Forgot password?")}
+                    </button>
+                  </div>
+
+                  {forgotOpen && (
+                    <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 space-y-3">
+                      <Input
+                        type="email"
+                        elementName="email"
+                        labelName={t("website.auth.login.email_label")}
+                        validate={validateEmail}
+                        onChange={(val, err) => handleForgotChange('email', val, err)}
+                        formData={forgotData}
+                        errors={forgotErrors}
+                        setFormData={setForgotData}
+                        setErrors={setForgotErrors}
+                        showErrors={showForgotErrors}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleForgotSubmit}
+                        disabled={sendingReset}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {t("website.auth.login.send_reset_link", "Send reset link")}
+                      </button>
+                    </div>
+                  )}
 
                   <button
                     type="button"

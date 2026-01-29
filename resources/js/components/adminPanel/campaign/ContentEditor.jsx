@@ -19,12 +19,12 @@ const modules = {
     ],
 };
 
-export default function CampaignTextEditor({ content, setContent, currLan }) {
+export default function CampaignTextEditor({ content, setContent, currLan, label, showCount = true }) {
     const {t} = useTranslation()
     return (
         <div>
             <label className="block text-lg font-semibold mb-2 text-gray-700">
-                {t("adminpanel.pricing.add_campaign.campaign_content")}
+                {label ?? t("adminpanel.pricing.add_campaign.campaign_content")}
             </label>
             <div
                 className="resize overflow-auto border rounded-md"
@@ -44,7 +44,9 @@ export default function CampaignTextEditor({ content, setContent, currLan }) {
                     style={{ height: "100%", borderRadius: "0.5rem" }}
                 />
             </div>
-            <span>{content.replace(/<[^>]*>/g, "").length} char</span>
+            {showCount && (
+                <span>{content.replace(/<[^>]*>/g, "").length} char</span>
+            )}
         </div>
     );
 }

@@ -1,5 +1,5 @@
-import { Link, useForm } from '@inertiajs/react';
-import { usePage } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
+import { usePage, router } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import LanguageDropdown from './LanguageDropdown.jsx';
 import CurrencyDropDown from "../CurrencyDropDown.jsx";
@@ -10,7 +10,6 @@ import { useState } from 'react';
 export default function UpSide({ isMobileMenuOpen }) {
     const { auth } = usePage().props;
     const [user, setUser] = useState(auth?.user);
-    const { post } = useForm();
     const { i18n, t } = useTranslation();
 
     const upperFirstLetter = (str) => {
@@ -34,12 +33,16 @@ export default function UpSide({ isMobileMenuOpen }) {
         });
     };
 
+    const handleClick = () => {
+        router.visit(`/${i18n.language}`);
+    }
+
     return (
         <div className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:flex w-full items-center justify-center bg-white border-b border-gray-200 py-2`}>
             <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-3">
-                <Link href={`/`} className="hidden md:flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors">
+                <button onClick={handleClick} className="hidden md:flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors">
                     <CarFront size={28}/>
-                </Link>
+                </button>
                 
                 <nav className="flex items-center">
                     <ul className="flex flex-col md:flex-row items-center gap-2 md:gap-3 py-3 md:py-0">

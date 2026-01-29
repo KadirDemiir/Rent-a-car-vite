@@ -54,6 +54,12 @@ export default function LeftSide({ isOpen, onClose }) {
             ]
         },
         {
+            title: t("adminpanel.navigator.email_templates"),
+            subSec: [
+                {name: t("adminpanel.navigator.email_templates"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.email-templates")}`},
+            ]
+        },
+        {
             title: t("adminpanel.navigator.language_operations"),
             subSec: [
                 {name: t("adminpanel.navigator.language_operations"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.languages")}`},

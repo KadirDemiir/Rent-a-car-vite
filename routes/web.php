@@ -6,6 +6,7 @@ use App\Http\Controllers\BodyTypeController;
 use App\Http\Controllers\CampaignsController;
 use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\DropPriceController;
+use App\Http\Controllers\EmailTemplateController;
 use App\Http\Controllers\ExtraServicesController;
 use App\Http\Controllers\FuelController;
 use App\Http\Controllers\SegmentController;
@@ -212,6 +213,14 @@ Route::get('/adminpanel/get-locations', function () {
 
 Route::get('/adminpanel/get-info/locations/{id}', [LocationsController::class, 'getIndexLocationInfo']);
 Route::post('/auth', [AuthController::class, 'auth'])->name('auth.login');
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('password.email');
+Route::get('/reset-password/{token}', function ($token) {
+    return Inertia::render('auth/ResetPassword', [
+        'token' => $token,
+        'email' => request('email')
+    ]);
+})->name('password.reset');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 
 Route::group([
     'prefix' => LaravelLocalization::setLocale(),
@@ -223,7 +232,7 @@ Route::group([
     ]
 ], function () {
 
-    Route::get('/', function () {
+    Route::get('', function () {
         return Inertia::render('Home', ['locations' => Locations::all()]);
     })->name('home');
     Route::get(dbTransRoute('cars'), [CarController::class, 'showAllCars'])->name('showCars');
@@ -396,7 +405,14 @@ Route::group([
         return Inertia::render('adminPanel/carProperties/transmissions/AddTransmission', ['lngs' => $lngs]);
     })->name('adminAddTransmissionPage');
     Route::post('/adminpanel/transmissions/add', [TransmissionController::class, 'addTransmission'])->name('adminAddTransmission');
+
+    Route::get(dbTransRoute('adminpanel') . '/'. dbTransRoute('email-templates'), [EmailTemplateController::class, 'index'])->name('adminEmailTemplates');
+    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('email-templates') . '/{id}', [EmailTemplateController::class, 'show'])->name('adminShowEmailTemplate');
+    Route::post('/adminpanel/email-templates', [EmailTemplateController::class, 'store'])->name('adminStoreEmailTemplate');
+    Route::put('/adminpanel/email-templates/{id}', [EmailTemplateController::class, 'update'])->name('adminUpdateEmailTemplate');
+    Route::delete('/adminpanel/email-templates/{id}', [EmailTemplateController::class, 'destroy'])->name('adminDeleteEmailTemplate');
 });
+
 
 Route::get('{any?}', function () {
     return Inertia::render('NotFound');
