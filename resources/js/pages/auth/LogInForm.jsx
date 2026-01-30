@@ -170,7 +170,8 @@ export default function LogInForm({ onMessage }) {
                         setFormData={setForgotData}
                         setErrors={setForgotErrors}
                         showErrors={showForgotErrors}
-                      />
+                      /> 
+                      <br /><br />
                       <button
                         type="button"
                         onClick={handleForgotSubmit}

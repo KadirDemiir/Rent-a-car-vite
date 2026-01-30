@@ -25,7 +25,7 @@ export default function CurrencyDropDown() {
                 <ul className="absolute top-full mt-1 bg-white border rounded shadow-md w-full z-40 text-center max-h-60 overflow-auto">
                     {currencies.map(curr => (
                         <li
-                            key={curr.id} className={`flex items-center justify-center gap-2 px-4 py-2 cursor-pointer ${current === curr ? 'bg-blue-800 text-white' : ''}`} onClick={() => { changeCurrency(curr); setOpen(false); }}>
+                            key={curr.id} className={`flex items-center justify-center gap-2 px-4 py-2 cursor-pointer ${current.code === curr.code ? 'bg-blue-800 text-white' : ''}`} onClick={() => { changeCurrency(curr); setOpen(false); }}>
                             <span className="font-semibold">{curr.symbol}</span>
                             <span className="font-semibold">{curr.name}</span>
                             <span>{curr.code.toUpperCase()}</span>

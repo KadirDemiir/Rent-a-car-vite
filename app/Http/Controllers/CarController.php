@@ -7,6 +7,7 @@ use App\Models\Currency;
 use App\Models\Discount;
 use App\Models\InternalService;
 use App\Models\Language;
+use App\Models\Locations;
 use App\Models\Photo;
 use App\Models\Price;
 use App\Models\Translation;
@@ -26,7 +27,8 @@ class  CarController extends Controller
         App::setLocale(session('lang'));
         $cars = Car::with(['photos', 'brandKey', 'modelKey'])->orderBy('sort_order', 'asc')->get();
         return Inertia::render('Cars', [
-            'cars' => $cars
+            'cars' => $cars,
+            'locations' => Locations::where('is_active', true)->get(),
         ]);
     }
 

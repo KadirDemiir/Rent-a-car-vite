@@ -2,7 +2,6 @@ import Navbar from '../../components/websites/Navbar.jsx'
 import SignUpForm from './SignUpForm.jsx'
 import LogInForm from './LogInForm'
 import { useState, useEffect } from 'react';
-import { usePage } from '@inertiajs/react';
 import {useTranslation} from "react-i18next";
 
 

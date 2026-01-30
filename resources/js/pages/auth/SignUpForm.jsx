@@ -94,7 +94,7 @@ export default function SignUpForm({ onMessage, setFormType }) {
     return(
         <div className="bg-white rounded-b-2xl shadow-lg border border-gray-100 border-t-0">
             <div className="px-8 py-8 space-y-5 flex flex-col gap-2">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
                     type={'text'}
                     elementName={'name'}

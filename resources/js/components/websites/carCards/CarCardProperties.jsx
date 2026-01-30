@@ -6,7 +6,7 @@ export default function CarCardProperties({ fuel_id, transmission_id, seat_count
     const { t } = useTranslation();
 
     return (
-        <div className="flex-1 flex flex-col gap-4">
+        <div className="flex-1 flex flex-wrap gap-4">
             <div className="w-full flex justify-center font-bold">
                 {compName}
             </div>

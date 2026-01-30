@@ -17,15 +17,15 @@ export default function LocationCard({location}){
                 <div className="font-extrabold text-xl font-sans">{location.name}</div>
                 <div className="font-normal text-gray-700">{location.city}</div>
                 <div className="flex gap-4 h-8 items-center">
-                    <Plane />
+                    <Plane className={`text-blue-600`} />
                     <div className="font-medium text-gray-700">{location.address}</div>
                 </div>
                 <div className="flex gap-4 h-8 items-center">
-                    <Phone/>
+                    <Phone className={`text-blue-600`}/>
                     <div className="font-medium text-gray-700">{location.phone}</div>
                 </div>
                 <div className="flex gap-4 h-8 items-center">
-                    <Mail/>
+                    <Mail className={`text-blue-600`}/>
                     <div className="font-medium text-gray-700">{location.email}</div>
                 </div>
                 <a 
