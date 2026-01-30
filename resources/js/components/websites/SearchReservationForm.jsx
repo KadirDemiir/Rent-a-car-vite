@@ -93,7 +93,7 @@ export default function SearchReservation({locations, defPickupLocation, defRetu
   const currentLocale = supportedLocales.includes(i18n.language) ? i18n.language : 'en';
 
   return (
-    <div className={`${!home ? 'w-full' : 'max-w-5xl'} mx-auto bg-white/85 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-white/30 relative z-10`}>
+    <div className={`${!home ? 'w-full' : 'max-w-5xl'} mx-auto bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/30 relative z-10`}>
       {home &&
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-800 text-center mb-2">

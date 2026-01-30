@@ -6,7 +6,7 @@ export default function ReservationCarInfo({
     requirements = [],
 }) {
     return (
-        <div className={`col-span-1 md:col-span-6 lg:col-span-5 flex flex-col items-center justify-between gap-4 p-2 ${className}`}>
+        <div className={`col-span-1 md:col-span-6 lg:col-span-5 flex flex-col items-center justify-between gap-4 p-1 ${className}`}>
             <div className="flex items-center gap-4 flex-wrap justify-center text-center">
                 {segmentLabel && (
                     <span className="text-blue-700 font-bold bg-blue-100 px-3 py-1 rounded-full text-sm">

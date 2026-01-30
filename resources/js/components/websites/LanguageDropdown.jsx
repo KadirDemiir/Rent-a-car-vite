@@ -77,24 +77,24 @@ export default function LanguageDropdown() {
 
 
     return (
-        <div ref={ref} className="w-24 relative flex items-center justify-center">
-            <button type={`button`} onClick={() => setOpen(!open)} className="px-2 py-1 border rounded-xl flex items-center justify-center gap-2">
-                <img src={languages[current]?.flag} alt="" className="h-6 w-6 rounded-2xl" />
-                <span>{current.toUpperCase()}</span>
-                <div className="h-6 w-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`h-6 w-6 ${open ? "rotate-180" : ""} transition-transform `}>
+        <div ref={ref} className="w-28 relative flex items-center justify-center">
+            <button type={`button`} onClick={() => setOpen(!open)} className="w-full px-2 py-1.5 border border-blue-400/60 bg-blue-500 text-white rounded-xl flex items-center justify-center gap-2">
+                <img src={languages[current]?.flag} alt="" className="h-5 w-5 rounded-full" />
+                <span className="text-sm font-semibold">{current.toUpperCase()}</span>
+                <div className="h-5 w-5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`h-5 w-5 ${open ? "rotate-180" : ""} transition-transform`}>
                         <path d="M6 9l6 6 6-6" />
                     </svg>
                 </div>
             </button>
             {open && (
-                <ul className="absolute top-full mt-2 bg-white border rounded shadow-md w-24 z-40 text-center">
+                <ul className="absolute top-full mt-2 bg-white border border-blue-200 rounded-lg shadow-lg w-full z-40 text-center overflow-hidden">
                     {langs.map(lng => (
                         <li key={lng}>
                             <button
                                 onClick={() => {handleChangeLang(lng); setOpen(false)}}
-                                className={`flex items-center justify-between w-full px-4 py-2 ${current === lng ? 'bg-blue-800 text-white' : ''}`}>
-                                <img src={languages[lng]?.flag} alt="" className="h-6 w-6 rounded-2xl" />
+                                className={`flex items-center justify-between w-full px-3 py-2 text-sm ${current === lng ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-blue-50'}`}>
+                                <img src={languages[lng]?.flag} alt="" className="h-5 w-5 rounded-full" />
                                 {lng.toUpperCase()}
                             </button>
                         </li>
