@@ -19,7 +19,7 @@ export default function CarReservations({ allReservations, updateData, current =
     const { t } = useTranslation();
     const [selectedReservation, setSelectedReservation] = useState(null);
     const [startIndex, setStartIndex] = useState(0);
-    const perPage = 10;
+    const perPage = 50;
 
     const TDclass = "border border-gray-500 px-4 py-2";
     const headers = [

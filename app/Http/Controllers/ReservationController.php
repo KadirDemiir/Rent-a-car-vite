@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use App\Models\Translation;
+use Illuminate\Support\Facades\Log;
 
 class ReservationController extends Controller
 {
@@ -268,6 +270,7 @@ public function showExtras(Request $request)
                 'user_info.arrival_flight_no' => 'nullable|string',
                 'user_info.return_flight_no' => 'nullable|string',
                 'extras' => 'nullable|json',
+                'lang' => 'required|string',
             ]);
 
             DB::beginTransaction();
@@ -302,11 +305,14 @@ public function showExtras(Request $request)
             $total_price = $rental_cost + $drop_cost + $extras_total_price;
             $total_price = max(0, $total_price);
 
+            $exchange_rate = \App\Models\Currency::findOrFail($validated['currency_id'])->exchange_rate;
+
             $reservation = Reservation::create([
                 'car_id' => $validated['car_id'],
                 'pickup_datetime' => Carbon::parse($validated['start_date_time'], 'Europe/Istanbul')->setTimezone('UTC'),
                 'return_datetime' => Carbon::parse($validated['finish_date_time'], 'Europe/Istanbul')->setTimezone('UTC'),
                 'currency_id' => $validated['currency_id'],
+                'exchange_rate' => $exchange_rate,
                 'pickup_location_id' => $validated['pick_up_location_id'],
                 'return_location_id' => $validated['return_location_id'],
                 'rental_days' => $validated['total_days'],
@@ -339,19 +345,38 @@ public function showExtras(Request $request)
             }
 
             DB::commit();
+            $reservation->load(['car.brandKey', 'car.modelKey', 'pickupLocation', 'returnLocation', 'currency']);
+            $lang_id = \App\Models\Language::where('code', $validated['lang'])->first()->id;
+
+            $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_created', [
+                'user_name' => $reservation->name,
+                'reference_code' => $reservation->reference_code,
+                'car_name' => Translation::where('language_id', $lang_id)->where('translation_key_id', $reservation->car->brandKey->id)->first()->value . ' ' . Translation::where('language_id', $lang_id)->where('translation_key_id', $reservation->car->modelKey->id)->first()->value,
+                'tracking_url'   => $reservation->trackingUrl, 
+                'pickup_location' => $reservation->pickupLocation->name,
+                'return_location' => $reservation->returnLocation->name,
+                'pickup_date' => $reservation->pickup_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
+                'return_date' => $reservation->return_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
+                'total_price' => number_format($reservation->total_price * $reservation->exchange_rate, 2, ',', '.') . ' ' . $reservation->currency->symbol,
+                'lang' => $validated['lang']
+            ])); 
 
             return response()->json([
                 'success' => true,
-                'reservation' => $reservation
+                'reference_code' => $reservation->reference_code
             ], 201);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
         } catch (\Exception $exception){
             DB::rollBack();
+            \Log::error('Reservation Error: ' . $exception->getMessage(), [
+                'user' => $request->input('user_info.email'),
+                'trace' => $exception->getTraceAsString()
+            ]);
             return response()->json([
                 'error' => 'Reservation creation failed',
-                'message' => $exception->getMessage()
+                'message' => 'An unexpected error occurred.'
             ], 500);
         }
     }
@@ -393,25 +418,70 @@ public function showExtras(Request $request)
         return Inertia::render('adminPanel/reservation/Reservations');
     }
 
-    public function rejectReservation($id)
+    public function rejectReservation(Request $request, $id)
     {
-        $res = Reservation::findOrFail($id);
-        if($res->status !== 'pending')
+        $reservation = Reservation::findOrFail($id);
+        $langCode = $request->input('lang');
+        if($reservation->status !== 'pending')
             return response()->json(['error' => 'Reservation not pending'], 422);
-        $res->payment_status = 'failed';
-        $res->status = 'cancelled';
-        $res->save();
+        $reservation->payment_status = 'failed';
+        $reservation->status = 'cancelled';
+        $reservation->save();
+
+        $lang = \App\Models\Language::where('code', $langCode)->first();
+        $lang_id = $lang ? $lang->id : 1;
+
+        $reservation->load(['car.brandKey', 'car.modelKey', 'pickupLocation', 'returnLocation', 'currency']);
+        $brandName = Translation::where('language_id', $lang_id)
+            ->where('translation_key_id', $reservation->car->brandKey->id)
+            ->value('value');
+            
+        $modelName = Translation::where('language_id', $lang_id)
+            ->where('translation_key_id', $reservation->car->modelKey->id)
+            ->value('value');
+
+        $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_decline', [
+            'user_name' => $reservation->name,
+            'reference_code' => $reservation->reference_code,
+            'car_name' => $brandName . ' ' . $modelName,
+            'pickup_location' => $reservation->pickupLocation->name,
+            'return_location' => $reservation->returnLocation->name,
+            'pickup_date' => $reservation->pickup_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
+            'return_date' => $reservation->return_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
+            'total_price' => number_format($reservation->total_price * $reservation->exchange_rate, 2, ',', '.') . ' ' . $reservation->currency->symbol,
+            'lang' => $langCode
+        ]));
         return response()->json(['success' => 'Reservation cancelled'], 200);
     }
 
     public function approveReservation($id)
     {
-        $res = Reservation::findOrFail($id);
-        if($res->status !== 'pending')
+        $validated = request()->validate([
+            'lang' => 'required|string',
+        ]);
+        $reservation = Reservation::findOrFail($id);
+        if($reservation->status !== 'pending')
             return response()->json(['error' => 'Reservation not pending'], 422);
-        $res->status = 'confirmed';
-        $res->payment_status = 'paid';
-        $res->save();
+        $reservation->status = 'confirmed';
+        $reservation->payment_status = 'paid';
+        $reservation->save();
+
+        $reservation->load(['car.brandKey', 'car.modelKey', 'pickupLocation', 'returnLocation', 'currency']);
+        $lang_id = \App\Models\Language::where('code', $validated['lang'])->first()->id;
+
+        $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_confirmation', [
+            'user_name' => $reservation->name,
+            'reference_code' => $reservation->reference_code,
+            'car_name' => Translation::where('language_id', $lang_id)->where('translation_key_id', $reservation->car->brandKey->id)->first()->value . ' ' . Translation::where('language_id', $lang_id)->where('translation_key_id', $reservation->car->modelKey->id)->first()->value,
+            'tracking_url'   => $reservation->trackingUrl, 
+            'pickup_location' => $reservation->pickupLocation->name,
+            'return_location' => $reservation->returnLocation->name,
+            'pickup_date' => $reservation->pickup_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
+            'return_date' => $reservation->return_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
+            'total_price' => number_format($reservation->total_price * $reservation->exchange_rate, 2, ',', '.') . ' ' . $reservation->currency->symbol,
+            'lang' => $validated['lang']
+        ]));
+
         return response()->json(['success' => 'Reservation confirmed'], 200);
     }
 
@@ -428,23 +498,56 @@ public function showExtras(Request $request)
         ]);
     }
 
-    public function cancelReservation($id){
+    public function cancelReservation(Request $request)
+    {
         $user = auth()->user();
-        $reservation = Reservation::where('email', $user->email)->where('id', $id)->firstOrFail();
+        $langCode = $request->input('lang');
+
+        $reservation = Reservation::where('email', $user->email)
+            ->where('reference_code', $request->input('reference_code'))
+            ->firstOrFail();
 
         if ($reservation->status !== 'pending') {
-            return response()->json(['error' => 'Only pending reservations can be cancelled.'], 422);
+            return response()->json(['error' => 'Sadece beklemedeki rezervasyonlar iptal edilebilir.'], 422);
         }
 
         $reservation->status = 'cancelled';
         $reservation->save();
 
-            $reservations = Reservation::where('email', $user->email)
-                ->with(['car.photos', 'pickupLocation', 'returnLocation', 'car.brandKey', 'car.modelKey', 'currency'])
-                ->orderBy('created_at', 'desc')
-                ->get();
+        $reservation->load(['car.brandKey', 'car.modelKey', 'pickupLocation', 'returnLocation', 'currency']);
+        
+        $lang = \App\Models\Language::where('code', $langCode)->first();
+        $lang_id = $lang ? $lang->id : 1;
 
-        return response()->json(['success' => 'Reservation cancelled successfully.', 'reservations' => $reservations], 200);
+        $brandName = Translation::where('language_id', $lang_id)
+            ->where('translation_key_id', $reservation->car->brandKey->id)
+            ->value('value');
+            
+        $modelName = Translation::where('language_id', $lang_id)
+            ->where('translation_key_id', $reservation->car->modelKey->id)
+            ->value('value');
+
+        $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_cancelled', [
+            'user_name' => $reservation->name,
+            'reference_code' => $reservation->reference_code,
+            'car_name' => $brandName . ' ' . $modelName,
+            'pickup_location' => $reservation->pickupLocation->name,
+            'return_location' => $reservation->returnLocation->name,
+            'pickup_date' => $reservation->pickup_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
+            'return_date' => $reservation->return_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
+            'total_price' => number_format($reservation->total_price * $reservation->exchange_rate, 2, ',', '.') . ' ' . $reservation->currency->symbol,
+            'lang' => $langCode
+        ]));
+
+        $reservations = Reservation::where('email', $user->email)
+            ->with(['car.photos', 'pickupLocation', 'returnLocation', 'car.brandKey', 'car.modelKey', 'currency'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => 'Rezervasyon başarıyla iptal edildi.', 
+            'reservations' => $reservations
+        ], 200);
     }
 
     public function checkReservationPage(Request $request){
@@ -472,9 +575,8 @@ public function showExtras(Request $request)
                 ->first();
 
             if ($reservation) {
-                return Inertia::render('GuestReservationDetails', [
-                    'reservation' => $reservation
-                ]);
+                //\Log::info('Redirecting to reservation tracking URL: ' . $reservation->tracking_url);
+                return \Inertia\Inertia::location($reservation->tracking_url);
             }
 
             return Inertia::render('CheckReservation')->withErrors([
@@ -483,6 +585,33 @@ public function showExtras(Request $request)
         }
 
         return Inertia::render('CheckReservation');
+    }
+
+    public function guestTrackReservation(Request $request, $reference_code)
+    {
+        $email = $request->query('email');
+
+        $reservation = Reservation::where('reference_code', $reference_code)
+            ->where('email', $email)
+            ->with([
+                'car.brandKey',
+                'car.modelKey',
+                'pickupLocation',
+                'returnLocation',
+                'currency',
+                'extras.extraService'
+            ])
+            ->first();
+
+        if (!$reservation) {
+            return inertia('CheckReservation', [
+                'errors' => ['email' => 'Rezervasyon bulunamadı veya geçersiz erişim denemesi.']
+            ]);
+        }
+
+        return inertia('GuestReservationDetails', [
+            'reservation' => $reservation
+        ]);
     }
 
     public function checkReservation(Request $request){
@@ -504,34 +633,56 @@ public function showExtras(Request $request)
         return to_route('checkReservationPage', $validated);
     }
 
-    public function guestCancelReservation(Request $request, $id){
-        $request->validate([
-            'email' => 'required|email'
+  public function guestCancelReservation(Request $request, $reference_code)
+    {
+        $validated = $request->validate([
+            'email' => 'required|email',
+            'lang' => 'nullable|string|max:5' 
         ]);
 
-        $reservation = Reservation::where('id', $id)
-            ->where('email', $request->email)
+        $reservation = Reservation::where('reference_code', $reference_code)
+            ->where('email', $validated['email'])
             ->firstOrFail();
 
         if ($reservation->status !== 'pending') {
-            if ($request->wantsJson()) {
-                return response()->json(['message' => 'Only pending reservations can be cancelled.', 'status' => 'error'], 422);
-            }
-            return back()->with('error', 'Only pending reservations can be cancelled.');
+            $msg = 'Sadece beklemedeki rezervasyonlar iptal edilebilir.';
+            return $request->wantsJson() 
+                ? response()->json(['message' => $msg, 'status' => 'error'], 422) 
+                : back()->with('error', $msg);
         }
 
         $reservation->status = 'cancelled';
         $reservation->save();
+        $reservation->load(['car.brandKey', 'car.modelKey', 'pickupLocation', 'returnLocation', 'currency']);
+
+        $langCode = $validated['lang'] ?? $reservation->lang ?? 'tr';
+        $lang = \App\Models\Language::where('code', $langCode)->first();
+        $lang_id = $lang ? $lang->id : 1;
+
+        $brandName = Translation::where('language_id', $lang_id)->where('translation_key_id', $reservation->car->brandKey->id)->value('value');
+        $modelName = Translation::where('language_id', $lang_id)->where('translation_key_id', $reservation->car->modelKey->id)->value('value');
+
+        $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_cancelled', [
+            'user_name' => $reservation->name,
+            'reference_code' => $reservation->reference_code,
+            'car_name' => $brandName . ' ' . $modelName,
+            'pickup_location' => $reservation->pickupLocation->name,
+            'return_location' => $reservation->returnLocation->name,
+            'pickup_date' => $reservation->pickup_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
+            'return_date' => $reservation->return_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
+            'total_price' => number_format($reservation->total_price * $reservation->exchange_rate, 2, ',', '.') . ' ' . $reservation->currency->symbol,
+            'lang' => $langCode
+        ]));
 
         if ($request->wantsJson()) {
             return response()->json([
-                'message' => 'Reservation cancelled successfully.',
+                'message' => 'Rezervasyon başarıyla iptal edildi.',
                 'status' => 'success',
                 'reservation_status' => 'cancelled'
             ]);
         }
 
-        return back()->with('success', 'Reservation cancelled successfully.');
+        return back()->with('success', 'Rezervasyon başarıyla iptal edildi.');
     }
 
     public function startRental($id)
@@ -570,4 +721,29 @@ public function showExtras(Request $request)
 
         return response()->json(['success' => 'Rental completed successfully.', 'data' => $reservation]);
     }
+
+    public function track(Request $request, $reference_code)
+{  
+
+    \Log::info('Tracking reservation with reference code: ',  [$reference_code, $request->query('email')]);
+    
+    $reservation = Reservation::where('reference_code', $reference_code)
+        ->where('email', $request->query('email'))
+        ->with(['car.photos', 'pickupLocation', 'returnLocation', 'car.brandKey', 'car.modelKey', 'currency'])
+        ->first();
+
+    \Log::info('Reservation found: ' . ($reservation ? 'Yes' : 'No'));
+
+    if (!$reservation) {
+        return inertia('CheckReservation', [
+            'errors' => ['email' => 'Rezervasyon bulunamadı veya e-posta adresi eşleşmiyor.'],
+            //'currentLang' => $lang
+        ]);
+    }
+    
+    return inertia('GuestReservationDetails', [
+        'reservation' => $reservation,
+        //'currentLang' => $lang
+    ]);
+}
 }

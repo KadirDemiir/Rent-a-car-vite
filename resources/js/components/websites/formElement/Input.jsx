@@ -32,7 +32,7 @@ const Input = ({type, elementName, labelName, validate, onChange, maxV, prefix, 
         }
 
         let errorMessage = '';
-        if (validate) {
+        if (errors[elementName] && validate) {
             errorMessage = validate(newValue);
         }
 

@@ -1,12 +1,14 @@
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 export default function ReservationAction({updateData, closeModal, res }) {
+    const { i18n } = useTranslation();
     const handleApprove = async () => {
         const confirm = window.confirm(`${res.name} ${res.surname} adlı kişinin rezervasyonunu onaylamak istediğinize emin misiniz?`);
         if (confirm) {
             try {
-                const response = await axios.patch(`/reservation/approve/${res.id}`, {
-                    headers: { 'Accept': 'application/json' }
+                const response = await axios.post(`/reservation/approve/${res.id}`, {
+                    lang: i18n.language    
                 });
                 updateData();
                 alert(`Rezervasyon onaylandı: ${res.name} ${res.surname}`);
@@ -27,9 +29,7 @@ export default function ReservationAction({updateData, closeModal, res }) {
 
     const handleReject = async () => {
         try {
-            const response = await axios.patch(`/reservation/reject/${res.id}`, {
-                headers: { 'Accept': 'application/json' }
-            });
+            const response = await axios.post(`/reservation/reject/${res.id}`, {lang: i18n.language});
             updateData();
             console.log(response.data.success);
             closeModal();

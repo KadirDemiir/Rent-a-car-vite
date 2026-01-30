@@ -1,4 +1,3 @@
-import React from 'react';
 import { useForm, Head } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import NavBar from '../components/websites/Navbar.jsx';

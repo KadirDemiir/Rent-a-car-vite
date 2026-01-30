@@ -13,8 +13,9 @@ export default function GuestReservationDetails({ reservation: initialReservatio
     const handleCancel = () => {
         if (confirm(t('website.reservation_details.confirm_cancel'))) {
             setProcessing(true);
-            axios.patch(`/guest-reservation/${reservation.id}/cancel`, {
-                email: reservation.email
+            axios.post(`/guest-reservation/${reservation.id}/cancel`, {
+                email: reservation.email,
+                lang: i18n.language
             })
             .then(response => {
                  setReservation(prev => ({ ...prev, status: 'cancelled' }));
@@ -45,12 +46,12 @@ export default function GuestReservationDetails({ reservation: initialReservatio
 
     const formatDate = (dateString) => {
         const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-        return new Date(dateString).toLocaleDateString(undefined, options);
+        return new Date(dateString).toLocaleDateString(i18n.language, options);
     };
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <Head title={t('website.reservation_details.title', { id: reservation.id })} />
+            <Head title={t('website.reservation_details.title', { id: reservation.reference_code })} />
             <NavBar />
 
             <div className="container mx-auto px-4 py-8">
@@ -66,7 +67,7 @@ export default function GuestReservationDetails({ reservation: initialReservatio
                     {/* Header */}
                     <div className="bg-gray-800 text-white p-6 flex justify-between items-center flex-wrap gap-4">
                         <div>
-                            <h1 className="text-2xl font-bold">{t('website.reservation_details.title', { id: reservation.id })}</h1>
+                            <h1 className="text-2xl font-bold">{t('website.reservation_details.title', { id: reservation.reference_code })}</h1>
                             <p className="text-gray-300 text-sm">{t('website.reservation_details.created_on', { date: formatDate(reservation.created_at) })}</p>
                         </div>
                         <span className={`px-4 py-2 rounded-full font-bold text-sm uppercase tracking-wide ${getStatusColor(reservation.status)}`}>

@@ -40,7 +40,7 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 Route::post('/adminpanel/cars/update-sort', [AdminCarController::class, 'updateSortOrder'])->name('adminUpdateCarSort');
 
 Route::get('/get-reservations-informations', function () {
-    return response(['reservations' => Reservation::with(['extras', 'car', 'pickupLocation', 'returnLocation'])->get()], 200);
+    return response(['reservations' => Reservation::with(['extras', 'car', 'pickupLocation', 'returnLocation', 'currency'])->get()], 200);
 });
 Route::get('/get-car-information/{id}', function ($id) {
     $car = Car::where('id', $id)
@@ -192,8 +192,8 @@ Route::get('/get-included-services', function () {
     return response()->json(['services' => \App\Models\InternalService::all()]);
 });
 Route::post('/create-reservation', [ReservationController::class, 'createReservation'])->name('createReservation');
-Route::patch('/reservation/reject/{id}', [ReservationController::class, 'rejectReservation'])->name('rejectReservation');
-Route::patch('/reservation/approve/{id}', [ReservationController::class, 'approveReservation'])->name('approveReservation');
+Route::post('/reservation/reject/{id}', [ReservationController::class, 'rejectReservation'])->name('rejectReservation');
+Route::post('/reservation/approve/{id}', [ReservationController::class, 'approveReservation'])->name('approveReservation');
 
 Route::post('/adminpanel/locations/add', [LocationsController::class, 'addLocation'])->name('adminAddLocation');
 Route::post('/adminpanel/locations/update/{id}', [LocationsController::class, 'updateLocation'])->name('adminUpdateLocation');
@@ -247,6 +247,10 @@ Route::group([
     Route::get(dbTransRoute('searchReservations'), [ReservationController::class, 'searchReservations'])->name('searchReservations');
     Route::post(dbTransRoute('reservation-create'), [ReservationController::class, 'initiateDraft'])->name('reservation.init');
     Route::get(dbTransRoute('reservation-create'), [ReservationController::class, 'showExtras'])->name('reservation-create');   
+
+    Route::get('/r/track/{reference_code}', [ReservationController::class, 'track'])
+    ->name('reservations.track')
+    ->middleware('signed');
     
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -258,7 +262,7 @@ Route::group([
 
     Route::get(dbTransRoute ('checkReservation'), [ReservationController::class, 'checkReservationPage'])->name('checkReservationPage');
     Route::post(dbTransRoute('checkReservation'), [ReservationController::class, 'checkReservation'])->name('checkReservation');
-    Route::patch('/guest-reservation/{id}/cancel', [ReservationController::class, 'guestCancelReservation'])->name('guestCancelReservation');
+    Route::post('/guest-reservation/{id}/cancel', [ReservationController::class, 'guestCancelReservation'])->name('guestCancelReservation');
 
     Route::get(dbTransRoute('adminpanel'), function () {
         $upcoming = Reservation::upcoming()->with(['car.brandKey', 'car.modelKey', 'user'])->orderBy('pickup_datetime')->get();

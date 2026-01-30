@@ -35,7 +35,7 @@ export default function ShowResCard({ res, updateData, closeModal, curr, past })
                         <h2 className="text-xl font-bold text-gray-800">
                             {t("adminpanel.reservation.reservation_modal.reservation_detail")}
                         </h2>
-                        <p className="text-xs text-gray-400 mt-0.5">ID: #{res.id}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">ID: #{res.reference_code}</p>
                     </div>
                     <button
                         onClick={() => closeModal()}
@@ -144,12 +144,12 @@ export default function ShowResCard({ res, updateData, closeModal, curr, past })
                                     </dd>
                                 </div>
                                 <DetailItem label={t("adminpanel.reservation.reservation_modal.payment_method")} value={res.payment_type} />
-                                <DetailItem label={t("adminpanel.reservation.reservation_modal.extra_price")} value={res.extras_total} />
-                                <DetailItem label={t("adminpanel.reservation.reservation_modal.drop_price", "Drop Price")} value={res.drop_price} />
-                                <DetailItem label={t("adminpanel.reservation.reservation_modal.day*daily_price", "Day x fDaily Price")} value={`${res.rental_days} x ${calculateTotal(res.daily_price).toFixed(2)} ${current.symbol}`} />
+                                <DetailItem label={t("adminpanel.reservation.reservation_modal.extra_price")} value={`${(res.extras_total * res.exchange_rate).toFixed(2)} ${res.currency.symbol}`} />
+                                <DetailItem label={t("adminpanel.reservation.reservation_modal.drop_price", "Drop Price")} value={`${(res.drop_price * res.exchange_rate).toFixed(2)} ${res.currency.symbol}`} />
+                                <DetailItem label={t("adminpanel.reservation.reservation_modal.day*daily_price", "Day x fDaily Price")} value={`${res.rental_days} x ${(res.daily_price * res.exchange_rate).toFixed(2)} ${res.currency.symbol}`} />
                                 <div className="mt-auto pt-4 border-t border-gray-100">
                                     <dt className="text-xs font-medium text-gray-500 uppercase mb-1">{t("adminpanel.reservation.reservation_modal.total_price")}</dt>
-                                    <dd className="text-2xl font-bold text-gray-900">{`${calculateTotal(res.total_price).toFixed(2)} ${current.symbol}`}</dd>
+                                    <dd className="text-2xl font-bold text-gray-900">{`${(res.total_price * res.exchange_rate).toFixed(2)} ${res.currency.symbol}`}</dd>
                                 </div>
                             </dl>
                         </div>
@@ -166,7 +166,7 @@ export default function ShowResCard({ res, updateData, closeModal, curr, past })
                                 {res.extras?.map((e, index) => {
                                     const names = JSON.parse(e.extra.name);
                                     return (
-                                        <DetailItem key={e.id || index} label={names[i18n.language] || names['tr']} value={`${e.quantity} x ${calculateTotal(e.price).toFixed(2)} ${current.symbol}`}/>
+                                        <DetailItem key={e.id || index} label={names[i18n.language] || names['tr']} value={`${e.quantity} x ${(e.price * res.exchange_rate).toFixed(2)} ${res.currency.symbol}`}/>
                                     );
                                 })}
                             </dl>

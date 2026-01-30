@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\Language;
+use App\Models\Reservation;
+use App\Observers\ReservationObserver;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
@@ -26,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Reservation::observe(ReservationObserver::class);
         Mail::extend('brevo', function () {
             return (new BrevoTransportFactory)->create(
                 new Dsn(

@@ -36,8 +36,8 @@ export default function LanguageForm({ language, keys, campaigns}) {
     const { hasCampaignError, totalCampaign, campaignErrorCount } = useMemo(() => {
         let errors = 0;
         campaigns.forEach(cmp => {
-            const cmT = JSON.parse(cmp.title || "{}");
-            const cmC = JSON.parse(cmp.content || "{}");
+            const cmT = cmp.title;
+            const cmC = cmp.content
             if (!cmT?.[lang.code]?.trim() || !cmC?.[lang.code]?.trim()) errors++;
         });
         return {

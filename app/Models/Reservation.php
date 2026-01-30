@@ -4,12 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\URL;
+use Carbon\Carbon;
 
 class Reservation extends Model
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     protected $fillable = [
+        'reference_code',
         'car_id',
         'user_id',
         'name',
@@ -29,6 +34,7 @@ class Reservation extends Model
         'discount_target',
         'total_price',
         'currency_id',
+        'exchange_rate',
         'email',
         'address',
         'birthday',
@@ -45,7 +51,30 @@ class Reservation extends Model
         'return_datetime' => 'datetime',
         'birthday' => 'date',
         'discount_amount' => 'decimal:2',
+        'total_price' => 'decimal:2',
+        'daily_price' => 'decimal:2',
     ];
+
+    protected $appends = ['tracking_url'];
+
+    protected function trackingUrl(): Attribute
+    {
+        return Attribute::get(function ($value, $attributes) {
+            if (empty($attributes['reference_code']) || empty($attributes['return_datetime'])) {
+                return null;
+            }
+            //$lang = request()->route('lang') ?? app()->getLocale();
+            return URL::temporarySignedRoute(
+                'reservations.track',
+                Carbon::parse($attributes['return_datetime'])->addDays(15),
+                [
+                    //'lang' => app()->getLocale(),
+                    'reference_code' => $attributes['reference_code'],
+                    'email'          => $attributes['email']
+                ]
+            );
+        });
+    }
 
     public function user()
     {
@@ -84,14 +113,17 @@ class Reservation extends Model
 
     public function scopeReadyForPickup($query)
     {
-        return $query->whereDate('pickup_datetime', '<=', \Carbon\Carbon::tomorrow())
+        return $query->whereDate('pickup_datetime', '<=', Carbon::tomorrow())
             ->where('status', 'confirmed');
     }
 
     public function scopeUpcoming($query)
     {
-        return $query->where('status', 'confirmed')->where('pickup_datetime', '>=', now())->orWhereDate('return_datetime', '>=', now())
-            ->where('status', 'confirmed');
+        return $query->where('status', 'confirmed')
+            ->where(function ($q) {
+                $q->where('pickup_datetime', '>=', now())
+                  ->orWhereDate('return_datetime', '>=', now());
+            });
     }
 
     public function scopeActiveRentals($query)

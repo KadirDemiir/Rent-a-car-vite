@@ -12,7 +12,9 @@ export default function MyReservations({ reservations }) {
 
     const handleCancel = (id) => {
         if (confirm(t('Are you sure you want to cancel this reservation?'))) {
-            axios.patch(`/my-reservations/${id}/cancel`)
+            axios.post(`/my-reservations/${id}/cancel`, {
+                lang: i18n.language
+            })
                 .then(response => {
                     console.log(response.data);
                     setUpdatedReservations(response.data.reservations)

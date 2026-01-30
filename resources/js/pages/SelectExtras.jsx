@@ -8,10 +8,12 @@ import {useTranslation} from "react-i18next";
 import axios from "axios";
 import ReservationDatePreview from "../components/websites/reservation/ReservationDatePreview.jsx";
 import IncludedServices from "../components/websites/reservation/create-reservation/IncludeServicesList.jsx";
+import { useCurrency } from "../providers/CurrencyContext.jsx";
 
 export default function SelectExtras({car, auth_user, params}){
     console.log(car, auth_user, params);
-    const {t} = useTranslation();
+    const {t, i18n} = useTranslation();
+    const {current} = useCurrency();
     const [selectedExtras, setSelectedExtras] = useState([]);
     const [showErrors, setShowErrors] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -50,7 +52,6 @@ export default function SelectExtras({car, auth_user, params}){
     const validateRequired = (value) => value.trim() === '' ? '*'+t("website.auth.signup.this_area_cannot_be_empty") : '';
 
     const handleSubmit =  () => {
-        console.log(user.birthday);
         setError("");
         setShowErrors(true);
         
@@ -87,14 +88,14 @@ export default function SelectExtras({car, auth_user, params}){
             setError(firstErrorMessage);
             return;
         }
-        console.log(1);
         setIsLoading(true);
         const submissionData = {
+            lang: i18n.language,
             car_id: car.id,
             drop_price: car.drop_price ?? 0,
             total_days: car.total_days,
             daily_price: car.daily_price,
-            currency_id: car.currency_id,
+            currency_id: current.id,
             pick_up_location_id: params.PULocation.id,
             return_location_id: params.RLocation.id,
             start_date_time: params.startDateTime,

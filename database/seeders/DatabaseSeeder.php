@@ -937,8 +937,8 @@
             "website.check_reservation.button_check" => "Rezervasyonu Kontrol Et",
             "website.check_reservation.button_checking" => "Kontrol Ediliyor...",
 
-            "website.reservation_details.title" => "Rezervasyon #{id}", 
-            "website.reservation_details.created_on" => "Oluşturulma Tarihi: {date}",
+            "website.reservation_details.title" => "Rezervasyon #{{id}}", 
+            "website.reservation_details.created_on" => "Oluşturulma Tarihi: {{date}}",
             "website.reservation_details.back_to_search" => "Aramaya Dön",
             "website.reservation_details.status.pending" => "Bekliyor",
             "website.reservation_details.status.confirmed" => "Onaylandı",
