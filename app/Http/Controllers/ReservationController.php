@@ -345,6 +345,8 @@ public function showExtras(Request $request)
             }
 
             DB::commit();
+            $reservation->refresh();
+
             $reservation->load(['car.brandKey', 'car.modelKey', 'pickupLocation', 'returnLocation', 'currency']);
             $lang_id = \App\Models\Language::where('code', $validated['lang'])->first()->id;
 
@@ -352,14 +354,14 @@ public function showExtras(Request $request)
                 'user_name' => $reservation->name,
                 'reference_code' => $reservation->reference_code,
                 'car_name' => Translation::where('language_id', $lang_id)->where('translation_key_id', $reservation->car->brandKey->id)->first()->value . ' ' . Translation::where('language_id', $lang_id)->where('translation_key_id', $reservation->car->modelKey->id)->first()->value,
-                'tracking_url'   => $reservation->trackingUrl, 
+                'tracking_url'   => $reservation->tracking_url, 
                 'pickup_location' => $reservation->pickupLocation->name,
                 'return_location' => $reservation->returnLocation->name,
                 'pickup_date' => $reservation->pickup_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
                 'return_date' => $reservation->return_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
                 'total_price' => number_format($reservation->total_price * $reservation->exchange_rate, 2, ',', '.') . ' ' . $reservation->currency->symbol,
                 'lang' => $validated['lang']
-            ])); 
+            ]));
 
             return response()->json([
                 'success' => true,
@@ -466,20 +468,29 @@ public function showExtras(Request $request)
         $reservation->payment_status = 'paid';
         $reservation->save();
 
+        $lang = \App\Models\Language::where('code', $validated['lang'])->first();
+        $lang_id = $lang ? $lang->id : 1;
+
         $reservation->load(['car.brandKey', 'car.modelKey', 'pickupLocation', 'returnLocation', 'currency']);
-        $lang_id = \App\Models\Language::where('code', $validated['lang'])->first()->id;
+        $brandName = Translation::where('language_id', $lang_id)
+            ->where('translation_key_id', $reservation->car->brandKey->id)
+            ->value('value');
+            
+        $modelName = Translation::where('language_id', $lang_id)
+            ->where('translation_key_id', $reservation->car->modelKey->id)
+            ->value('value');
 
         $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_confirmation', [
             'user_name' => $reservation->name,
             'reference_code' => $reservation->reference_code,
-            'car_name' => Translation::where('language_id', $lang_id)->where('translation_key_id', $reservation->car->brandKey->id)->first()->value . ' ' . Translation::where('language_id', $lang_id)->where('translation_key_id', $reservation->car->modelKey->id)->first()->value,
-            'tracking_url'   => $reservation->trackingUrl, 
+            'car_name' => $brandName . ' ' . $modelName,
+            'tracking_url'   => $reservation->tracking_url, 
             'pickup_location' => $reservation->pickupLocation->name,
             'return_location' => $reservation->returnLocation->name,
             'pickup_date' => $reservation->pickup_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
             'return_date' => $reservation->return_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
             'total_price' => number_format($reservation->total_price * $reservation->exchange_rate, 2, ',', '.') . ' ' . $reservation->currency->symbol,
-            'lang' => $validated['lang']
+            'lang' => $lang->code
         ]));
 
         return response()->json(['success' => 'Reservation confirmed'], 200);
@@ -576,7 +587,7 @@ public function showExtras(Request $request)
 
             if ($reservation) {
                 //\Log::info('Redirecting to reservation tracking URL: ' . $reservation->tracking_url);
-                return \Inertia\Inertia::location($reservation->tracking_url);
+                return to_route('reservation.track', ['token' => $reservation->token]);
             }
 
             return Inertia::render('CheckReservation')->withErrors([
@@ -633,14 +644,14 @@ public function showExtras(Request $request)
         return to_route('checkReservationPage', $validated);
     }
 
-  public function guestCancelReservation(Request $request, $reference_code)
+  public function guestCancelReservation(Request $request, $id)
     {
         $validated = $request->validate([
             'email' => 'required|email',
             'lang' => 'nullable|string|max:5' 
         ]);
 
-        $reservation = Reservation::where('reference_code', $reference_code)
+        $reservation = Reservation::where('id', $id)
             ->where('email', $validated['email'])
             ->firstOrFail();
 
@@ -653,16 +664,22 @@ public function showExtras(Request $request)
 
         $reservation->status = 'cancelled';
         $reservation->save();
+        
         $reservation->load(['car.brandKey', 'car.modelKey', 'pickupLocation', 'returnLocation', 'currency']);
-
-        $langCode = $validated['lang'] ?? $reservation->lang ?? 'tr';
+        $langCode = $validated['lang'] ?? app()->getLocale() ?? 'en';
         $lang = \App\Models\Language::where('code', $langCode)->first();
         $lang_id = $lang ? $lang->id : 1;
 
-        $brandName = Translation::where('language_id', $lang_id)->where('translation_key_id', $reservation->car->brandKey->id)->value('value');
-        $modelName = Translation::where('language_id', $lang_id)->where('translation_key_id', $reservation->car->modelKey->id)->value('value');
+        $reservation->load(['car.brandKey', 'car.modelKey', 'pickupLocation', 'returnLocation', 'currency']);
+        $brandName = Translation::where('language_id', $lang_id)
+            ->where('translation_key_id', $reservation->car->brandKey->id)
+            ->value('value');
+            
+        $modelName = Translation::where('language_id', $lang_id)
+            ->where('translation_key_id', $reservation->car->modelKey->id)
+            ->value('value');
 
-        $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_cancelled', [
+        $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_decline', [
             'user_name' => $reservation->name,
             'reference_code' => $reservation->reference_code,
             'car_name' => $brandName . ' ' . $modelName,
@@ -722,28 +739,14 @@ public function showExtras(Request $request)
         return response()->json(['success' => 'Rental completed successfully.', 'data' => $reservation]);
     }
 
-    public function track(Request $request, $reference_code)
-{  
+    public function track($token)
+    {
+        $reservation = Reservation::where('token', $token)
+            ->with(['car.photos', 'pickupLocation', 'returnLocation', 'car.brandKey', 'car.modelKey', 'currency', 'extras.extra'])
+            ->firstOrFail();
 
-    \Log::info('Tracking reservation with reference code: ',  [$reference_code, $request->query('email')]);
-    
-    $reservation = Reservation::where('reference_code', $reference_code)
-        ->where('email', $request->query('email'))
-        ->with(['car.photos', 'pickupLocation', 'returnLocation', 'car.brandKey', 'car.modelKey', 'currency'])
-        ->first();
-
-    \Log::info('Reservation found: ' . ($reservation ? 'Yes' : 'No'));
-
-    if (!$reservation) {
-        return inertia('CheckReservation', [
-            'errors' => ['email' => 'Rezervasyon bulunamadı veya e-posta adresi eşleşmiyor.'],
-            //'currentLang' => $lang
+        return inertia('GuestReservationDetails', [
+            'reservation' => $reservation
         ]);
     }
-    
-    return inertia('GuestReservationDetails', [
-        'reservation' => $reservation,
-        //'currentLang' => $lang
-    ]);
-}
 }

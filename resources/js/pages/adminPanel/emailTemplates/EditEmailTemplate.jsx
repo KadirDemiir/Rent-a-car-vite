@@ -7,7 +7,7 @@ import CampaignTextEditor from '../../../components/adminPanel/campaign/ContentE
 import LanguageProgress from '../../../components/adminPanel/LanguageProgress.jsx';
 
 export default function EditEmailTemplate({ template, languages }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     console.log(template);
     const langOpt = useMemo(() => languages.map(l => ({ label: l.name, value: l.code })), [languages]);
     const [lang, setLang] = useState(langOpt[0]?.value || 'tr');
@@ -43,7 +43,7 @@ export default function EditEmailTemplate({ template, languages }) {
         try {
             const response = await axios.put(`/adminpanel/email-templates/${template.id}`, formData);
             setMessage({ type: 'success', text: response.data.message });
-            setTimeout(() => router.get('/adminpanel/email-templates'), 1000);
+            setTimeout(() => router.get(`/${i18n.language}/${t('address.adminpanel')}/${t('address.email-templates')}`), 1000);
         } catch (error) {
             console.error('Error updating template:', error);
             setMessage({ type: 'error', text: error.response?.data?.message || 'Failed to update template' });

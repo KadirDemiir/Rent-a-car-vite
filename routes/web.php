@@ -40,7 +40,13 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 Route::post('/adminpanel/cars/update-sort', [AdminCarController::class, 'updateSortOrder'])->name('adminUpdateCarSort');
 
 Route::get('/get-reservations-informations', function () {
-    return response(['reservations' => Reservation::with(['extras', 'car', 'pickupLocation', 'returnLocation', 'currency'])->get()], 200);
+    $data = Reservation::with(['extras', 'car', 'pickupLocation', 'returnLocation', 'currency'])->get();
+    
+    if ($data->isEmpty()) {
+        return response()->json(['message' => 'Veritabanında rezervasyon bulunamadı.'], 404);
+    }
+
+    return response()->json(['reservations' => $data], 200);
 });
 Route::get('/get-car-information/{id}', function ($id) {
     $car = Car::where('id', $id)
@@ -248,9 +254,8 @@ Route::group([
     Route::post(dbTransRoute('reservation-create'), [ReservationController::class, 'initiateDraft'])->name('reservation.init');
     Route::get(dbTransRoute('reservation-create'), [ReservationController::class, 'showExtras'])->name('reservation-create');   
 
-    Route::get('/r/track/{reference_code}', [ReservationController::class, 'track'])
-    ->name('reservations.track')
-    ->middleware('signed');
+    Route::get('/r/track/{token}', [ReservationController::class, 'track'])
+        ->name('reservation.track');
     
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 

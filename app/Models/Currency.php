@@ -17,6 +17,10 @@ class Currency extends Model
         });
     }
 
+    protected $casts = [
+        'exchange_rate' => 'decimal:8',
+    ];
+
     public function prices(){
         return $this->hasMany(Price::class);
     }

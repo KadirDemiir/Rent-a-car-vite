@@ -1,12 +1,11 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 class Reservation extends Model
@@ -15,6 +14,7 @@ class Reservation extends Model
 
     protected $fillable = [
         'reference_code',
+        'token',
         'car_id',
         'user_id',
         'name',
@@ -56,25 +56,26 @@ class Reservation extends Model
     ];
 
     protected $appends = ['tracking_url'];
-
-    protected function trackingUrl(): Attribute
+    
+    protected static function booted()
     {
-        return Attribute::get(function ($value, $attributes) {
-            if (empty($attributes['reference_code']) || empty($attributes['return_datetime'])) {
-                return null;
-            }
-            //$lang = request()->route('lang') ?? app()->getLocale();
-            return URL::temporarySignedRoute(
-                'reservations.track',
-                Carbon::parse($attributes['return_datetime'])->addDays(15),
-                [
-                    //'lang' => app()->getLocale(),
-                    'reference_code' => $attributes['reference_code'],
-                    'email'          => $attributes['email']
-                ]
-            );
+        static::creating(function ($reservation) {
+            $reservation->token = (string) Str::uuid();
         });
     }
+
+    protected function trackingUrl(): Attribute
+{
+    return Attribute::get(function () {
+        if (!$this->token) {
+            return null;
+        }
+
+        return route('reservation.track', [
+            'token' => $this->token
+        ]);
+    });
+}
 
     public function user()
     {

@@ -71,7 +71,7 @@ class CurrencyService
                 }
                 
                 $exchangeRate = $baseRate / ($targetRateTRY ?: 1);
-                $curr->update(['exchange_rate' => $exchangeRate]);
+                $curr->update(['exchange_rate' => round($exchangeRate, 8)]);
             }
 
             return $myCurrs;

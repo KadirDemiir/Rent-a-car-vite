@@ -8,6 +8,7 @@ import axios from 'axios';
 export default function GuestReservationDetails({ reservation: initialReservation }) {
     const { t, i18n } = useTranslation();
     const [reservation, setReservation] = useState(initialReservation);
+    console.log(reservation);
     const [processing, setProcessing] = useState(false);
 
     const handleCancel = () => {
@@ -122,7 +123,7 @@ export default function GuestReservationDetails({ reservation: initialReservatio
                                         <div className="flex justify-between items-center mb-1">
                                             <span className="text-gray-600 text-sm">{t('website.reservation_details.total_price')}</span>
                                             <span className="font-bold text-xl text-blue-700">
-                                                {reservation.total_price} {reservation.currency?.symbol}
+                                                {((reservation.total_price * reservation.exchange_rate).toFixed(2))} {reservation.currency?.symbol}
                                             </span>
                                         </div>
                                         <div className="flex justify-between items-center">
