@@ -65,7 +65,7 @@ class AuthController extends Controller
             'email' => ['required', 'email', 'unique:users'],
             'birthday'  => ['required', 'date', 'before_or_equal:' . now()->subYears(18)->toDateString()],
             'phone_number' => ['required', 'digits:10'],
-            'tc_number' => ['required', 'digits:11'],
+            'identity_number' => ['required', 'digits:11'],
             'password' => ['required', 'min:6', 'confirmed']
         ]);
 
@@ -75,7 +75,8 @@ class AuthController extends Controller
             'email' => $request->email,
             'birthday' => $request->birthday,
             'phone_number' => $request->phone_number,
-            'tc_number' => $request->tc_number,
+            'role' => 'customer',
+            'identity_number' => $request->identity_number,
             'password' => Hash::make($request->password)
         ]);
 

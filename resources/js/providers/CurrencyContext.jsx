@@ -48,7 +48,6 @@ export const CurrencyProvider = ({ children }) => {
     };
 
     const calculateTotal = useMemo(() => {
-        console.log(current.exchange_rate)
         return (amount = 0, convertToBase = true) => {
             if (!current || !current.exchange_rate) return amount;
             

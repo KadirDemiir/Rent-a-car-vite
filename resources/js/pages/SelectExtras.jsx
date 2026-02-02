@@ -24,7 +24,7 @@ export default function SelectExtras({car, auth_user, params}){
         phone: auth_user?.phone_number ?? "",
         address: auth_user?.address ?? "",
         birthday: auth_user?.birthday ?? "",
-        identity: auth_user?.tc_number ?? "",
+        identity: auth_user?.identity_number ?? "",
         arrivalFlightNo: "",
         returnFlightNo: "",
         notes: "",

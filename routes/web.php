@@ -84,7 +84,7 @@ Route::get('/test-lang', function () {
     session()->put('deneme', true);
     return redirect('get-session');
 });
-Route::get('/deneme-curr', function () {
+/* Route::get('/deneme-curr', function () {
     $def = Currency::where('is_active', 1)->where('is_default', 1)->first();
     if (!$def)
         return response()->json(['error' => 'Default currency not found'], 404);
@@ -119,7 +119,7 @@ Route::get('/deneme-curr', function () {
 });
 Route::get('/get-supported-currencies', function () {
     return response()->json(['currencies' => Currency::where('is_active', true)->get()]);
-});
+}); */
 Route::get('/get-currencies', function () {
     \Illuminate\Support\Facades\Log::info('Currency Route Hit: ' . now());
     $currencies = Cache::store('file')->remember('active_currencies', 3600, function () {

@@ -343,7 +343,7 @@ public function showExtras(Request $request)
                 'birthday' => $validated['user_info']['birthday'],
                 'arrival_flight_no' => $validated['user_info']['arrival_flight_no'] ?? null,
                 'return_flight_no' => $validated['user_info']['return_flight_no'] ?? null,
-                'tc_number' => $validated['user_info']['id'],
+                'identity_number' => $validated['user_info']['id'],
             ]);
 
             foreach($extrasArray as $extraId => $e){

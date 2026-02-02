@@ -84,7 +84,7 @@ export default function UserInfo({setUser, user, userErrors, setUserErrors, show
                 <Input
                     type={`text`}
                     elementName={"identity"}
-                    labelName={t('website.auth.signup.tc_number', 'T.C. Kimlik No')}
+                    labelName={t('website.auth.signup.identity_number', 'T.C. Kimlik No')}
                     onChange={(val, err) => handleUserChange('identity', val, err)}
                     validate={validateIdentity}
                     maxV={11}

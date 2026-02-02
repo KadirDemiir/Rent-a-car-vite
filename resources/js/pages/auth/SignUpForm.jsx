@@ -33,7 +33,7 @@ export default function SignUpForm({ onMessage, setFormType }) {
             email: validateEmail(formData.email || ''),
             birthday: validateName(formData.birthday || ''),
             phone_number: validatePhoneNumber(formData.phone_number || ''),
-            tc_number: validateTcNumber(formData.tc_number || '') || '',
+            identity_number: validateTcNumber(formData.identity_number || '') || '',
             password: validatePassword(formData.password || ''),
             password_confirmation: validatePasswordConfirm(formData.password_confirmation || '', formData.password || '')
         };
@@ -165,10 +165,10 @@ export default function SignUpForm({ onMessage, setFormType }) {
 
                 <Input
                   type={'text'}
-                  elementName={'tc_number'}
-                  labelName={t("website.auth.signup.tc_number")}
+                  elementName={'identity_number'}
+                  labelName={t("website.auth.signup.identity_number")}
                   validate={validateTcNumber}
-                  onChange={(value, error) => handleInputChange('tc_number', value, error)}
+                  onChange={(value, error) => handleInputChange('identity_number', value, error)}
                   maxV={11}
                   formData={formData}
                   errors={errors}

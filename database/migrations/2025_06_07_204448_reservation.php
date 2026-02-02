@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('name');
             $table->string('surname');
-            $table->string('tc_number', 11);
+            $table->string('identity_number');
             $table->string('phone_number');
             $table->foreignId('pickup_location_id')->nullable()->constrained('locations')->nullOnDelete();
             $table->foreignId('return_location_id')->nullable()->constrained('locations')->nullOnDelete();

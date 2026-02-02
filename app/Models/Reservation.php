@@ -19,7 +19,7 @@ class Reservation extends Model
         'user_id',
         'name',
         'surname',
-        'tc_number',
+        'identity_number',
         'phone_number',
         'pickup_location_id',
         'return_location_id',
