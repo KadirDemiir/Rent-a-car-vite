@@ -22,50 +22,61 @@ use Illuminate\Support\Facades\Log;
 class ReservationController extends Controller
 {
     public function searchReservations(Request $request)
-    {
-        if (!$request->has(['startDateTime', 'finishDateTime', 'PULocation', 'RLocation'])) {
-            return Inertia::render('SearchReservations', ['availableCars' => []]);
-        }
+{
+    if (!$request->has(['startDateTime', 'finishDateTime', 'PULocation', 'RLocation'])) {
+        return Inertia::render('SearchReservations', ['availableCars' => []]);
+    }
 
-        $request->validate([
-            'startDateTime' => 'required|date|after:today',
-            'finishDateTime' => 'required|date|after:startDateTime',
-            'PULocation' => 'required|exists:locations,id',
-            'RLocation' => 'required|exists:locations,id',
-        ]);
+    $request->validate([
+        'startDateTime' => 'required|date|after:today',
+        'finishDateTime' => 'required|date|after:startDateTime',
+        'PULocation' => 'required|exists:locations,id',
+        'RLocation' => 'required|exists:locations,id',
+    ]);
 
-        if($request->startDateTime >= $request->finishDateTime || $request->startDateTime < Carbon::now() || $request->finishDateTime < Carbon::now())
-            return to_route('home');
+    $reqStart = Carbon::parse($request->startDateTime);
+    $reqEnd = Carbon::parse($request->finishDateTime);
 
-        $cars = Car::with('location', 'photos', 'brandKey', 'modelKey', 'price')->orderBy('sort_order', 'asc')->get();
-        $availableCars = [];
+    if($reqStart >= $reqEnd || $reqStart->isPast())
+        return to_route('home');
 
-        $reqStart = Carbon::parse($request->startDateTime);
-        $reqEnd = Carbon::parse($request->finishDateTime);
+    $cars = Car::with(['location', 'photos', 'brandKey', 'modelKey', 'price'])
+        ->orderBy('sort_order', 'asc')
+        ->get();
 
-        foreach ($cars as $car) {
-            if ($this->isCarAvailable($car->id, $request->startDateTime, $request->finishDateTime, $request->PULocation)) {
-                $this->CalcPrice($car, $request->startDateTime, $request->finishDateTime, $request->PULocation, $request->RLocation);
+    // Lokasyonları tek seferde çekelim
+    $locationIds = [$request->PULocation, $request->RLocation];
+    $selectedLocations = Locations::whereIn('id', $locationIds)->get();
+    
+    $puLocation = $selectedLocations->firstWhere('id', $request->PULocation);
+    $rLocation = $selectedLocations->firstWhere('id', $request->RLocation);
 
-                if($car->daily_price !== null) {
-                    $availableCars[] = $car;
-                }
+    $availableCars = [];
+
+    foreach ($cars as $car) {
+        // isCarAvailable içine ID yerine doğrudan $car objesini gönderin
+        if ($this->isCarAvailable($car->id, $request->startDateTime, $request->finishDateTime, $request->PULocation)) {
+            $this->CalcPrice($car, $request->startDateTime, $request->finishDateTime, $request->PULocation, $request->RLocation);
+
+            if($car->daily_price !== null) {
+                $availableCars[] = $car;
             }
         }
-
-        return Inertia::render('SearchReservations', [
-            'availableCars' => $availableCars,
-            'reservation' => [
-                'startDate' => $reqStart->toDateString(),
-                'startTime' => $reqStart->format('H:i'),
-                'finishDate' => $reqEnd->toDateString(),
-                'finishTime' => $reqEnd->format('H:i'),
-                'selectedPULocation' => Locations::where('id', $request->PULocation)->first(),
-                'selectedRLocation' => Locations::where('id', $request->RLocation)->first(),
-            ],
-            'locations' => Locations::all()
-        ]);
     }
+
+    return Inertia::render('SearchReservations', [
+        'availableCars' => $availableCars,
+        'reservation' => [
+            'startDate' => $reqStart->toDateString(),
+            'startTime' => $reqStart->format('H:i'),
+            'finishDate' => $reqEnd->toDateString(),
+            'finishTime' => $reqEnd->format('H:i'),
+            'selectedPULocation' => $puLocation,
+            'selectedRLocation' => $rLocation,
+        ],
+        'locations' => Locations::all() 
+    ]);
+}
 
 
 public function initiateDraft(Request $request)

@@ -1,6 +1,6 @@
 import {useCurrency} from "../../../../providers/CurrencyContext.jsx";
 
-export default function PriceInformationCard({total_days, daily_price, extra_price}) {
+export default function PriceInformationCard({drop_price, total_days, daily_price, extra_price}) {
     console.log(daily_price);
     const {calculateTotal, current} = useCurrency()
     return (
@@ -23,7 +23,16 @@ export default function PriceInformationCard({total_days, daily_price, extra_pri
                         </span>
                     )}
                 </div>
-                
+
+                {drop_price && drop_price > 0 && current?.symbol && (
+                    <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+                    <span className="text-gray-600 font-medium">Drop Price</span>
+                        <span className="font-semibold text-gray-800">
+                            {`${calculateTotal(drop_price).toFixed(2)} ${current.symbol}`}
+                        </span>
+                    </div>
+                )}
+
                 <div className="flex items-center justify-between pb-3 border-b border-gray-100">
                     <span className="text-gray-600 font-medium">Extra Price</span>
                     <span className="font-semibold text-gray-800">
@@ -34,7 +43,7 @@ export default function PriceInformationCard({total_days, daily_price, extra_pri
                 <div className="flex items-center justify-between pt-2">
                     <span className="text-lg font-bold text-gray-800">Total</span>
                     <span className="text-xl font-bold text-blue-600">
-                        {`${calculateTotal(total_days * daily_price + extra_price).toFixed(2)} ${current?.symbol}`}
+                        {`${calculateTotal(Number(total_days) * Number(daily_price) + Number(extra_price) + Number(drop_price)).toFixed(2)} ${current?.symbol || ''}`}
                     </span>
                 </div>
             </div>

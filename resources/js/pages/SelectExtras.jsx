@@ -175,6 +175,7 @@ export default function SelectExtras({car, auth_user, params}){
                                 />
                                 
                                 <PriceInformationCard 
+                                    drop_price={car.drop_price ?? 0}
                                     total_days={car.total_days} 
                                     daily_price={car.calculated_price.final_daily_price} 
                                     extra_price={Object.values(selectedExtras).reduce((sum, se) => sum + (se.price ?? 0) * (se.count ?? 1), 0)}
