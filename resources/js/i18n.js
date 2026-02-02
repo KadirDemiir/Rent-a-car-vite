@@ -1,78 +1,31 @@
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import axios from 'axios';
 
-const CACHE_KEY = 'i18n_config_cache';
-const CACHE_VERSION = 'v1.0.0';
+/**
+ * Initialize i18n with translations from Inertia props
+ * Database -> Laravel Cache -> Inertia Props -> i18n
+ */
+const initI18n = async (translations = {}, languages = []) => {
+    // Get language config from database (via Inertia props)
+    const supportedLngs = languages?.map(lang => lang.code) || ['tr'];
+    const currentLang = languages?.[0]?.code || 'tr';
+    const fallbackLng = languages?.find(l => l.code === 'tr')?.code || supportedLngs[0] || 'tr';
 
-const getCachedConfig = () => {
-    try {
-        const cachedData = localStorage.getItem(CACHE_KEY);
-        if (!cachedData) return null;
-        const { version, config } = JSON.parse(cachedData);
-        if (version !== CACHE_VERSION) {
-            localStorage.removeItem(CACHE_KEY);
-            return null;
-        }
-        return config;
-    } catch {
-        return null;
-    }
-};
-
-const setCachedConfig = (config) => {
-    try {
-        const cacheData = JSON.stringify({ version: CACHE_VERSION, config });
-        localStorage.setItem(CACHE_KEY, cacheData);
-    } catch {}
-};
-
-const setConfig = async () => {
-    let config;
-    try {
-        const [currentRes, langsRes] = await Promise.all([
-            axios.get('/get-current-language'),
-            axios.get('/supported-languages')
-        ]);
-
-        const current = currentRes.data;
-        const supportedLngs = langsRes.data.length ? langsRes.data : ['tr'];
-
-        const translationPromises = supportedLngs.map(lng =>
-            axios.get(`/translations/${lng}`)
-                .then(res => ({ [lng]: { translation: res.data } }))
-        );
-
-        const translationResults = await Promise.all(translationPromises);
-
-        const resources = translationResults.reduce((acc, res) => ({ ...acc, ...res }), {});
-
-        config = {
-            lng: current,
-            supportedLngs,
-            resources,
-            fallbackLng: 'tr',
-            interpolation: { escapeValue: false }
+    // Build resources object
+    const resources = {};
+    supportedLngs.forEach(lng => {
+        resources[lng] = {
+            translation: translations[lng] || {}
         };
-    } catch {
-        config = {
-            lng: 'tr',
-            supportedLngs: ['tr'],
-            resources: { tr: { translation: {} } },
-            fallbackLng: 'tr',
-            interpolation: { escapeValue: false }
-        };
-    }
-    return config;
-};
+    });
 
-const initI18n = async () => {
-    let config = getCachedConfig();
-
-    if (!config) {
-        config = await setConfig();
-        setCachedConfig(config);
-    }
+    const config = {
+        lng: currentLang,
+        fallbackLng: fallbackLng,
+        supportedLngs: supportedLngs,
+        resources: resources,
+        interpolation: { escapeValue: false }
+    };
 
     await i18next
         .use(initReactI18next)
@@ -81,9 +34,36 @@ const initI18n = async () => {
     return i18next;
 };
 
+/**
+ * Update i18n resources with translations from Inertia props
+ * This is called from a React component where we can access Inertia props
+ */
+export const updateI18nResources = (translations, languages) => {
+    if (!translations || !languages) {
+        console.warn('Translations or languages not available');
+        return;
+    }
+
+    const supportedLngs = languages?.map(lang => lang.code) || ['tr'];
+    const currentLang = languages?.[0]?.code || 'tr';
+
+    // Update i18next config
+    supportedLngs.forEach(lng => {
+        const translationData = translations[lng] || {};
+        i18next.addResourceBundle(lng, 'translation', translationData, true, true);
+    });
+
+    // Set current language
+    if (i18next.language !== currentLang) {
+        i18next.changeLanguage(currentLang);
+    }
+};
+
+/**
+ * Reload translations after updates
+ */
 export const reloadTranslations = async () => {
-    localStorage.removeItem(CACHE_KEY)
-    await initI18n();
+    // Will be called from component with fresh props
 };
 
 export default initI18n;

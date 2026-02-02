@@ -2,13 +2,15 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {router, usePage} from '@inertiajs/react';
 import { languages } from '../../constans/language.js';
+import { updateI18nResources } from '../../i18n.js';
 
 export default function LanguageDropdown() {
     const { i18n } = useTranslation();
+    const { translations, languages: inertiaLanguages } = usePage().props;
     const ref = useRef(null);
     const [open, setOpen] = useState(false);
     const { locale } = usePage().props;
-    const langs = i18n.options?.supportedLngs?.filter(l => l !== 'cimode') || [];
+    const langs = inertiaLanguages?.map(l => l.code).filter(l => l !== 'cimode') || ['tr'];
 
     useEffect(() => {
         if (locale && i18n.language.split('-')[0] !== locale) {
@@ -45,36 +47,14 @@ export default function LanguageDropdown() {
         const hash = window.location.hash;
         newUrl += searchParams + hash;
 
-        try {
-            const cached = JSON.parse(localStorage.getItem('i18n_config_cache'));
-            if (cached?.config) {
-                const updatedConfig = {
-                    ...cached.config,
-                    lng: lng,
-                    resources: {
-                        ...(cached.config.resources || {}),
-                    }
-                };
-                localStorage.setItem('i18n_config_cache', JSON.stringify({
-                    version: cached.version,
-                    config: updatedConfig
-                }));
-                console.log(`🌐 Cache dili ${lng} olarak güncellendi.`);
-            }
-        } catch (e) {
-            console.error('Cache güncellenemedi:', e);
+        // Change language
+        if (!i18n.store.data[lng] || !i18n.store.data[lng].translation) {
+            updateI18nResources(translations, inertiaLanguages);
         }
-
-        if (!i18n.store.data[lng]) {
-            await reloadTranslations(lng);
-        } else {
-            await i18n.changeLanguage(lng);
-        }
+        await i18n.changeLanguage(lng);
 
         router.visit(newUrl, { method: 'get', preserveState: true, preserveScroll: true });
     };
-
-
 
     return (
         <div ref={ref} className="w-28 relative flex items-center justify-center">

@@ -3,7 +3,7 @@ import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
 import { InertiaProgress } from '@inertiajs/progress';
 import { I18nextProvider } from 'react-i18next';
-import initI18n from './i18n';
+import initI18n, { updateI18nResources } from './i18n';
 import { CurrencyProvider } from "./providers/CurrencyContext.jsx";
 import axios from 'axios';
 
@@ -13,39 +13,59 @@ axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 InertiaProgress.init();
 
-initI18n().then(i18nInstance => {
-    createInertiaApp({
-        resolve: name => {
-            const pages = import.meta.glob('./pages/**/*.jsx');
-            const importPage = pages[`./pages/${name}.jsx`];
+// Get initial translations from the first page load
+const getInitialProps = () => {
+    return new Promise((resolve) => {
+        const checkProps = () => {
+            const propsElement = document.getElementById('app');
+            if (propsElement && propsElement.dataset.page) {
+                const pageData = JSON.parse(propsElement.dataset.page);
+                resolve({
+                    translations: pageData.props.translations || {},
+                    languages: pageData.props.languages || []
+                });
+            } else {
+                setTimeout(checkProps, 10);
+            }
+        };
+        checkProps();
+    });
+};
 
-            if (!importPage) throw new Error(`Sayfa bulunamadı: ${name}`);
+getInitialProps().then(({ translations, languages }) => {
+    initI18n(translations, languages).then(i18nInstance => {
+        createInertiaApp({
+            resolve: name => {
+                const pages = import.meta.glob('./pages/**/*.jsx');
+                const importPage = pages[`./pages/${name}.jsx`];
 
-            return importPage().then(module => {
-                const page = module.default;
+                if (!importPage) throw new Error(`Sayfa bulunamadı: ${name}`);
 
-                // 1. Sayfanın mevcut bir layout'u var mı kontrol et
-                // Yoksa sayfayı olduğu gibi döndüren basit bir fonksiyon ata
-                const defaultLayout = page.layout || ((page) => page);
+                return importPage().then(module => {
+                    const page = module.default;
 
-                // 2. Layout fonksiyonunu CurrencyProvider ile sarmala
-                // Böylece Provider, Inertia'nın İÇİNDE kalır ve usePage() çalışır.
-                page.layout = (children) => (
-                    <CurrencyProvider>
-                        {defaultLayout(children)}
-                    </CurrencyProvider>
+                    // 1. Sayfanın mevcut bir layout'u var mı kontrol et
+                    // Yoksa sayfayı olduğu gibi döndüren basit bir fonksiyon ata
+                    const defaultLayout = page.layout || ((page) => page);
+
+                    // 2. Layout fonksiyonunu CurrencyProvider ile sarmala
+                    // Böylece Provider, Inertia'nın İÇİNDE kalır ve usePage() çalışır.
+                    page.layout = (children) => (
+                        <CurrencyProvider>
+                            {defaultLayout(children)}
+                        </CurrencyProvider>
+                    );
+
+                    return page;
+                });
+            },
+            setup({ el, App, props }) {
+                createRoot(el).render(
+                    <I18nextProvider i18n={i18nInstance}>
+                        <App {...props} />
+                    </I18nextProvider>
                 );
-
-                return page;
-            });
-        },
-        setup({ el, App, props }) {
-            createRoot(el).render(
-                <I18nextProvider i18n={i18nInstance}>
-                    {/* CurrencyProvider'ı BURADAN SİLDİK */}
-                    <App {...props} />
-                </I18nextProvider>
-            );
-        },
+            },
+        });
     });
 });

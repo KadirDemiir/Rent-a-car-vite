@@ -14,6 +14,10 @@ use Inertia\Inertia;
 
 class TranslationController extends Controller
 {
+    public function __construct(
+        protected \App\Services\TranslationService $translationService
+    ) {}
+
     public function addLanguage(Request $request){
         try {
         $validated = $request->validate([
@@ -41,7 +45,7 @@ class TranslationController extends Controller
                 ]);
             }
             DB::commit();
-            clearTranslationCache();
+            $this->translationService->clearCache();
                 return response()->json(['success' => 'New Language Add Successfully', 'id' => $language->id]);
         }catch (\Exception $exception){
             DB::rollBack();
@@ -89,7 +93,7 @@ class TranslationController extends Controller
                 $lang->flag_photo_path =  $validated['flag']->store('flags', 'public');
             $lang->save();
             DB::commit();
-            clearTranslationCache();
+            $this->translationService->clearCache();
             return response()->json(['success' => 'Language Updated Successfully']);
         }catch (\Exception $exception){
             DB::rollBack();
@@ -106,7 +110,7 @@ class TranslationController extends Controller
                 Storage::disk('public')->delete($language->flag_photo_path);
             }
             $language->delete();
-            clearTranslationCache();
+            $this->translationService->clearCache();
             return response()->json(['success' => 'Language deleted successfully.']);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to delete language: ' . $e->getMessage()], 500);
@@ -133,7 +137,7 @@ class TranslationController extends Controller
                 );
             }
             DB::commit();
-            clearTranslationCache();
+            $this->translationService->clearCache();
             return response()->json(['success' => 'Language updated successfully.']);
         }catch (\Exception $exception){
             DB::rollBack();

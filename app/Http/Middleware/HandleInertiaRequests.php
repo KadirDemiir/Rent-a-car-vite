@@ -2,6 +2,7 @@
 namespace App\Http\Middleware;
 
 use App\Services\CurrencyService;
+use App\Services\TranslationService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -21,6 +22,8 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'currencies' => fn () => (new CurrencyService())->getActiveCurrencies(),
+            'translations' => fn () => TranslationService::getAllTranslations(),
+            'languages' => fn () => TranslationService::getActiveLanguages(),
         ]);
     }
 }
