@@ -37,17 +37,43 @@ use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
-Route::post('/adminpanel/cars/update-sort', [AdminCarController::class, 'updateSortOrder'])->name('adminUpdateCarSort');
+// Admin routes that need protection
+Route::middleware('admin')->group(function () {
+    Route::post('/adminpanel/cars/update-sort', [AdminCarController::class, 'updateSortOrder'])->name('adminUpdateCarSort');
+    Route::post('/adminpanel/car/add', [CarController::class, 'addCar'])->name('adminAddCar');
+    Route::post('/adminpanel/cars/{id}', [AdminCarController::class, 'updateCar'])->name('adminUpdateCar');
+    Route::post('/adminpanel/locations/add', [LocationsController::class, 'addLocation'])->name('adminAddLocation');
+    Route::post('/adminpanel/locations/update/{id}', [LocationsController::class, 'updateLocation'])->name('adminUpdateLocation');
+    Route::post('/adminpanel/campaigns', [CampaignsController::class, 'deleteCampaign'])->name('adminDeleteCampaign');
+    Route::post('/adminpanel/campaigns/{id}', [CampaignsController::class, 'updateCampaign'])->name('adminUpdateCampaign');
+    Route::post('/adminpanel/campaign/add', [CampaignsController::class, 'addCampaign'])->name('adminAddCampaign');
+    Route::get('/adminpanel/get-all-cars-info', function () {
+        try {
+            $allInfo = getAllCarPropertiesInfo();
+            $languages = getActiveLanguages();
+            return response()->json(['segments' => $allInfo['segments'], 'bodyTypes' => $allInfo['bodyTypes'], 'fuels' => $allInfo['fuels'], 'transmissions' => $allInfo['transmissions'], 'languages' => $languages]);
+        } catch (Exception $e) {
+            return response()->json($e);
+        }
+    });
+    Route::get('/adminpanel/get-locations', function () {
+        return response()->json([
+            'locations' => Locations::with(['city.translations', 'translations'])->get(),
+            'active_locations' => Locations::where('is_active', 1)->with(['translations', 'city.translations'])->get()
+        ]);
+    });
+    Route::get('/adminpanel/get-info/locations/{id}', [LocationsController::class, 'getIndexLocationInfo']);
+    Route::get('/get-reservations-informations', function () {
+        $data = Reservation::with(['extras', 'car', 'pickupLocation', 'returnLocation', 'currency'])->get();
+        
+        if ($data->isEmpty()) {
+            return response()->json(['message' => 'Veritabanında rezervasyon bulunamadı.'], 404);
+        }
 
-Route::get('/get-reservations-informations', function () {
-    $data = Reservation::with(['extras', 'car', 'pickupLocation', 'returnLocation', 'currency'])->get();
-    
-    if ($data->isEmpty()) {
-        return response()->json(['message' => 'Veritabanında rezervasyon bulunamadı.'], 404);
-    }
-
-    return response()->json(['reservations' => $data], 200);
+        return response()->json(['reservations' => $data], 200);
+    });
 });
+
 Route::get('/get-car-information/{id}', function ($id) {
     $car = Car::where('id', $id)
         ->with(['reservations', 'photos', 'brandKey', 'modelKey'])
@@ -172,16 +198,6 @@ Route::get('/get-currencies', function () {
 Route::get('get-session', function () {
     dd(session()->all());
 });
-Route::post('/adminpanel/car/add', [CarController::class, 'addCar'])->name('adminAddCar');
-Route::get('/adminpanel/get-all-cars-info', function () {
-    try {
-        $allInfo = getAllCarPropertiesInfo();
-        $languages = getActiveLanguages();
-        return response()->json(['segments' => $allInfo['segments'], 'bodyTypes' => $allInfo['bodyTypes'], 'fuels' => $allInfo['fuels'], 'transmissions' => $allInfo['transmissions'], 'languages' => $languages]);
-    } catch (Exception $e) {
-        return response()->json($e);
-    }
-});
 Route::get('/get-all-cars-info', function () {
     try {
         $allInfo = getAllCarPropertiesInfo();
@@ -190,7 +206,6 @@ Route::get('/get-all-cars-info', function () {
         return response()->json($e);
     }
 });
-Route::post('/adminpanel/cars/{id}', [AdminCarController::class, 'updateCar'])->name('adminUpdateCar');
 Route::get('/get-extras', function () {
     return response()->json(['extras' => \App\Models\ExtraServices::where('stock', '>', 0)->with('extraServicePrices')->get()]);
 });
@@ -201,23 +216,10 @@ Route::post('/create-reservation', [ReservationController::class, 'createReserva
 Route::post('/reservation/reject/{id}', [ReservationController::class, 'rejectReservation'])->name('rejectReservation');
 Route::post('/reservation/approve/{id}', [ReservationController::class, 'approveReservation'])->name('approveReservation');
 
-Route::post('/adminpanel/locations/add', [LocationsController::class, 'addLocation'])->name('adminAddLocation');
-Route::post('/adminpanel/locations/update/{id}', [LocationsController::class, 'updateLocation'])->name('adminUpdateLocation');
-
 Route::get('/get-locations', function () {
     return response()->json(['success' => true, 'locations' => Locations::where('is_active', 1)->get()], 200);
 });
 
-Route::get('/adminpanel/get-locations', function () {
-    $locations = \App\Models\Locations::with('parent')->get();
-    return response()->json([
-        'success' => true,
-        'data'    => $locations,
-        'count'   => $locations->count()
-    ], 200);
-});
-
-Route::get('/adminpanel/get-info/locations/{id}', [LocationsController::class, 'getIndexLocationInfo']);
 Route::post('/auth', [AuthController::class, 'auth'])->name('auth.login');
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('password.email');
 Route::get('/reset-password/{token}', function ($token) {
@@ -269,7 +271,13 @@ Route::group([
     Route::post(dbTransRoute('checkReservation'), [ReservationController::class, 'checkReservation'])->name('checkReservation');
     Route::post('/guest-reservation/{id}/cancel', [ReservationController::class, 'guestCancelReservation'])->name('guestCancelReservation');
 
-    Route::get(dbTransRoute('adminpanel'), function () {
+    // Admin Login Routes
+    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('auth'), [AuthController::class, 'showAdminLogin'])->name('admin.login');
+    Route::post(dbTransRoute('adminpanel') . '/' . dbTransRoute('login'), [AuthController::class, 'adminLogin']);
+
+    // Admin Panel Routes (Protected)
+    Route::middleware('admin')->group(function () {
+        Route::get(dbTransRoute('adminpanel'), function () {
         $upcoming = Reservation::upcoming()->with(['car.brandKey', 'car.modelKey', 'user'])->orderBy('pickup_datetime')->get();
         $active = Reservation::activeRentals()->with(['car.brandKey', 'car.modelKey', 'user'])->orderBy('return_datetime')->get();
         $late = Reservation::lateReturns()->with(['car.brandKey', 'car.modelKey', 'user'])->orderBy('return_datetime')->get();
@@ -285,14 +293,11 @@ Route::group([
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('cars') . '/{id}', [AdminCarController::class, 'showIndex'])->name('adminShowCar');
 
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('campaigns'), [CampaignsController::class, 'showAllAdminPanel'])->name('showAllCampaignsAdminPanel');
-    Route::post('/adminpanel/campaigns', [CampaignsController::class, 'deleteCampaign'])->name('adminDeleteCampaign');
-    Route::post('/adminpanel/campaigns/{id}', [CampaignsController::class, 'updateCampaign'])->name('adminUpdateCampaign');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('campaigns') . '/' . dbTransRoute('add'), function () {
         $languages = getActiveLanguages();
         return Inertia::render('adminPanel/campaigns/AddCampaign', ['languages' => $languages]);
     })->name('adminAddCampaignPage');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('campaigns') . '/{id}', [CampaignsController::class, 'showIndexAdminPanel'])->name('showIndexAdminPanel');
-    Route::post('/adminpanel/campaign/add', [CampaignsController::class, 'addCampaign'])->name('adminAddCampaign');
 
     Route::inertia(dbTransRoute('adminpanel') . '/' . dbTransRoute('locations'), 'adminPanel/locations/Locations')->name('adminLocations');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('locations'). '/{id}', function ($id) {
@@ -420,6 +425,7 @@ Route::group([
     Route::post('/adminpanel/email-templates', [EmailTemplateController::class, 'store'])->name('adminStoreEmailTemplate');
     Route::put('/adminpanel/email-templates/{id}', [EmailTemplateController::class, 'update'])->name('adminUpdateEmailTemplate');
     Route::delete('/adminpanel/email-templates/{id}', [EmailTemplateController::class, 'destroy'])->name('adminDeleteEmailTemplate');
+    });
 });
 
 

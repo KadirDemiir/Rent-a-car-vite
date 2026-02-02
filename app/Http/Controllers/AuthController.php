@@ -172,4 +172,41 @@ class AuthController extends Controller
         ], 422);
     }
 
+    // Admin Login Methods
+    public function showAdminLogin()
+    {
+        if (Auth::check() && Auth::user()->role === 'admin') {
+            return redirect('/adminpanel');
+        }
+        
+        return Inertia::render('admin/Login');
+    }
+
+    public function adminLogin(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+            
+            if ($user->role !== 'admin') {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Unauthorized access.',
+                ]);
+            }
+
+            $request->session()->regenerate();
+            
+            return redirect()->intended('/adminpanel');
+        }
+
+        return back()->withErrors([
+            'email' => 'Invalid credentials.',
+        ]);
+    }
+
 }

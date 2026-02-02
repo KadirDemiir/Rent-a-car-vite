@@ -46,7 +46,9 @@ class TranslationService
         $translations = [];
 
         foreach ($activeLanguages as $lang) {
-            $translations[$lang['code']] = self::getTranslationsByLanguage($lang['code']);
+            $translations[$lang['code']] = [
+                'translation' => self::getTranslationsByLanguage($lang['code'])
+            ];
         }
 
         return $translations;

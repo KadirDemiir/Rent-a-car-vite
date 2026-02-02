@@ -1,69 +1,57 @@
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-/**
- * Initialize i18n with translations from Inertia props
- * Database -> Laravel Cache -> Inertia Props -> i18n
- */
-const initI18n = async (translations = {}, languages = []) => {
-    // Get language config from database (via Inertia props)
-    const supportedLngs = languages?.map(lang => lang.code) || ['tr'];
-    const currentLang = languages?.[0]?.code || 'tr';
-    const fallbackLng = languages?.find(l => l.code === 'tr')?.code || supportedLngs[0] || 'tr';
-
-    // Build resources object
+const initI18n = async (locale, translations, allTranslations = {}) => {
+    console.log('Initializing i18n with locale:', locale);
+    
+    // Build resources for all languages
     const resources = {};
-    supportedLngs.forEach(lng => {
-        resources[lng] = {
-            translation: translations[lng] || {}
+    Object.keys(allTranslations).forEach(lang => {
+        resources[lang] = {
+            translation: allTranslations[lang] || {}
         };
     });
+    
+    // Ensure current locale is included
+    if (!resources[locale]) {
+        resources[locale] = {
+            translation: translations || {}
+        };
+    }
 
     const config = {
-        lng: currentLang,
-        fallbackLng: fallbackLng,
-        supportedLngs: supportedLngs,
+        lng: locale,
+        fallbackLng: 'tr',
         resources: resources,
-        interpolation: { escapeValue: false }
+        interpolation: { escapeValue: false },
+        react: { useSuspense: false }
     };
 
-    await i18next
-        .use(initReactI18next)
-        .init(config);
+    if (!i18next.isInitialized) {
+        await i18next
+            .use(initReactI18next)
+            .init(config);
+    } else {
+        // Add all resource bundles
+        Object.keys(resources).forEach(lang => {
+            i18next.addResourceBundle(lang, 'translation', resources[lang].translation, true, true);
+        });
+        await i18next.changeLanguage(locale);
+    }
 
     return i18next;
 };
 
-/**
- * Update i18n resources with translations from Inertia props
- * This is called from a React component where we can access Inertia props
- */
-export const updateI18nResources = (translations, languages) => {
-    if (!translations || !languages) {
-        console.warn('Translations or languages not available');
-        return;
-    }
+export const updateI18nResources = (locale, translations) => {
+    if (!translations || !locale) return;
 
-    const supportedLngs = languages?.map(lang => lang.code) || ['tr'];
-    const currentLang = languages?.[0]?.code || 'tr';
+    i18next.addResourceBundle(locale, 'translation', translations, true, true);
 
-    // Update i18next config
-    supportedLngs.forEach(lng => {
-        const translationData = translations[lng] || {};
-        i18next.addResourceBundle(lng, 'translation', translationData, true, true);
-    });
-
-    // Set current language
-    if (i18next.language !== currentLang) {
-        i18next.changeLanguage(currentLang);
+    if (i18next.language !== locale) {
+        i18next.changeLanguage(locale);
     }
 };
 
-/**
- * Reload translations after updates
- */
-export const reloadTranslations = async () => {
-    // Will be called from component with fresh props
-};
+export const reloadTranslations = async () => {};
 
 export default initI18n;

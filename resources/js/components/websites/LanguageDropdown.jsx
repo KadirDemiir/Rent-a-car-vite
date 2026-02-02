@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {router, usePage} from '@inertiajs/react';
 import { languages } from '../../constans/language.js';
-import { updateI18nResources } from '../../i18n.js';
 
 export default function LanguageDropdown() {
     const { i18n } = useTranslation();
@@ -10,6 +9,8 @@ export default function LanguageDropdown() {
     const ref = useRef(null);
     const [open, setOpen] = useState(false);
     const { locale } = usePage().props;
+    console.log('Translations from Inertia:', translations);
+    //console.log('Inertia locale:', locale, i18n.language);
     const langs = inertiaLanguages?.map(l => l.code).filter(l => l !== 'cimode') || ['tr'];
 
     useEffect(() => {
@@ -47,13 +48,10 @@ export default function LanguageDropdown() {
         const hash = window.location.hash;
         newUrl += searchParams + hash;
 
-        // Change language
-        if (!i18n.store.data[lng] || !i18n.store.data[lng].translation) {
-            updateI18nResources(translations, inertiaLanguages);
-        }
+        // Change language (all translations already loaded on app init)
         await i18n.changeLanguage(lng);
 
-        router.visit(newUrl, { method: 'get', preserveState: true, preserveScroll: true });
+        router.visit(newUrl, { method: 'get', preserveState: false, preserveScroll: true });
     };
 
     return (

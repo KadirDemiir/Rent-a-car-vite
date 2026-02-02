@@ -22,6 +22,8 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'currencies' => fn () => (new CurrencyService())->getActiveCurrencies(),
+            'locale' => app()->getLocale(),
+            'active_translation' => fn () => TranslationService::getTranslationsByLanguage(app()->getLocale()),
             'translations' => fn () => TranslationService::getAllTranslations(),
             'languages' => fn () => TranslationService::getActiveLanguages(),
         ]);
