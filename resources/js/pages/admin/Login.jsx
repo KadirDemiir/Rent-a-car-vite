@@ -1,25 +1,30 @@
 import { useState } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 
 export default function AdminLogin() {
     const { t } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
-    
-    const { data, setData, post, processing, errors } = useForm({
+
+    const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
     });
 
+    const { errors: pageErrors } = usePage().props;
+    const formErrors = Object.keys(errors || {}).length ? errors : (pageErrors || {});
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        post('/admin/login');
+        post(`/adminpanel/auth`, {
+            onFinish: () => {reset('password')},
+        });
     };
 
     return (
         <>
             <Head title="Admin Login" />
-            
+
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
                 <div className="w-full max-w-md">
                     <div className="bg-white rounded-2xl shadow-2xl p-8">
@@ -38,11 +43,11 @@ export default function AdminLogin() {
                                     type="email"
                                     value={data.email}
                                     onChange={e => setData('email', e.target.value)}
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                    className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${formErrors.email ? 'border-red-500' : 'border-gray-300'}`}
                                     required
                                 />
-                                {errors.email && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                                {formErrors.email && (
+                                    <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>
                                 )}
                             </div>
 
@@ -56,7 +61,7 @@ export default function AdminLogin() {
                                         type={showPassword ? 'text' : 'password'}
                                         value={data.password}
                                         onChange={e => setData('password', e.target.value)}
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                        className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${formErrors.password ? 'border-red-500' : 'border-gray-300'}`}
                                         required
                                     />
                                     <button
@@ -76,8 +81,8 @@ export default function AdminLogin() {
                                         )}
                                     </button>
                                 </div>
-                                {errors.password && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                                {formErrors.password && (
+                                    <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>
                                 )}
                             </div>
 

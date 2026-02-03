@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\PasswordReset;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -184,29 +185,65 @@ class AuthController extends Controller
 
     public function adminLogin(Request $request)
     {
+        \Log::info('Admin login attempt:', ['email' => $request->input('email')]);
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
-
+        Log::info('Validated credentials:', ['email' => $credentials['email']]);
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-            
+            Log::info('Authenticated user:', ['user_id' => $user->id, 'role' => $user->role]);
             if ($user->role !== 'admin') {
+                Log::warning('Unauthorized admin access attempt:', ['user_id' => $user->id]);
                 Auth::logout();
                 return back()->withErrors([
                     'email' => 'Unauthorized access.',
                 ]);
             }
-
+            Log::info('Admin user logged in successfully:', ['user_id' => $user->id]);
             $request->session()->regenerate();
-            
+            Log::info('Session regenerated for admin user:', ['user_id' => $user->id, 'session_id' => $request->session()->getId()]);
             return redirect()->intended('/adminpanel');
         }
-
+        Log::warning('Admin login failed for email:', ['email' => $request->input('email')]);
         return back()->withErrors([
             'email' => 'Invalid credentials.',
         ]);
+    }
+
+    public function showAdminChangePassword()
+    {
+        return Inertia::render('adminPanel/profile/ChangePassword', [
+            'success' => session('success'),
+        ]);
+    }
+
+    public function updateAdminPassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => ['required'],
+            'password' => ['required', 'min:6', 'confirmed'],
+        ]);
+
+        $user = Auth::user();
+
+        if (!$user || $user->role !== 'admin') {
+            return back()->withErrors([
+                'current_password' => 'Unauthorized action.',
+            ]);
+        }
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors([
+                'current_password' => 'Current password is incorrect.',
+            ]);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return back()->with('success', 'Password updated successfully.');
     }
 
 }

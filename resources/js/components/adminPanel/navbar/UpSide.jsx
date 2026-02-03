@@ -1,8 +1,9 @@
 import LanguageDropdown from "../../websites/LanguageDropdown.jsx";
 import CurrencyDropDown from "../../CurrencyDropDown.jsx";
-import {CarFront, User, Menu} from 'lucide-react';
+import {CarFront, User, Menu, LogOut} from 'lucide-react';
 import {router} from "@inertiajs/react";
 import {useTranslation} from "react-i18next";
+import axios from "axios";
 
 export default function UpSide({ onToggleSidebar }) {
 
@@ -10,6 +11,18 @@ export default function UpSide({ onToggleSidebar }) {
     const goToHomePage = () => {
         router.visit(`/${i18n.language}/${t('address.adminpanel')}`)
     }
+    const goToChangePassword = () => {
+        router.visit(`/${i18n.language}/${t('address.adminpanel')}/admin`)
+    }
+    const handleLogout = async () => {
+        try {
+            await axios.post(`/${i18n.language}/logout`, {}, { withCredentials: true });
+            router.visit(`/${i18n.language}/${t('address.adminpanel')}/${t('address.auth')}`);
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
+    }
+
     return(
         <div className="fixed w-full px-4 md:px-16 flex items-center justify-between h-20 border-b z-40 bg-white shadow-sm">
             <div className="flex items-center gap-4">
@@ -21,9 +34,16 @@ export default function UpSide({ onToggleSidebar }) {
             <div className="flex items-center gap-3 md:gap-6">
                 <LanguageDropdown/>
                 <CurrencyDropDown/>
-                <div className="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors">
-                    <span className="hidden md:block font-medium text-sm">PROFILE</span>
+                <div onClick={goToChangePassword} className="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors">
+                    <span className="hidden md:block font-medium text-sm">
+                        <User size={24} />
+                    </span>
                     <User className="md:hidden" size={24}/>
+                </div>
+                <div className={`flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors`} onClick={handleLogout}>
+                    <span className="hidden md:block font-medium text-sm">
+                        <LogOut size={24}/>
+                    </span>
                 </div>
             </div>
         </div>

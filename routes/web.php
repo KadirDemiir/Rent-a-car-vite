@@ -110,6 +110,8 @@ Route::get('/test-lang', function () {
     session()->put('deneme', true);
     return redirect('get-session');
 });
+
+Route::post('/adminpanel/auth', [AuthController::class, 'adminLogin']);
 /* Route::get('/deneme-curr', function () {
     $def = Currency::where('is_active', 1)->where('is_default', 1)->first();
     if (!$def)
@@ -273,9 +275,7 @@ Route::group([
 
     // Admin Login Routes
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('auth'), [AuthController::class, 'showAdminLogin'])->name('admin.login');
-    Route::post(dbTransRoute('adminpanel') . '/' . dbTransRoute('login'), [AuthController::class, 'adminLogin']);
 
-    // Admin Panel Routes (Protected)
     Route::middleware('admin')->group(function () {
         Route::get(dbTransRoute('adminpanel'), function () {
         $upcoming = Reservation::upcoming()->with(['car.brandKey', 'car.modelKey', 'user'])->orderBy('pickup_datetime')->get();
@@ -288,6 +288,8 @@ Route::group([
             'lateReservations' => $late,
         ]);
     })->name('adminHome');
+    Route::post(dbTransRoute('adminpanel') . '/admin', [AuthController::class, 'updateAdminPassword'])->name('adminUpdatePassword');
+    Route::get(dbTransRoute('adminpanel') . '/admin', [AuthController::class, 'showAdminChangePassword'])->name('adminChangePassword');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('cars'), [AdminCarController::class, 'showAll'])->name('adminCars');
     Route::inertia(dbTransRoute('adminpanel') . '/' . dbTransRoute('cars') . '/' . dbTransRoute('add'), 'adminPanel/cars/AddCar')->name('adminAddCarPage');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('cars') . '/{id}', [AdminCarController::class, 'showIndex'])->name('adminShowCar');

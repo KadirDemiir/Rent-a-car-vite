@@ -9,8 +9,6 @@ export default function LanguageDropdown() {
     const ref = useRef(null);
     const [open, setOpen] = useState(false);
     const { locale } = usePage().props;
-    console.log('Translations from Inertia:', translations);
-    //console.log('Inertia locale:', locale, i18n.language);
     const langs = inertiaLanguages?.map(l => l.code).filter(l => l !== 'cimode') || ['tr'];
 
     useEffect(() => {
@@ -51,7 +49,7 @@ export default function LanguageDropdown() {
         // Change language (all translations already loaded on app init)
         await i18n.changeLanguage(lng);
 
-        router.visit(newUrl, { method: 'get', preserveState: false, preserveScroll: true });
+        window.location.href = newUrl + window.location.search;
     };
 
     return (
