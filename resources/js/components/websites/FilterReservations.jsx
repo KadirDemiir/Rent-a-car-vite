@@ -18,7 +18,6 @@ export default function FilterReservations({ onFilterChange }) {
   const [segmentOpt, setSegmentOpt] = useState([]);
 
   useEffect(() => {
-      console.log(fuel)
     onFilterChange({ sort, fuel, transmission, segment });
   }, [sort, fuel, transmission, segment]);
 

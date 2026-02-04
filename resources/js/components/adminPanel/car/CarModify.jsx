@@ -2,7 +2,6 @@ import CarForm from "./form/CarForm.jsx";
 import { usePage } from "@inertiajs/react";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
-import { reloadTranslations } from "../../../i18n.js";
 
 export default function CarModify({ closeModal = null, car = null, setCar }) {
     const { t, i18n } = useTranslation();
@@ -14,7 +13,6 @@ export default function CarModify({ closeModal = null, car = null, setCar }) {
             const res = await axios.post(`/adminpanel/cars/${car.id}`, data, {
                 headers: { 'X-CSRF-TOKEN': csrfToken },
             });
-            await reloadTranslations(i18n.language);
             setCar(res.data.car);
             closeModal();
         } catch (error) {

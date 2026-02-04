@@ -7,7 +7,7 @@ import FilterReservations from "../components/websites/FilterReservations.jsx"
 
 export default function SearchReservations(){
     const { availableCars, reservation, locations } = usePage().props;
-    console.log(availableCars, reservation, locations);
+    //console.log(availableCars, reservation, locations);
     const [sortBy, setSortBy] = useState("increase");
     const [fuelType, setFuelType] = useState("");
     const [transmissionType, setTransmissionType] = useState("");

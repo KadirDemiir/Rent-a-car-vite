@@ -3,7 +3,6 @@ import CarForm from "../../../components/adminPanel/car/form/CarForm.jsx";
 import {useTranslation} from "react-i18next";
 import axios from "axios";
 import {useState, useRef} from "react";
-import {reloadTranslations} from "../../../i18n.js";
 
 export default function AddCars() {
     const {t, i18n} = useTranslation();
@@ -29,7 +28,6 @@ export default function AddCars() {
                         setSuccess(null);
                     }
                     localStorage.removeItem('i18n_config_cache');
-                    reloadTranslations(i18n.language);
 
                     setTimeout(() => {
                         if (topRef.current) {

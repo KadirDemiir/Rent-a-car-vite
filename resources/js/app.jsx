@@ -33,15 +33,11 @@ createInertiaApp({
         });
     },
     setup({ el, App, props }) {
-        const { locale, translations } = props.initialPage.props;
+        // Props'tan sadece locale bilgisini alıyoruz. 
+        // Translations artık prop olarak gelmiyor.
+        const { locale } = props.initialPage.props;
 
-        // Initialize with all language translations
-        const allTranslations = {};
-        Object.keys(translations || {}).forEach(lang => {
-            allTranslations[lang] = translations[lang]?.translation || {};
-        });
-
-        initI18n(locale, allTranslations[locale] || {}, allTranslations).then((i18nInstance) => {
+        initI18n(locale).then((i18nInstance) => {
             createRoot(el).render(
                 <I18nextProvider i18n={i18nInstance}>
                     <App {...props} />

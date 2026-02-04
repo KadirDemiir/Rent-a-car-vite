@@ -37,7 +37,8 @@ use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
-// Admin routes that need protection
+Route::get('/locales/{locale}/translation.json', [TranslationController::class, 'fetch'])
+    ->name('translations.fetch');
 Route::middleware('admin')->group(function () {
     Route::post('/adminpanel/cars/update-sort', [AdminCarController::class, 'updateSortOrder'])->name('adminUpdateCarSort');
     Route::post('/adminpanel/car/add', [CarController::class, 'addCar'])->name('adminAddCar');

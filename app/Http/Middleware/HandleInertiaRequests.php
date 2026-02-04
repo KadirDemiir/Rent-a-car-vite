@@ -23,8 +23,8 @@ class HandleInertiaRequests extends Middleware
             ],
             'currencies' => fn () => (new CurrencyService())->getActiveCurrencies(),
             'locale' => app()->getLocale(),
-            'active_translation' => fn () => TranslationService::getTranslationsByLanguage(app()->getLocale()),
-            'translations' => fn () => TranslationService::getAllTranslations(),
+            //'active_translation' => fn () => TranslationService::getTranslationsByLanguage(app()->getLocale()),
+            //'translations' => fn () => TranslationService::getAllTranslations(),
             'languages' => fn () => TranslationService::getActiveLanguages(),
         ]);
     }

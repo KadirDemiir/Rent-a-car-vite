@@ -2,7 +2,6 @@ import CarPropertiesGenericInfo from "./CarPropertiesGenericInfo.jsx";
 import {useState} from "react";
 import axios from "axios";
 import {useTranslation} from "react-i18next";
-import {reloadTranslations} from "../../../i18n.js";
 
 export default function FuelTypeForm({mode="create", lngs, fuel=null}){
     const {t} = useTranslation();
@@ -45,7 +44,6 @@ export default function FuelTypeForm({mode="create", lngs, fuel=null}){
             .then((response) => {
                 if (response.data.success) {
                     localStorage.removeItem('i18n_config_cache');
-                    reloadTranslations();
                     setSuccess(mode === "create" ? "Added Successfully!" : "Updated Successfully!");
                 } else
                     setError(mode === "create" ? "Failed to add BodyType" : "Failed to update BodyType");

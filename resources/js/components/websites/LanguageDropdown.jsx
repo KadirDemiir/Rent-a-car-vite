@@ -5,7 +5,7 @@ import { languages } from '../../constans/language.js';
 
 export default function LanguageDropdown() {
     const { i18n } = useTranslation();
-    const { translations, languages: inertiaLanguages } = usePage().props;
+    const {languages: inertiaLanguages } = usePage().props;
     const ref = useRef(null);
     const [open, setOpen] = useState(false);
     const { locale } = usePage().props;
@@ -29,6 +29,9 @@ export default function LanguageDropdown() {
         const currLang = i18n.language.split('?');
         const url = window.location.pathname.split('/').filter(Boolean);
         let newUrl = '/' + lng;
+        await i18n.changeLanguage(lng)
+        .then(() => {
+        console.log(i18n.language);
 
         for (let i = 1; i < url.length; i++) {
             const currTranslations = i18n.store.data[currLang[0].split('/')[0]]?.translation || {};
@@ -46,10 +49,8 @@ export default function LanguageDropdown() {
         const hash = window.location.hash;
         newUrl += searchParams + hash;
 
-        // Change language (all translations already loaded on app init)
-        await i18n.changeLanguage(lng);
-
-        window.location.href = newUrl + window.location.search;
+            window.location.href = newUrl + window.location.search;
+        });
     };
 
     return (

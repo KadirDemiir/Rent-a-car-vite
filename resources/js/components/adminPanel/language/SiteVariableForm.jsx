@@ -1,7 +1,6 @@
 import {useState} from "react";
 import SiteVariable from "./SiteVariable.jsx";
 import axios from "axios";
-import {reloadTranslations} from "../../../i18n.js";
 import { useTranslation } from "react-i18next";
 
 export default function SiteVariableForm({keys, language}){
@@ -42,7 +41,6 @@ export default function SiteVariableForm({keys, language}){
         .then(response => {
             setSuccess(response.data.success);
             localStorage.removeItem('i18n_config_cache');
-            reloadTranslations(i18n.language);
         })
         .catch(err => {
             setError(err.response?.data?.error || "Kaydetme sırasında bir hata oluştu.");

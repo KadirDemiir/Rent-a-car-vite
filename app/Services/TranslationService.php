@@ -9,53 +9,37 @@ use Illuminate\Support\Facades\Cache;
 class TranslationService
 {
     /**
-     * Get all translations for a specific language from cache or database
+     * Belirli bir dil için çevirileri Cache veya DB'den çeker.
+     * API üzerinden çağrıldığında bu metod kullanılır.
      */
     public static function getTranslationsByLanguage(string $langCode): array
     {
         $cacheKey = "translations_{$langCode}";
-        $cacheDuration = 3600 * 24; // 24 hours
+        $cacheDuration = 3600 * 24 * 30; 
 
         return Cache::store('file')->remember($cacheKey, $cacheDuration, function () use ($langCode) {
             return Translation::with('translationKey')
                 ->whereHas('language', fn($q) => $q->where('code', $langCode))
                 ->get()
-                ->mapWithKeys(fn($t) => [$t->translationKey->key => $t->value])
+                ->mapWithKeys(function ($t) {
+                    return [$t->translationKey->key => $t->value];
+                })
                 ->toArray();
         });
     }
 
-    /**
-     * Get all active languages with basic info
-     */
     public static function getActiveLanguages(): array
     {
-        return Cache::store('file')->remember('active_languages_list', 3600 * 24, function () {
+        return Cache::store('file')->remember('active_languages_list', 3600 * 24 * 30, function () {
             return Language::where('status', 'active')
-                ->get(['id', 'code', 'name', 'flag_photo_path'])
+                ->select('id', 'code', 'name', 'flag_photo_path') // Sadece gerekli alanları çekiyoruz
+                ->get()
                 ->toArray();
         });
     }
 
     /**
-     * Get all translations for all languages (useful for i18n config)
-     */
-    public static function getAllTranslations(): array
-    {
-        $activeLanguages = self::getActiveLanguages();
-        $translations = [];
-
-        foreach ($activeLanguages as $lang) {
-            $translations[$lang['code']] = [
-                'translation' => self::getTranslationsByLanguage($lang['code'])
-            ];
-        }
-
-        return $translations;
-    }
-
-    /**
-     * Clear translation cache when translations are updated
+     * Admin panelinde çeviri güncellendiğinde Cache'i temizler.
      */
     public static function clearCache(): void
     {
@@ -66,6 +50,5 @@ class TranslationService
         }
         
         Cache::store('file')->forget('active_languages_list');
-        Cache::store('file')->forget('supported_locales');
     }
 }

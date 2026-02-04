@@ -9,6 +9,7 @@ use App\Models\TranslationKey;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -143,5 +144,12 @@ class TranslationController extends Controller
             DB::rollBack();
             return response()->json(['error' => $exception->getMessage()], 500);
         }
+    }
+
+    public function fetch(string $locale): JsonResponse
+    {
+        $translations = $this->translationService->getTranslationsByLanguage($locale);
+        
+        return response()->json($translations);
     }
 }

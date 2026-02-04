@@ -2,7 +2,6 @@ import CarPropertiesGenericInfo from "./CarPropertiesGenericInfo.jsx";
 import {useState} from "react";
 import axios from "axios";
 import {useTranslation} from "react-i18next";
-import {reloadTranslations} from "../../../i18n.js";
 
 export default function BodyTypeForm({mode="create", lngs, bt=null}){
     const {t} = useTranslation();
@@ -50,7 +49,6 @@ export default function BodyTypeForm({mode="create", lngs, bt=null}){
                     : await axios.put(url, data, { headers: { "X-CSRF-TOKEN": csrfToken, "Content-Type": "application/json" }});
 
             if (response.data.success) {
-                await reloadTranslations();
 
                 setSuccess(mode === "create" ? "Added Successfully!" : "Updated Successfully!");
                 setError("");
