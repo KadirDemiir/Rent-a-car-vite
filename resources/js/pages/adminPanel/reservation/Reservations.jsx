@@ -40,7 +40,7 @@ export default function Reservations({}){
                   </div>
                 </div>
             </Navbar>
-            <div className="h-24 bg-blue-700"></div>
+            <div className="h-24 bg-gray-700"></div>
         </div>
     );
 }

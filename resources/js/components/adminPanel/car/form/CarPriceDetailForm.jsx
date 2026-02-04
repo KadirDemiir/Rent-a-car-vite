@@ -134,13 +134,13 @@ export default function CarPriceDetailForm({ data, setData, errors, setErrors })
                             <th key={dayKey} className="relative min-w-20 md:min-w-36">
                                 <div className="group relative">
                                     <div className="absolute -top-6 left-0 right-0 flex justify-between px-1 opacity-0 group-hover:opacity-100 transition-all duration-200 z-20">
-                                        <button type="button" onClick={() => copyColumn(dayKey)} className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-[10px] hover:bg-blue-600 shadow-sm" title="Sütunu Kopyala">C</button>
+                                        <button type="button" onClick={() => copyColumn(dayKey)} className="bg-gray-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-[10px] hover:bg-gray-800 shadow-sm" title="Sütunu Kopyala">C</button>
                                         <button type="button" onClick={() => removeColumn(dayKey)} className="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 shadow-sm" title="Sütunu Sil">&times;</button>
                                     </div>
                                     <input
                                         defaultValue={dayKey}
                                         onBlur={(e) => handleDayKeyChange(dayKey, e.target.value, index)}
-                                        className={`outline-none bg-blue-100 rounded-md w-full text-center px-1 md:px-2 py-1 md:py-1.5 transition-all font-medium text-xs md:text-sm ${errors.month?.[index] ? 'ring-2 ring-red-500' : 'focus:ring-2 focus:ring-blue-400'}`}
+                                        className={`outline-none bg-gray-100 rounded-md w-full text-center px-1 md:px-2 py-1 md:py-1.5 transition-all font-medium text-xs md:text-sm ${errors.month?.[index] ? 'ring-2 ring-red-500' : 'focus:ring-2 focus:ring-gray-400'}`}
                                     />
                                 </div>
                                 {errors.month?.[index] && (
@@ -156,7 +156,7 @@ export default function CarPriceDetailForm({ data, setData, errors, setErrors })
                     <tbody>
                     {months.map((month, i) => (
                         <tr key={month}>
-                            <th className="bg-blue-200 rounded-md px-2 md:px-4 py-1 md:py-2 text-xs md:text-sm font-bold text-blue-900 min-w-16 md:min-w-32">{month}</th>
+                            <th className="bg-gray-200 rounded-md px-2 md:px-4 py-1 md:py-2 text-xs md:text-sm font-bold text-gray-900 min-w-16 md:min-w-32">{month}</th>
                             {dayKeys.map((dayKey) => {
                                 const rawVal = data.price[i + 1]?.[dayKey];
                                 const selectedCurr = currencies.find(c => c.id === data.currency);

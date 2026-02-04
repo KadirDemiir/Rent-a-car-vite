@@ -77,7 +77,7 @@ export default function CarPhoto({defPhotos, maxFiles = 4, onChange }) {
                 className={`flex items-center justify-center h-40 border-2 border-dashed rounded-lg cursor-pointer text-sm ${
                     photos.length >= maxFiles
                         ? "border-gray-300 text-gray-400 bg-gray-100"
-                        : "border-blue-400 text-blue-600 hover:bg-blue-50"
+                        : "border-gray-400 text-gray-700 hover:bg-gray-50"
                 }`}
             >
                 {photos.length >= maxFiles
@@ -92,7 +92,7 @@ export default function CarPhoto({defPhotos, maxFiles = 4, onChange }) {
                         <div
                             key={i}
                             className={`relative rounded overflow-hidden border ${
-                                coverIndex === i ? "ring-2 ring-blue-500" : ""
+                                coverIndex === i ? "ring-2 ring-gray-700" : ""
                             }`}
                         >
                             <img
@@ -110,7 +110,7 @@ export default function CarPhoto({defPhotos, maxFiles = 4, onChange }) {
                                 ×
                             </button>
                             {coverIndex === i && (
-                                <div className="absolute bottom-0 left-0 bg-blue-600 text-white text-[10px] px-1 w-full text-center">
+                                <div className="absolute bottom-0 left-0 bg-gray-700 text-white text-[10px] px-1 w-full text-center">
                                     Kapak
                                 </div>
                             )}

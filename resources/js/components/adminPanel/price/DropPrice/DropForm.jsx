@@ -58,7 +58,7 @@ export default function DropForm({handleSubmit, opt, data, setData, error, setEr
                 <button
                     type="button"
                     onClick={handleSubmit}
-                    className="rounded-2xl bg-blue-500 px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-600"
+                    className="rounded-2xl bg-gray-700 px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-800"
                 >
                     {t("adminpanel.pricing.drop_price.locations_price.save")}
                 </button>

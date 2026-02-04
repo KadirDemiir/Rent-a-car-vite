@@ -32,7 +32,7 @@ export default function CarCard({ car }) {
             
             <div className="relative w-full aspect-[16/10] bg-gray-50 overflow-hidden">
                 <div className="absolute top-3 left-3 z-10">
-                    <span className="px-3 py-1 text-xs font-bold text-white bg-blue-600/90 backdrop-blur-md rounded-full shadow-sm uppercase tracking-wider">
+                    <span className="px-3 py-1 text-xs font-bold text-white bg-gray-700/90 backdrop-blur-md rounded-full shadow-sm uppercase tracking-wider">
                         {t(`segment.${car.segment_id}`)}
                     </span>
                 </div>
@@ -50,7 +50,7 @@ export default function CarCard({ car }) {
             <div className="flex-1 p-5 flex flex-col">
                 {/* Marka & Model */}
                 <div className="mb-4">
-                    <h3 className="text-gray-900 text-xl font-bold leading-tight group-hover:text-blue-600 transition-colors">
+                    <h3 className="text-gray-900 text-xl font-bold leading-tight group-hover:text-gray-700 transition-colors">
                         {t(car.brand_key.key)} <span className="font-normal text-gray-600">{t(car.model_key.key)}</span>
                     </h3>
                     <p className="text-sm text-gray-400 mt-1 capitalize">
@@ -84,8 +84,7 @@ export default function CarCard({ car }) {
                             <span>{currencySymbol}{Number(depositAmount).toFixed(2)}</span>
                         </div>
                     </div>
-
-                    <button className="flex items-center gap-2 bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:bg-blue-600 hover:gap-3 shadow-md hover:shadow-blue-500/30">
+                    <button className="flex items-center gap-2 bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:bg-gray-700 hover:gap-3 shadow-md hover:shadow-gray-500/30">
                         {t('website.searchReservation.rent_now') || 'Kirala'}
                         <ArrowRight size={16} />
                     </button>

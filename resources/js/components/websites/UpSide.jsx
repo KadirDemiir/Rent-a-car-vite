@@ -47,7 +47,7 @@ export default function UpSide({ isMobileMenuOpen }) {
                 <nav className="flex items-center">
                     <ul className="flex flex-col md:flex-row items-center gap-2 md:gap-3 py-3 md:py-0">
                         <li>
-                            <Link href={`/${i18n.language}/${t('address.checkReservation')}`} className="px-4 py-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2 text-sm font-medium">
+                            <Link href={`/${i18n.language}/${t('address.checkReservation')}`} className="px-4 py-2 rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-700 hover:text-white transition-all flex items-center gap-2 text-sm font-medium">
                                 <ClipboardCheck size={16}/>
                                 {upperFirstLetter(t("website.navigator.check_reservation", "rez-kontrol"))}
                             </Link>
@@ -59,7 +59,7 @@ export default function UpSide({ isMobileMenuOpen }) {
                                     {upperFirstLetter(t('logout'))}
                                 </button>
                             ) : (
-                                <Link href={`/${i18n.language}/${t('address.auth')}`} className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2 text-sm font-medium">
+                                <Link href={`/${i18n.language}/${t('address.auth')}`} className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-700 hover:text-white transition-all flex items-center gap-2 text-sm font-medium">
                                     <User size={16}/>
                                     {upperFirstLetter(t("website.auth.login.login_label"))}
                                 </Link>

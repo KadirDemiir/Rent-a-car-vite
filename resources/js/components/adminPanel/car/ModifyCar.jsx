@@ -38,7 +38,7 @@ export default function ModifyCar({ car, setCar, setSuccess }) {
                     </button>
                     <button
                         onClick={() => setOpenCarModify(true)}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition cursor-pointer"
+                        className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 transition cursor-pointer"
                     >
                         {t("adminpanel.car.car_modify.edit_car_information.edit_car_information")}
                     </button>

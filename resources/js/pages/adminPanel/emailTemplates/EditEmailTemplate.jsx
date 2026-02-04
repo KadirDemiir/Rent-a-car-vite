@@ -148,7 +148,7 @@ export default function EditEmailTemplate({ template, languages }) {
                         <div className="flex gap-3 pt-4">
                             <button
                                 type="submit"
-                                className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                className="flex-1 bg-gray-700 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors font-medium"
                             >
                                 {t('adminpanel.email.update_template')}
                             </button>

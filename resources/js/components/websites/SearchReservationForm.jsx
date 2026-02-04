@@ -99,7 +99,7 @@ export default function SearchReservation({locations, defPickupLocation, defRetu
           <h2 className="text-3xl font-bold text-gray-800 text-center mb-2">
             {upperFirstLetter(t('website.home.button.save'))}
           </h2>
-          <div className="w-20 h-1 bg-gradient-to-r from-blue-600 to-blue-400 mx-auto rounded-full"></div>
+          <div className="w-20 h-1 bg-gradient-to-r from-gray-600 to-gray-400 mx-auto rounded-full"></div>
         </div>
       }
       <form onSubmit={submitHandler} className={`grid grid-cols-1 gap-6 ${home ? "md:grid-cols-2" : "md:flex md:flex-wrap md:items-end"}`}> 
@@ -176,7 +176,7 @@ export default function SearchReservation({locations, defPickupLocation, defRetu
         <div className={`flex items-center justify-center ${home ? 'mt-6 md:col-span-2' : 'min-w-[150px] md:flex-initial md:mt-0 mt-6'}`}>
           <button
             type="submit"
-            className={`${home ? 'px-12 py-4' : 'px-8 py-3 w-full md:w-auto'} bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2`}
+            className={`${home ? 'px-12 py-4' : 'px-8 py-3 w-full md:w-auto'} bg-gradient-to-r from-gray-700 to-gray-700 hover:from-gray-800 hover:to-gray-900 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />

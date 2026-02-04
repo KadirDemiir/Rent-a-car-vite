@@ -6,6 +6,7 @@ import {useTranslation} from "react-i18next";
 
 export default function Car({cars, locations}) {
     const {i18n, t} = useTranslation();
+    console.log(cars);
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200">
             <Navbar />
@@ -13,7 +14,7 @@ export default function Car({cars, locations}) {
                 <div className="mb-8">
                     <SearchReservationForm locations={locations} home={false} />
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
                     {cars.map((car) => (
                         <Link 
                             key={car.id} 

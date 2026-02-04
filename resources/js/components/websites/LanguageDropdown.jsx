@@ -31,23 +31,22 @@ export default function LanguageDropdown() {
         let newUrl = '/' + lng;
         await i18n.changeLanguage(lng)
         .then(() => {
-        console.log(i18n.language);
 
-        for (let i = 1; i < url.length; i++) {
-            const currTranslations = i18n.store.data[currLang[0].split('/')[0]]?.translation || {};
-            const newTranslations = i18n.store.data[lng]?.translation || {};
-            const key = Object.keys(currTranslations).find(k => currTranslations[k] === url[i]);
-            if (key) {
-                const translatedSegment = newTranslations[key] || url[i];
-                newUrl += '/' + translatedSegment;
-            } else {
-                newUrl += '/' + url[i];
+            for (let i = 1; i < url.length; i++) {
+                const currTranslations = i18n.store.data[currLang[0].split('/')[0]]?.translation || {};
+                const newTranslations = i18n.store.data[lng]?.translation || {};
+                const key = Object.keys(currTranslations).find(k => currTranslations[k] === url[i]);
+                if (key) {
+                    const translatedSegment = newTranslations[key] || url[i];
+                    newUrl += '/' + translatedSegment;
+                } else {
+                    newUrl += '/' + url[i];
+                }
             }
-        }
 
-        const searchParams = window.location.search;
-        const hash = window.location.hash;
-        newUrl += searchParams + hash;
+            const searchParams = window.location.search;
+            const hash = window.location.hash;
+            newUrl += searchParams + hash;
 
             window.location.href = newUrl + window.location.search;
         });
@@ -55,7 +54,7 @@ export default function LanguageDropdown() {
 
     return (
         <div ref={ref} className="w-28 relative flex items-center justify-center">
-            <button type={`button`} onClick={() => setOpen(!open)} className="w-full px-2 py-1.5 border border-blue-400/60 bg-blue-500 text-white rounded-xl flex items-center justify-center gap-2">
+            <button type={`button`} onClick={() => setOpen(!open)} className="w-full px-2 py-1.5 border border-gray-400/60 bg-gray-500 text-white rounded-xl flex items-center justify-center gap-2">
                 <img src={languages[current]?.flag} alt="" className="h-5 w-5 rounded-full" />
                 <span className="text-sm font-semibold">{current.toUpperCase()}</span>
                 <div className="h-5 w-5">
@@ -65,12 +64,12 @@ export default function LanguageDropdown() {
                 </div>
             </button>
             {open && (
-                <ul className="absolute top-full mt-2 bg-white border border-blue-200 rounded-lg shadow-lg w-full z-40 text-center overflow-hidden">
+                <ul className="absolute top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg w-full z-40 text-center overflow-hidden">
                     {langs.map(lng => (
                         <li key={lng}>
                             <button
                                 onClick={() => {handleChangeLang(lng); setOpen(false)}}
-                                className={`flex items-center justify-between w-full px-3 py-2 text-sm ${current === lng ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-blue-50'}`}>
+                                className={`flex items-center justify-between w-full px-3 py-2 text-sm ${current === lng ? 'bg-gray-700 text-white' : 'text-gray-700 hover:bg-gray-50'}`}>
                                 <img src={languages[lng]?.flag} alt="" className="h-5 w-5 rounded-full" />
                                 {lng.toUpperCase()}
                             </button>

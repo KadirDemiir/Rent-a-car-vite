@@ -173,7 +173,7 @@ export default function InternalServices({services, languages}) {
                                 <div className="pt-4">
                                     <button 
                                         onClick={handleAddNew} 
-                                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-colors"
+                                        className="w-full bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2.5 px-6 rounded-lg transition-colors"
                                     >
                                         {t("adminpanel.pricing.adding_services.internal_services.save")}
                                     </button>

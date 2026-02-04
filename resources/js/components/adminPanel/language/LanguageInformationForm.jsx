@@ -88,7 +88,7 @@ export default function LanguageInformationForm({lang, setLang, totalCmpCount, c
                 <div className="flex flex-col sm:flex-row gap-2 md:gap-3 lg:gap-4">
                     <button 
                         onClick={handleSubmit}
-                        className="w-full sm:flex-1 px-4 md:px-6 py-2 md:py-3 bg-blue-600 text-white font-medium text-sm md:text-base rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm active:scale-95"
+                        className="w-full sm:flex-1 px-4 md:px-6 py-2 md:py-3 bg-gray-700 text-white font-medium text-sm md:text-base rounded-lg hover:bg-gray-800 transition-colors duration-200 shadow-sm active:scale-95"
                     >
                         {t("adminpanel.languages.edit_language.button.delete")}
                     </button>

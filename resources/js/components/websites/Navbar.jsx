@@ -29,7 +29,7 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="bg-blue-700 text-white shadow-md sticky top-0 z-50">
+        <nav className="bg-gray-700 text-white shadow-md sticky top-0 z-50">
             <div className="container mx-auto px-4">
                 {/* Desktop Navigation */}
                 <div className="hidden lg:flex items-center justify-between h-16">

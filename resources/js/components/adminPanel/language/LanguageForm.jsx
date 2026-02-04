@@ -58,7 +58,7 @@ export default function LanguageForm({ language, keys, campaigns}) {
                 onClick={() => setActiveSection(section.value)}
                 className={`relative flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
                     isActive
-                        ? 'bg-blue-600 text-white shadow-md'
+                        ? 'bg-gray-700 text-white shadow-md'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
             >

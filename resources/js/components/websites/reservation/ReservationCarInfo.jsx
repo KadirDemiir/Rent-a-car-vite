@@ -6,33 +6,32 @@ export default function ReservationCarInfo({
     requirements = [],
 }) {
     return (
-        <div className={`col-span-1 md:col-span-6 lg:col-span-5 flex flex-col items-center justify-between gap-4 p-1 ${className}`}>
-            <div className="flex items-center gap-4 flex-wrap justify-center text-center">
+        <div className={`col-span-1 md:col-span-6 lg:col-span-5 flex flex-col justify-center gap-3 ${className}`}>
+            <div className="flex items-center gap-3">
                 {segmentLabel && (
-                    <span className="text-blue-700 font-bold bg-blue-100 px-3 py-1 rounded-full text-sm">
+                    <span className="px-2.5 py-1 text-[10px] font-bold text-gray-700 bg-gray-50 rounded-md uppercase tracking-wider border border-gray-200">
                         {segmentLabel}
                     </span>
                 )}
-                <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
+            </div>
+            
+            <h2 className="text-lg font-bold text-gray-900 leading-tight">{title}</h2>
+
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600">
+                {features.map((item, index) => (
+                    <div key={index} className="flex items-center gap-1.5">
+                        <span className="text-gray-400">{item.icon}</span>
+                        <span>{item.label}</span>
+                    </div>
+                ))}
             </div>
 
-            {features.length > 0 && (
-                <div className="flex flex-wrap gap-3 justify-center">
-                    {features.map((item, index) => (
-                        <div key={index} className="flex flex-col items-center justify-center p-2 rounded-xl w-20 shadow-xl">
-                            {item.icon}
-                            <span className="text-sm text-gray-600 text-center">{item.label}</span>
-                        </div>
-                    ))}
-                </div>
-            )}
-
             {requirements.length > 0 && (
-                <div className="flex flex-wrap gap-3 justify-center">
+                <div className="flex flex-wrap gap-2 mt-1">
                     {requirements.map((item, index) => (
-                        <div key={index} className="flex flex-col items-center justify-center p-2 rounded-xl w-24 shadow-2xl">
-                            {item.icon}
-                            <span className="text-sm text-gray-600 text-center">{item.label}</span>
+                        <div key={index} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-amber-50 rounded-lg border border-amber-100">
+                            <span className="text-amber-600">{item.icon}</span>
+                            <span className="text-xs text-amber-700 font-medium">{item.label}</span>
                         </div>
                     ))}
                 </div>

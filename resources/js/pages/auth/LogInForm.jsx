@@ -151,7 +151,7 @@ export default function LogInForm({ onMessage }) {
                     <button
                       type="button"
                       onClick={() => setForgotOpen(p => !p)}
-                      className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                      className="text-sm text-gray-700 hover:text-gray-800 font-medium"
                     >
                       {t("website.auth.login.forgot_password", "Forgot password?")}
                     </button>
@@ -176,7 +176,7 @@ export default function LogInForm({ onMessage }) {
                         type="button"
                         onClick={handleForgotSubmit}
                         disabled={sendingReset}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {t("website.auth.login.send_reset_link", "Send reset link")}
                       </button>

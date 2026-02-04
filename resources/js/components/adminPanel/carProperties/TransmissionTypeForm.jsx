@@ -65,7 +65,7 @@ export default function TransmissionTypeForm({mode="create", lngs, transmission=
             {error && <p className={`w-full border-l-12 border-red-700 bg-red-300 text-red-700 font-semibold p-2`}>{error}</p>}
             <CarPropertiesGenericInfo title={t("adminpanel.add_fuel.select_language")} name={t("adminpanel.add_fuel.fuel_name")} formData={formData} currentLang={currentLang} langOptions={langOptions} setCurrentLang={setCurrentLang} setFormData={setFormData}/>
             <br/>
-            <div className={`w-full flex justify-end pr-4`}><button onClick={handleSubmit} className={`bg-blue-500 rounded-lg py-1 px-4 text-white`}>{t("adminpanel.add_transmission.button.save")}</button></div>
+            <div className={`w-full flex justify-end pr-4`}><button onClick={handleSubmit} className={`bg-gray-700 rounded-lg py-1 px-4 text-white`}>{t("adminpanel.add_transmission.button.save")}</button></div>
         </div>
     );
 }

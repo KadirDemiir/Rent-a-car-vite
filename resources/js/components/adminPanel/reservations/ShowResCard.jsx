@@ -49,7 +49,7 @@ export default function ShowResCard({ res, updateData, closeModal, curr, past })
 
                         <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
                             <div className="flex items-center justify-center gap-2 mb-4 pb-2 border-b border-gray-100">
-                                <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                                <div className="p-2 bg-gray-50 text-gray-700 rounded-lg">
                                     <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                                 </div>
                                 {/*<h3 className="font-bold text-gray-800">{t("adminpanel.reservation.reservation_modal.name")}</h3>*/}

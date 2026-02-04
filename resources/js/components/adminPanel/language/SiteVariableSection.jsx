@@ -17,8 +17,8 @@ export default function  SiteVariableSection({activeSection, setActiveSection, s
                             onClick={() => setActiveSection(key)}
                             className={`w-full py-2 md:py-3 px-4 rounded-lg font-medium text-sm md:text-base transition-all duration-200 active:scale-95 ${
                                 activeSection === key 
-                                    ? 'bg-blue-600 text-white shadow-md' 
-                                    : 'bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100'
+                                    ? 'bg-gray-700 text-white shadow-md' 
+                                    : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
                             }`}
                         >
                             {label}

@@ -65,7 +65,7 @@ export default function FuelTypeForm({mode="create", lngs, fuel=null}){
             {success && <p className={`w-full border-l-12 border-green-700 bg-green-300 text-green-700 font-semibold p-2`}>{success}</p>}
             <CarPropertiesGenericInfo title={t("adminpanel.add_fuel.select_language")} name={t("adminpanel.add_fuel.fuel_name")} formData={formData} currentLang={currentLang} langOptions={langOptions} setCurrentLang={setCurrentLang} setFormData={setFormData}/>
             <br/>
-            <div className={`w-full flex justify-end pr-4`}><button onClick={handleSubmit} className={`bg-blue-500 rounded-lg py-1 px-4 text-white`}>{t("adminpanel.add_fuel.button.save")}</button></div>
+            <div className={`w-full flex justify-end pr-4`}><button onClick={handleSubmit} className={`bg-gray-700 rounded-lg py-1 px-4 text-white`}>{t("adminpanel.add_fuel.button.save")}</button></div>
         </div>
     );
 }

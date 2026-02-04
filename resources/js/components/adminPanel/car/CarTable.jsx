@@ -46,7 +46,7 @@ const SortableRow = ({ car, index, t, handleClick }) => {
             style={style}
             className={`
                 transition-colors border-b last:border-b-0 group
-                ${isDragging ? "bg-blue-100 shadow-xl ring-2 ring-blue-500 border-none" : "hover:bg-gray-50 bg-white"}
+                ${isDragging ? "bg-gray-100 shadow-xl ring-2 ring-gray-700 border-none" : "hover:bg-gray-50 bg-white"}
             `}
         >
             <td 
@@ -54,22 +54,22 @@ const SortableRow = ({ car, index, t, handleClick }) => {
                 {...listeners} 
                 className="px-4 py-3 w-10 text-gray-400 group-hover:text-gray-600 cursor-grab active:cursor-grabbing touch-none"
             >
-                <GripVertical size={20} className={isDragging ? "text-blue-700" : ""} />
+                <GripVertical size={20} className={isDragging ? "text-gray-700" : ""} />
             </td>
             
             <td className="px-4 py-3 font-bold text-gray-500 w-12 text-center select-none">
                 {index + 1}
             </td>
 
-            <td className="px-6 py-3 font-semibold text-gray-900 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{car.license_plate}</td>
-            <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{t(car.brand_key.key)}</td>
-            <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{t(car.model_key.key)}</td>
-            <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{car.year}</td>
-            <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{t(`transmission.${car.transmission_id}`)}</td>
-            <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{t(`segment.${car.segment_id}`)}</td>
-            <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{t(`body_type.${car.body_type_id}`)}</td>
-            <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{t(`fuel.${car.fuel_id}`)}</td>
-            <td className="px-6 py-3 cursor-pointer hover:text-blue-600" onClick={() => handleClick(car.id)}>{car.trunk_capacity}</td>
+            <td className="px-6 py-3 font-semibold text-gray-900 cursor-pointer hover:text-gray-700" onClick={() => handleClick(car.id)}>{car.license_plate}</td>
+            <td className="px-6 py-3 cursor-pointer hover:text-gray-700" onClick={() => handleClick(car.id)}>{t(car.brand_key.key)}</td>
+            <td className="px-6 py-3 cursor-pointer hover:text-gray-700" onClick={() => handleClick(car.id)}>{t(car.model_key.key)}</td>
+            <td className="px-6 py-3 cursor-pointer hover:text-gray-700" onClick={() => handleClick(car.id)}>{car.year}</td>
+            <td className="px-6 py-3 cursor-pointer hover:text-gray-700" onClick={() => handleClick(car.id)}>{t(`transmission.${car.transmission_id}`)}</td>
+            <td className="px-6 py-3 cursor-pointer hover:text-gray-700" onClick={() => handleClick(car.id)}>{t(`segment.${car.segment_id}`)}</td>
+            <td className="px-6 py-3 cursor-pointer hover:text-gray-700" onClick={() => handleClick(car.id)}>{t(`body_type.${car.body_type_id}`)}</td>
+            <td className="px-6 py-3 cursor-pointer hover:text-gray-700" onClick={() => handleClick(car.id)}>{t(`fuel.${car.fuel_id}`)}</td>
+            <td className="px-6 py-3 cursor-pointer hover:text-gray-700" onClick={() => handleClick(car.id)}>{car.trunk_capacity}</td>
         </tr>
     );
 };

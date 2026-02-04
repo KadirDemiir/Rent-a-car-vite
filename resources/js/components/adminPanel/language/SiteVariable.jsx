@@ -62,7 +62,7 @@ export default function SiteVariable({ keys, formData, setFormData }) {
                 <div className="flex gap-2 md:gap-3">
                     <button 
                         onClick={createHandle}
-                        className="flex-1 sm:flex-none px-4 md:px-6 py-2 md:py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm md:text-base active:scale-95"
+                        className="flex-1 sm:flex-none px-4 md:px-6 py-2 md:py-3 bg-gray-700 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors duration-200 text-sm md:text-base active:scale-95"
                     >
                         Üret
                     </button>

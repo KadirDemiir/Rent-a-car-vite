@@ -47,7 +47,7 @@ export default function ReservationCarPayment({
                 </div>
             </div>
             <button
-                className="w-full md:w-auto lg:w-full px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition duration-300 md:min-w-[200px]"
+                className="w-full md:w-auto lg:w-full px-4 py-2 bg-gray-700 text-white rounded-xl hover:bg-gray-800 transition duration-300 md:min-w-[200px]"
                 onClick={onRentNow}
                 type="button"
             >

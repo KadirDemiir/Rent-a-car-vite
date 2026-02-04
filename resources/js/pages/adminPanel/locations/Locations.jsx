@@ -81,7 +81,7 @@ export default function Locations() {
                             <h1 className="text-2xl font-bold text-slate-800">Lokasyon Yönetimi</h1>
                             <p className="text-slate-500 text-sm">Ofis ekleme ve harita yönetimi.</p>
                         </div>
-                        <button type={`button`} onClick={() => setIsModalOpen(!isModalOpen)} className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-all active:scale-95 shadow-lg shadow-blue-100">
+                        <button type={`button`} onClick={() => setIsModalOpen(!isModalOpen)} className="px-6 py-2.5 bg-gray-700 text-white rounded-xl font-medium hover:bg-gray-800 transition-all active:scale-95 shadow-lg shadow-gray-100">
                             {isModalOpen ? 'İptal' : 'Yeni Lokasyon Ekle'}
                         </button>
                     </div>

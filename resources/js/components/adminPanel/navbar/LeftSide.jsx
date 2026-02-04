@@ -105,7 +105,7 @@ export default function LeftSide({ isOpen, onClose }) {
                     onClick={onClose}
                 ></div>
             )}
-            <div className={`fixed top-20 left-0 h-[calc(100vh-80px)] w-60 border border-blue-700 border-t-0 z-50 p-4 bg-blue-700 text-white overflow-y-auto transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
+            <div className={`fixed top-20 left-0 h-[calc(100vh-80px)] w-60 border border-gray-700 border-t-0 z-50 p-4 bg-gray-700 text-white overflow-y-auto transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
                 <ul className="flex flex-col items-start justify-center gap-2">

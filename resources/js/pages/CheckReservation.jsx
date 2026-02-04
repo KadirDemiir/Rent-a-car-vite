@@ -57,7 +57,7 @@ export default function CheckReservation() {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 focus:outline-none disabled:opacity-50 transition duration-150"
+                            className="w-full bg-gray-700 text-white font-bold py-2 px-4 rounded hover:bg-gray-800 focus:outline-none disabled:opacity-50 transition duration-150"
                         >
                             {processing ? t('website.check_reservation.button_checking') : t('website.check_reservation.button_check')}
                         </button>

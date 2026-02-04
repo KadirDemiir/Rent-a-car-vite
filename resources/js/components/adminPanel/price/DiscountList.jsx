@@ -25,7 +25,7 @@ export default function DiscountList({data = []}) {
             ) || t("adminpanel.pricing.discounts.target.car_fallback");
         }
         if (discount.target_type === "segment") {
-            return <span className="font-medium text-blue-600">{t(`segment.${discount.segment_id}`)}</span> || t("adminpanel.pricing.discounts.target.segment_fallback");
+            return <span className="font-medium text-gray-700">{t(`segment.${discount.segment_id}`)}</span> || t("adminpanel.pricing.discounts.target.segment_fallback");
         }
         return <span className="font-medium text-purple-600">{t("adminpanel.pricing.discounts.target.all_vehicles")}</span>;
     };
@@ -37,7 +37,7 @@ export default function DiscountList({data = []}) {
             return <span className="font-bold text-gray-900">{`${Number(calculateTotal(discount?.discount_value)).toFixed(2)} ${current?.symbol}`}</span>;
         }
         const percentage = Number(discount.discount_value ?? 0) * 100;
-        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">{percentage}%</span>;
+        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{percentage}%</span>;
     };
 
     const formatDate = (value) => {

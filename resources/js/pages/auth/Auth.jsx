@@ -28,13 +28,13 @@ export default function Auth() {
                                 onClick={() => setFormType('Login')} 
                                 className={`flex-1 py-4 font-semibold transition-all duration-300 relative ${
                                     formType === 'Login' 
-                                        ? 'text-blue-600' 
+                                        ? 'text-gray-700' 
                                         : 'text-gray-500 hover:text-gray-700'
                                 } ${formType === 'Login' ? 'rounded-tl-2xl' : ''}`}
                             >
                                 {t("website.auth.login.login_label")}
                                 {formType === 'Login' && (
-                                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+                                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-700"></div>
                                 )}
                             </button>
                             <button 
@@ -42,13 +42,13 @@ export default function Auth() {
                                 onClick={() => setFormType('Signup')} 
                                 className={`flex-1 py-4 font-semibold transition-all duration-300 relative ${
                                     formType === 'Signup' 
-                                        ? 'text-blue-600' 
+                                        ? 'text-gray-700' 
                                         : 'text-gray-500 hover:text-gray-700'
                                 } ${formType === 'Signup' ? 'rounded-tr-2xl' : ''}`}
                             >
                                 {t("website.auth.signup.signup_label")}
                                 {formType === 'Signup' && (
-                                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+                                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-700"></div>
                                 )}
                             </button>
                         </div>

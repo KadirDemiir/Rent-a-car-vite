@@ -36,11 +36,11 @@ export default function LocationsList({locations}) {
                     >
                         <div className="col-span-4 flex items-center gap-4">
                             <div
-                                className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-sm">
+                                className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-700 font-bold text-sm">
                                 {location.name.charAt(0)}
                             </div>
                             <div>
-                                <h3 className="text-sm font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">
+                                <h3 className="text-sm font-semibold text-slate-800 group-hover:text-gray-700 transition-colors">
                                     {location.name}
                                 </h3>
                                 <span
@@ -63,7 +63,7 @@ export default function LocationsList({locations}) {
 
                         <div className="col-span-3">
                             <div className="flex items-center gap-2 text-slate-600 text-xs font-medium">
-                                <MapPin size={14} className="text-blue-400"/>
+                                <MapPin size={14} className="text-gray-400"/>
                                 <span>{location.city}</span>
                             </div>
                             <p className="text-slate-400 text-[11px] mt-1 truncate max-w-50">
@@ -76,7 +76,7 @@ export default function LocationsList({locations}) {
                                     e.stopPropagation();
                                     handleShowIndex(location.id);
                                 }}
-                                className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                className="p-2 text-slate-400 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-all"
                             >
                                 <Edit2 size={16}/>
                             </button>

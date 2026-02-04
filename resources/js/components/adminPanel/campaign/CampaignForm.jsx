@@ -238,7 +238,7 @@ export default function CampaignForm({languages, mode = "add", campaign = null, 
 
                 <button
                     type="button"
-                    className="bg-blue-600 hover:bg-blue-700 transition text-white px-4 py-2 rounded-md cursor-pointer"
+                    className="bg-gray-700 hover:bg-gray-800 transition text-white px-4 py-2 rounded-md cursor-pointer"
                     onClick={validateAndSubmit}
                 >
                     {mode === "edit" ? t("adminpanel.pricing.update_campaign.buttonsave") : t("adminpanel.pricing.add_campaign.button.save")}

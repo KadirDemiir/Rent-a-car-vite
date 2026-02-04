@@ -26,21 +26,21 @@ export default function UpSide({ onToggleSidebar }) {
     return(
         <div className="fixed w-full px-4 md:px-16 flex items-center justify-between h-20 border-b z-40 bg-white shadow-sm">
             <div className="flex items-center gap-4">
-                <button onClick={onToggleSidebar} className="md:hidden text-gray-700 hover:text-blue-600 transition-colors">
+                <button onClick={onToggleSidebar} className="md:hidden text-gray-700 hover:text-gray-900 transition-colors">
                     <Menu size={28} />
                 </button>
-                <div onClick={goToHomePage} className="cursor-pointer hover:text-blue-600 transition-colors"><CarFront size={28}/></div>
+                <div onClick={goToHomePage} className="cursor-pointer hover:text-gray-700 transition-colors"><CarFront size={28}/></div>
             </div>
             <div className="flex items-center gap-3 md:gap-6">
                 <LanguageDropdown/>
                 <CurrencyDropDown/>
-                <div onClick={goToChangePassword} className="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors">
+                <div onClick={goToChangePassword} className="flex items-center gap-2 cursor-pointer hover:text-gray-700 transition-colors">
                     <span className="hidden md:block font-medium text-sm">
                         <User size={24} />
                     </span>
                     <User className="md:hidden" size={24}/>
                 </div>
-                <div className={`flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors`} onClick={handleLogout}>
+                <div className={`flex items-center gap-2 cursor-pointer hover:text-gray-700 transition-colors`} onClick={handleLogout}>
                     <span className="hidden md:block font-medium text-sm">
                         <LogOut size={24}/>
                     </span>

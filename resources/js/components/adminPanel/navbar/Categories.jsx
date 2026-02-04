@@ -8,7 +8,7 @@ export default function Categories({clickHandle, index, isOpenSection, menuSecti
         <li className="w-full mb-2">
             <div
                 onClick={() => clickHandle(index)}
-                className="w-full h-10 flex items-center justify-start gap-4 px-4 rounded-2xl hover:bg-blue-800 cursor-pointer bg-blue-700"
+                className="w-full h-10 flex items-center justify-start gap-4 px-4 rounded-2xl hover:bg-gray-800 cursor-pointer bg-gray-700"
             >
                 <span className="text-xl">{isOpenSection ? '−' : '+'}</span>
                 <span>{menuSection.title}</span>

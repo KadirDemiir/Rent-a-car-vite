@@ -93,7 +93,7 @@ export default function EmailTemplates({ templates, languages }) {
                     <h1 className="text-2xl font-bold text-gray-800">{t('adminpanel.email.email_templates')}</h1>
                     <button
                         onClick={() => setShowAddModal(!showAddModal)}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                        className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
                     >
                         {showAddModal ? t('adminpanel.email.cancel') : t('adminpanel.email.add_template')}
                     </button>
@@ -170,7 +170,7 @@ export default function EmailTemplates({ templates, languages }) {
                             <div className="flex gap-3 pt-4">
                                 <button
                                     type="submit"
-                                    className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                                    className="flex-1 bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800"
                                 >
                                     {t('adminpanel.email.create_template')}
                                 </button>
@@ -227,7 +227,7 @@ export default function EmailTemplates({ templates, languages }) {
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <button
                                             onClick={() => router.get(`/${i18n.language}/${t('address.adminpanel')}/${t('address.email-templates')}/${template.id}`)}
-                                            className="text-blue-600 hover:text-blue-900 mr-4"
+                                            className="text-gray-700 hover:text-gray-900 mr-4"
                                         >
                                             {t('adminpanel.email.edit')}
                                         </button>

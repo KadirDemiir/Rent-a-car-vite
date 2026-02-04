@@ -23,8 +23,6 @@ use Inertia\Inertia;
 class  CarController extends Controller
 {
     public function showAllCars(){
-        session(['lang' => 'a']);
-        App::setLocale(session('lang'));
         $cars = Car::with(['photos', 'brandKey', 'modelKey'])->orderBy('sort_order', 'asc')->get();
         return Inertia::render('Cars', [
             'cars' => $cars,

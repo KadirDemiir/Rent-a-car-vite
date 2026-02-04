@@ -128,7 +128,7 @@ export default function SortSearchReservations({ availableCars = [], sortBy, seg
                 return (
                     <div
                         key={filteredCar.id}
-                        className={`bg-white w-full rounded-2xl grid grid-cols-1 md:grid-cols-10 gap-4 p-6 shadow-md transition-opacity ${isProcessing ? 'opacity-70 pointer-events-none' : ''}`}
+                        className={`bg-white w-full rounded-3xl grid grid-cols-1 md:grid-cols-10 gap-6 p-5 shadow-md border border-gray-100/80 transition-all duration-300 hover:shadow-xl hover:border-blue-100 ${isProcessing ? 'opacity-60 pointer-events-none animate-pulse' : ''}`}
                     >
                         <ReservationCarPhoto
                             photoSrc={photoSrc}

@@ -26,7 +26,7 @@ export default function CampaignsCards({ campaigns, isAdmin = false }) {
             {/* Stats Badge */}
             {!isAdmin && campaigns.length > 0 && (
                 <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
-                    <TrendingUp className="w-4 h-4 text-blue-600" />
+                    <TrendingUp className="w-4 h-4 text-gray-700" />
                     <span className="font-medium">{campaigns.length} Active {campaigns.length === 1 ? 'Campaign' : 'Campaigns'}</span>
                 </div>
             )}

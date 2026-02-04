@@ -83,7 +83,7 @@ export default function BodyTypeForm({mode="create", lngs, bt=null}){
             <div className="w-full flex justify-end pr-4">
                 <button
                     onClick={handleSubmit}
-                    className="bg-blue-500 rounded-lg py-1 px-4 text-white disabled:bg-gray-400"
+                    className="bg-gray-700 rounded-lg py-1 px-4 text-white disabled:bg-gray-400"
                     disabled={isSubmitting}
                 >
                     {isSubmitting ? "Kaydediliyor..." : t("adminpanel.add_body_type.button.save")}

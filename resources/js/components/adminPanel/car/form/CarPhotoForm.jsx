@@ -102,7 +102,7 @@ const CarPhotoForm = forwardRef(({ defPhotos, maxFiles = 4, onSubmit }, ref) => 
 
             <div
                 onClick={triggerPicker}
-                className={`flex items-center justify-center h-40 border-2 border-dashed rounded-lg cursor-pointer text-sm ${photos.length >= maxFiles ? "border-gray-300 text-gray-400 bg-gray-100" : "border-blue-400 text-blue-600 hover:bg-blue-50"}`}>
+                className={`flex items-center justify-center h-40 border-2 border-dashed rounded-lg cursor-pointer text-sm ${photos.length >= maxFiles ? "border-gray-300 text-gray-400 bg-gray-100" : "border-gray-400 text-gray-700 hover:bg-gray-50"}`}>
                 {photos.length >= maxFiles ? t("adminpanel.car.car_modify.edit_photos.max_{count}_photos_added", { count: maxFiles }) : t("adminpanel.car.car_modify.edit_photos.click_for_add_photo")}
             </div>
 
@@ -114,7 +114,7 @@ const CarPhotoForm = forwardRef(({ defPhotos, maxFiles = 4, onSubmit }, ref) => 
                             <img src={p.url} alt={`preview-${i}`} className="object-cover w-full h-24 cursor-pointer" onClick={() => selectCover(i)} title="Kapak olarak ayarla"/>
                             <button type="button" onClick={() => handleDelete(i)} className="absolute top-0 right-0 text-white bg-black bg-opacity-60 px-1 text-xs">×</button>
                             {coverIndex === i && (
-                                <div className="absolute bottom-0 left-0 bg-blue-600 text-white text-[10px] px-1 w-full text-center">
+                                <div className="absolute bottom-0 left-0 bg-gray-700 text-white text-[10px] px-1 w-full text-center">
                                     {t("adminpanel.car.car_modify.edit_photos.cover")}
                                 </div>
                             )}

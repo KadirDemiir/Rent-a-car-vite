@@ -115,7 +115,7 @@ export default function LanguageInformation({ data, setData }) {
                         type="file" 
                         accept="image/*" 
                         onChange={handleFileChange}
-                        className="w-full text-xs md:text-sm text-gray-500 file:px-3 md:file:px-4 file:py-2 md:file:py-2.5 file:rounded-lg file:border-0 file:text-xs md:file:text-sm file:font-medium file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100 file:transition-colors file:cursor-pointer"
+                        className="w-full text-xs md:text-sm text-gray-500 file:px-3 md:file:px-4 file:py-2 md:file:py-2.5 file:rounded-lg file:border-0 file:text-xs md:file:text-sm file:font-medium file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100 file:transition-colors file:cursor-pointer"
                     />
                     {data.flag.error && (
                         <p className="text-xs md:text-sm text-red-600 font-medium">

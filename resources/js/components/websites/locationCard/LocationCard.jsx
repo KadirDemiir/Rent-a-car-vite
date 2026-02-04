@@ -17,22 +17,22 @@ export default function LocationCard({location}){
                 <div className="font-extrabold text-xl font-sans">{location.name}</div>
                 <div className="font-normal text-gray-700">{location.city}</div>
                 <div className="flex gap-4 h-8 items-center">
-                    <Plane className={`text-blue-600`} />
+                    <Plane className={`text-gray-700`} />
                     <div className="font-medium text-gray-700">{location.address}</div>
                 </div>
                 <div className="flex gap-4 h-8 items-center">
-                    <Phone className={`text-blue-600`}/>
+                    <Phone className={`text-gray-700`}/>
                     <div className="font-medium text-gray-700">{location.phone}</div>
                 </div>
                 <div className="flex gap-4 h-8 items-center">
-                    <Mail className={`text-blue-600`}/>
+                    <Mail className={`text-gray-700`}/>
                     <div className="font-medium text-gray-700">{location.email}</div>
                 </div>
                 <a 
                     href={googleMapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex gap-4 h-8 items-center text-blue-600 hover:text-blue-800 font-medium"
+                    className="flex gap-4 h-8 items-center text-gray-700 hover:text-gray-900 font-medium"
                 >
                     <MapPin size={20}/>
                     <div>View on Google Maps</div>

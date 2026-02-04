@@ -244,7 +244,7 @@ export default function FilterCar({cars, setFilteredCars}) {
                         <button
                             type="button"
                             onClick={handleFilter}
-                            className="inline-flex items-center justify-center rounded-2xl bg-blue-500 px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-600"
+                            className="inline-flex items-center justify-center rounded-2xl bg-gray-700 px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-800"
                         >
                             {t("adminpanel.cars.filter.button.filter")}
                         </button>

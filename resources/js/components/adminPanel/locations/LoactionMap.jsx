@@ -53,7 +53,7 @@ export default function LocationMap({ latitude, setLatitude, longitude, setLongi
                         </button>
                     </div>
                 </div>
-                <div className="hidden sm:flex items-center px-4 py-2.5 bg-blue-50 text-blue-700 rounded-xl text-xs font-mono border border-blue-100">
+                <div className="hidden sm:flex items-center px-4 py-2.5 bg-gray-50 text-gray-700 rounded-xl text-xs font-mono border border-gray-200">
                     {latitude?.toFixed(4)}, {longitude?.toFixed(4)}
                 </div>
             </div>

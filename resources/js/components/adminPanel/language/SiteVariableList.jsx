@@ -86,7 +86,7 @@ export default function SiteVariableList({keys, formData, setFormData}){
                         className={`w-full px-3 py-2 rounded-lg font-medium text-xs md:text-sm transition-all duration-200 active:scale-95 ${
                             formData[key.key]?.error
                                 ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
-                                : 'bg-blue-600 text-white hover:bg-blue-700'
+                                : 'bg-gray-700 text-white hover:bg-gray-800'
                         }`}
                     >
                         {t("adminpanel.add_languages.apply_all")} '{key.key.split('.').reverse()[0]}'

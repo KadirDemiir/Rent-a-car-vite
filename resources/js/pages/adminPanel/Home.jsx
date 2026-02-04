@@ -67,8 +67,8 @@ export default function Home({ upcomingReservations, activeReservations, lateRes
 
     const ReservationCard = ({ reservation, type }) => {
         const isLate = type === 'late';
-        const borderColor = isLate ? 'border-red-500' : (type === 'active' ? 'border-green-500' : 'border-blue-500');
-        const badgeColor = isLate ? 'bg-red-100 text-red-800' : (type === 'active' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800');
+        const borderColor = isLate ? 'border-red-500' : (type === 'active' ? 'border-green-500' : 'border-gray-500');
+        const badgeColor = isLate ? 'bg-red-100 text-red-800' : (type === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800');
 
         return (
             <div 
@@ -141,8 +141,8 @@ export default function Home({ upcomingReservations, activeReservations, lateRes
 
                         {/* Column 2: Upcoming */}
                         <div className="bg-gray-100 rounded-xl p-4">
-                            <h2 className="text-lg font-bold text-blue-700 mb-4 flex items-center">
-                                <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                            <h2 className="text-lg font-bold text-gray-700 mb-4 flex items-center">
+                                <div className="w-3 h-3 bg-gray-500 rounded-full mr-2"></div>
                                 Gelecek Rezervasyonlar ({upcoming.length})
                             </h2>
                             <div className="space-y-3 md:max-h-[70vh] md:overflow-y-auto pr-2 custom-scrollbar">

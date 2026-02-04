@@ -79,7 +79,7 @@ export default function AddLanguageForm({ keys}) {
             </div>
             {success && <div className={`w-full border-l-12 border-green-600 bg-green-500 text-white p-2`}>{success}</div>}
             {error && <div className={`w-full border-l-12 border-red-600 bg-red-500 text-white p-2`}>{error}</div>}
-            <button onClick={handleSubmit} className="mt-4 px-6 py-2 rounded-lg text-white bg-blue-500 hover:bg-blue-600 transition-colors">{t("adminpanel.add_languages.button.save")}</button>
+            <button onClick={handleSubmit} className="mt-4 px-6 py-2 rounded-lg text-white bg-gray-700 hover:bg-gray-800 transition-colors">{t("adminpanel.add_languages.button.save")}</button>
             <SiteVariable keys={keys} formData={formData} setFormData={setFormData}/>
         </div>
     );

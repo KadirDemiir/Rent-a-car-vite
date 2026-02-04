@@ -159,7 +159,7 @@ export default function ExternalServiceForm({ service, close, onSubmit, language
                 </div>
                 <div className={`flex gap-4`}>
                     <button type="button" onClick={close} className={`rounded-lg bg-gray-500 text-white hover:bg-gray-600 py-2 px-4 cursor-pointer`}>{t("adminpanel.pricing.adding_services.external_services.add_new_service_modal.cancel")}</button>
-                    <button type="button" onClick={handleSubmit} className={`rounded-lg bg-blue-500 text-white hover:bg-blue-600 py-2 px-4 cursor-pointer`}>{service ? t("adminpanel.pricing.adding_services.external_services.update_service_modal.save") : t("adminpanel.pricing.adding_services.external_services.add_new_service_modal.save")}</button>
+                    <button type="button" onClick={handleSubmit} className={`rounded-lg bg-gray-700 text-white hover:bg-gray-800 py-2 px-4 cursor-pointer`}>{service ? t("adminpanel.pricing.adding_services.external_services.update_service_modal.save") : t("adminpanel.pricing.adding_services.external_services.add_new_service_modal.save")}</button>
                 </div>
             </div>
             {confirmModalOpen && <Confirm message="Servisi Silmek İStediğinize Emin Misiniz?" confirm={deleteService} />}

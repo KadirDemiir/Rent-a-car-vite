@@ -75,7 +75,7 @@ export default function SegmentFormModal({segment = null, lngs, translations = n
             {success && <p className={`w-full border-l-12 border-green-700 bg-green-300 text-green-700 font-semibold p-2`}>{success}</p>}
             <SegmentForm formData={formData} currentLang={currentLang} langOptions={langOptions} setCurrentLang={setCurrentLang} setFormData={setFormData}/>
             <div className={`w-full flex justify-end p-8`}>
-                <button onClick={handleSubmit} className={`bg-blue-500 rounded-lg py-1 px-4 text-white`}>
+                <button onClick={handleSubmit} className={`bg-gray-700 rounded-lg py-1 px-4 text-white`}>
                     {mode==='create' ? t("adminpanel.segments.add_segment.button.save") : t("adminpanel.update_segment.button.save")}
                 </button>
             </div>

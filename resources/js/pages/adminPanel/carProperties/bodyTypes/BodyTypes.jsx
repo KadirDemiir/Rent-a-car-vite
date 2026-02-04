@@ -41,7 +41,7 @@ export default function BodyTypes({types}){
                         </div>
                         <Link 
                             href={`/${i18n.language}/${t("address.adminpanel")}/${t("address.body_types")}/${t("address.add")}`}
-                            className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm hover:shadow-md"
+                            className="flex items-center gap-2 px-6 py-3 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors duration-200 shadow-sm hover:shadow-md"
                         >
                             <span>+</span>
                             {t("adminpanel.body_types.button.add_new")}
