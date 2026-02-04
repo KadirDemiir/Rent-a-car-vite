@@ -22,7 +22,7 @@ class Car extends Model
     /**
      * Relationships to eager load by default to prevent N+1 queries
      */
-    protected $with = ['brandKey', 'modelKey', 'location', 'bodyType', 'segment', 'currency', 'fuel', 'transmission'];
+    //protected $with = ['brandKey', 'modelKey', 'location', 'bodyType', 'segment', 'currency', 'fuel', 'transmission'];
 
     protected $fillable = [
         'location_id',

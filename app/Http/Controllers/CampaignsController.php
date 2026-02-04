@@ -17,7 +17,9 @@ class CampaignsController extends Controller
 {
     public function showAll()
     {
-        $campaigns = Campaigns::all();
+        $campaigns = Campaigns::select('id', 'title', 'content', 'photo_path', 'start_date', 'end_date')
+            ->where('status', 'active')
+            ->get();
 
         return Inertia::render('Campaigns', [
             'campaigns' => $campaigns,

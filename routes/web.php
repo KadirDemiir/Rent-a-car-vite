@@ -98,10 +98,7 @@ Route::get('/get-supported-languages', function () {
     return response()->json(['languages' => $languages]);
 });
 Route::get('/translations/{lang}', function ($lang) {
-    $translations = Translation::with('translationKey')
-        ->whereHas('language', fn($q) => $q->where('code', $lang))
-        ->get()
-        ->mapWithKeys(fn($t) => [$t->translationKey->key => $t->value]);
+    $translations = \App\Services\TranslationService::getTranslationsByLanguage($lang);
     return response()->json($translations);
 });
 Route::get('/get-current-language', function () {
@@ -203,25 +200,26 @@ Route::get('get-session', function () {
     dd(session()->all());
 });
 Route::get('/get-all-cars-info', function () {
-    try {
-        $allInfo = getAllCarPropertiesInfo();
-        return response()->json(['segments' => $allInfo['segments'], 'bodyTypes' => $allInfo['bodyTypes'], 'fuels' => $allInfo['fuels'], 'transmissions' => $allInfo['transmissions']]);
-    } catch (Exception $e) {
-        return response()->json($e);
-    }
-});
+    // Helper fonksiyonunu burada çağırıyoruz
+    return response()->json(getAllCarPropertiesInfo());
+})->withoutMiddleware([\App\Http\Middleware\HandleInertiaRequests::class]);
 Route::get('/get-extras', function () {
     return response()->json(['extras' => \App\Models\ExtraServices::where('stock', '>', 0)->with('extraServicePrices')->get()]);
-});
+})->withoutMiddleware([\App\Http\Middleware\HandleInertiaRequests::class]);
 Route::get('/get-included-services', function () {
     return response()->json(['services' => \App\Models\InternalService::all()]);
-});
+})->withoutMiddleware([\App\Http\Middleware\HandleInertiaRequests::class]);
 Route::post('/create-reservation', [ReservationController::class, 'createReservation'])->name('createReservation');
 Route::post('/reservation/reject/{id}', [ReservationController::class, 'rejectReservation'])->name('rejectReservation');
 Route::post('/reservation/approve/{id}', [ReservationController::class, 'approveReservation'])->name('approveReservation');
 
 Route::get('/get-locations', function () {
-    return response()->json(['success' => true, 'locations' => Locations::where('is_active', 1)->get()], 200);
+    return response()->json([
+        'success' => true, 
+        'locations' => Locations::select('id', 'name', 'city', 'address', 'phone', 'email', 'latitude', 'longitude', 'photo_path')
+            ->where('is_active', 1)
+            ->get()
+    ], 200);
 });
 
 Route::post('/auth', [AuthController::class, 'auth'])->name('auth.login');
@@ -245,7 +243,7 @@ Route::group([
 ], function () {
 
     Route::get('', function () {
-        return Inertia::render('Home', ['locations' => Locations::all()]);
+        return Inertia::render('Home', ['locations' => Locations::select('id', 'name')->where('is_active', true)->get()]);
     })->name('home');
     Route::get(dbTransRoute('cars'), [CarController::class, 'showAllCars'])->name('showCars');
     Route::get(dbTransRoute('cars') . '/{id}', [CarController::class, 'showCar'])->name('showIndexCar');

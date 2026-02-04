@@ -2,20 +2,14 @@
 
 namespace Database\Factories;
 
+use App\Models\Car;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Photo>
  */
 class PhotoFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
-    protected static ?string $password;
-
     /**
      * Define the model's default state.
      *
@@ -24,18 +18,19 @@ class PhotoFactory extends Factory
     public function definition(): array
     {
         return [
-            'photo_path' => '/carPhotos/55l5nH6DTJBOb1oXklr1gZBMt8Qn40xEVmacBRZk.jpg',
-            'is_cover' => 1,
+            'car_id' => Car::factory(),
+            'photo_path' => 'carPhotos/55l5nH6DTJBOb1oXklr1gZBMt8Qn40xEVmacBRZk.jpg',
+            'is_cover' => false,
         ];
     }
 
     /**
-     * Indicate that the model's email address should be unverified.
+     * Mark photo as cover.
      */
-    public function unverified(): static
+    public function cover(): static
     {
         return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
+            'is_cover' => true,
         ]);
     }
 }

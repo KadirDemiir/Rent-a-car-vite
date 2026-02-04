@@ -6,7 +6,6 @@ export default function CampaignsIndex({ campaign }) {
     const currentLang = i18n.language.split("-")[0];
     const titleObj = typeof campaign.title === 'string' ? JSON.parse(campaign.title) : campaign.title;
     const contentObj = typeof campaign.content === 'string' ? JSON.parse(campaign.content) : campaign.content;
-    console.log('CampaignsIndex => ', contentObj);
 
     return (
         <div className="bg-gray-100 min-h-screen">
@@ -21,6 +20,7 @@ export default function CampaignsIndex({ campaign }) {
                         src={`/storage/${campaign.photo_path}`}
                         alt="Campaign Banner"
                         className="w-full h-full object-contain"
+                        loading="lazy"
                     />
                 </div>
 

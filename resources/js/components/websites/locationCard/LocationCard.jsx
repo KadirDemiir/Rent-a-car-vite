@@ -5,7 +5,7 @@ export default function LocationCard({location}){
     return(
         <div className="col-span-1 rounded-2xl bg-white shadow-md">
             {location.photo_path ?
-                (<img src={`/storage/${location.photo_path}`} alt="" className="w-full rounded-t-2xl h-60" />)
+                (<img src={`/storage/${location.photo_path}`} alt="" className="w-full rounded-t-2xl h-60" loading="lazy" />)
                 :
                 (
                     <div className="w-full rounded-t-2xl h-60 flex items-center justify-center">

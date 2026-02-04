@@ -1,7 +1,6 @@
 import {useCurrency} from "../../../../providers/CurrencyContext.jsx";
 
 export default function PriceInformationCard({drop_price, total_days, daily_price, extra_price}) {
-    console.log(daily_price);
     const {calculateTotal, current} = useCurrency()
     return (
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">

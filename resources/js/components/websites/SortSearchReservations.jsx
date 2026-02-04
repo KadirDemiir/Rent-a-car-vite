@@ -88,8 +88,7 @@ export default function SortSearchReservations({ availableCars = [], sortBy, seg
     return (
         <div className="space-y-4">
             {filteredCars.map((filteredCar) => {
-                const coverPhoto = filteredCar.photos?.find(p => p.is_cover)?.photo_path;
-                const photoSrc = coverPhoto ? `/storage/${coverPhoto}` : undefined;
+                const photoSrc = `/storage/${filteredCar.photos?.[0]?.photo_path}`;
                 const title = `${t(filteredCar.brand_key.key)} ${t(filteredCar.model_key.key)} • ${t(`fuel.${filteredCar.fuel_id}`)} • ${t(`transmission.${filteredCar.transmission_id}`)}`;
 
                 const features = [
@@ -128,7 +127,7 @@ export default function SortSearchReservations({ availableCars = [], sortBy, seg
                 return (
                     <div
                         key={filteredCar.id}
-                        className={`bg-white w-full rounded-3xl grid grid-cols-1 md:grid-cols-10 gap-6 p-5 shadow-md border border-gray-100/80 transition-all duration-300 hover:shadow-xl hover:border-blue-100 ${isProcessing ? 'opacity-60 pointer-events-none animate-pulse' : ''}`}
+                        className={`bg-white w-full rounded-2xl grid grid-cols-1 md:grid-cols-10 gap-4 p-6 shadow-md transition-opacity ${isProcessing ? 'opacity-70 pointer-events-none' : ''}`}
                     >
                         <ReservationCarPhoto
                             photoSrc={photoSrc}

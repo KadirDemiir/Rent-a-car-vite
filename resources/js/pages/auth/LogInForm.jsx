@@ -58,7 +58,6 @@ export default function LogInForm({ onMessage }) {
             onMessage({ type: 'error', text: response.data.message });
           }
       }).catch(error => {
-          console.error('There was an error!', error);
           onMessage({ type: 'error', text: error.response?.data?.message || 'An error occurred' });
       });
 
@@ -97,7 +96,6 @@ export default function LogInForm({ onMessage }) {
           }
         })
         .catch(error => {
-          console.error('There was an error!', error);
           onMessage({ type: 'error', text: error.response?.data?.message || 'An error occurred' });
         })
         .finally(() => setSendingReset(false));

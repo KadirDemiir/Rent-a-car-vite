@@ -19,7 +19,7 @@ class AdminCarController extends Controller
 {
     public function showAll()
     {
-        $cars = Car::with(['price', 'brandKey', 'modelKey'])->orderBy('sort_order', 'asc')->get();
+        $cars = Car::with(['brandKey:id,key', 'modelKey:id,key'])->orderBy('sort_order', 'asc')->get();
 
         return Inertia::render('adminPanel/cars/Cars', [
             'cars' => $cars

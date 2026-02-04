@@ -8,7 +8,6 @@ import axios from 'axios';
 export default function GuestReservationDetails({ reservation: initialReservation }) {
     const { t, i18n } = useTranslation();
     const [reservation, setReservation] = useState(initialReservation);
-    console.log(reservation);
     const [processing, setProcessing] = useState(false);
 
     const handleCancel = () => {
@@ -21,8 +20,7 @@ export default function GuestReservationDetails({ reservation: initialReservatio
             .then(response => {
                  setReservation(prev => ({ ...prev, status: 'cancelled' }));
             })
-            .catch(error => {
-                console.error(error);
+            .catch(() => {
                 alert('An error occurred while cancelling the reservation.');
             })
             .finally(() => {
@@ -86,6 +84,7 @@ export default function GuestReservationDetails({ reservation: initialReservatio
                                             src={`/storage/${reservation.car.photos[0].photo_path}`}
                                             alt={reservation.car.brandKey?.key + ' ' + reservation.car.modelKey?.key}
                                             className="object-cover w-full h-full"
+                                            loading="lazy"
                                         />
                                     ) : (
                                         <div className="flex items-center justify-center p-8 text-gray-400">No Image</div>

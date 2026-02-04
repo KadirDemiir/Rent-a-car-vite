@@ -37,8 +37,7 @@ export default function Home({ upcomingReservations, activeReservations, lateRes
                             setUpcoming(prev => prev.filter(r => r.id !== reservation.id));
                             setActive(prev => [...prev, { ...reservation, status: 'active' }]); 
                         })
-                        .catch(error => {
-                            console.error("Error starting rental:", error);
+                        .catch(() => {
                             setConfirmModal(null);
                         });
                 }
@@ -56,8 +55,7 @@ export default function Home({ upcomingReservations, activeReservations, lateRes
                                 setLate(prev => prev.filter(r => r.id !== reservation.id));
                             }
                         })
-                        .catch(error => {
-                            console.error("Error completing rental:", error);
+                        .catch(() => {
                             setConfirmModal(null);
                         });
                 }

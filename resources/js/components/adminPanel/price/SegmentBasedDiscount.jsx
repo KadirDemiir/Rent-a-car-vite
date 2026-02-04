@@ -19,9 +19,10 @@ export default function SegmentBasedDiscount({ selectedSegment, onChange, segmen
         if (!segments || !Array.isArray(segments)) {
             return [];
         }
-        return segments.map(segment => ({
-            label: t(`segment.${segment.id}`),
-            value: segment.id
+        // segments is now an array of IDs [1, 2, 3] instead of objects
+        return segments.map(id => ({
+            label: t(`segment.${id}`),
+            value: id
         }));
     }, [segments, t]);
 

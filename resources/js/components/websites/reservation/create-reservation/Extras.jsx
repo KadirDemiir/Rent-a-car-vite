@@ -13,7 +13,6 @@ export default function Extras({car, selectedExtras, setSelectedExtras}){
             axios.get('/get-extras')
                 .then(res => {
                     setExtras(res.data.extras);
-                    console.log(res.data.extras[0]);
                 })
                 .catch(error => {
                     const mesaj = error.response?.data?.message || 'Bir hata oluştu.';
@@ -74,7 +73,6 @@ export default function Extras({car, selectedExtras, setSelectedExtras}){
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {extras?.map(e => {
-                    console.log(selectedExtras);
                     let name = JSON.parse(e.name);
                     let description = JSON.parse(e.description);
                     const isSelected = selectedExtras[e.id];

@@ -6,7 +6,6 @@ import {useTranslation} from "react-i18next";
 
 export default function Car({cars, locations}) {
     const {i18n, t} = useTranslation();
-    console.log(cars);
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200">
             <Navbar />

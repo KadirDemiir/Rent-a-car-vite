@@ -141,7 +141,7 @@ export default function CarTable({ cars }) {
 
     return (
         <div className="px-4 py-8 md:px-8 lg:px-12 space-y-8">
-            <FilterCar cars={cars} setFilteredCars={setFilteredCars} />
+            {/* <FilterCar cars={cars} setFilteredCars={setFilteredCars} /> */}
 
             <div className="flex gap-4 items-center">
                 <button

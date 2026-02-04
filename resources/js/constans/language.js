@@ -1,10 +1,10 @@
 export const languages = {
     en: {
         name: 'English',
-        flag: '/storage/svg/flags/en.svg',
+        flag: '',
     },
     tr: {
         name: 'Türkçe',
-        flag: '/storage/svg/flags/tr.svg',
+        flag: '',
     }
 };

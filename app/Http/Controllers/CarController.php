@@ -23,10 +23,30 @@ use Inertia\Inertia;
 class  CarController extends Controller
 {
     public function showAllCars(){
-        $cars = Car::with(['photos', 'brandKey', 'modelKey'])->orderBy('sort_order', 'asc')->get();
+        $cars = Car::select([
+                'id',
+                'segment_id',
+                'body_type_id',
+                'transmission_id',
+                'fuel_id',
+                'seat_count',
+                'trunk_capacity',
+                'deposit',
+                'brand_translation_key_id',
+                'model_translation_key_id',
+                'sort_order'
+            ])
+            ->with([
+                'photos:id,car_id,photo_path,is_cover',
+                'brandKey:id,key',
+                'modelKey:id,key'
+            ])
+            ->orderBy('sort_order', 'asc')
+            ->get();
+            
         return Inertia::render('Cars', [
             'cars' => $cars,
-            'locations' => Locations::where('is_active', true)->get(),
+            'locations' => Locations::where('is_active', true)->select(['id', 'name'])->get(),
         ]);
     }
 

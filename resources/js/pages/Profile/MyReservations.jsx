@@ -16,11 +16,9 @@ export default function MyReservations({ reservations }) {
                 lang: i18n.language
             })
                 .then(response => {
-                    console.log(response.data);
                     setUpdatedReservations(response.data.reservations)
                 })
-                .catch(error => {
-                    console.error(error);
+                .catch(() => {
                 });
         }
     };
@@ -74,7 +72,8 @@ export default function MyReservations({ reservations }) {
                                              <img 
                                                 src={`/storage/${reservation.car.photos[0].photo_path}`} 
                                                 alt="Car" 
-                                                className="w-full h-full object-cover" 
+                                                className="w-full h-full object-cover"
+                                                loading="lazy"
                                                 onError={(e) => {e.target.onerror = null; e.target.src = '/placeholder.png'}} 
                                              />
                                         </div>

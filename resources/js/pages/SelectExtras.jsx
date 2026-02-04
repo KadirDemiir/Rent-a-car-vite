@@ -11,7 +11,6 @@ import IncludedServices from "../components/websites/reservation/create-reservat
 import { useCurrency } from "../providers/CurrencyContext.jsx";
 
 export default function SelectExtras({car, auth_user, params}){
-    console.log(car, auth_user, params);
     const {t, i18n} = useTranslation();
     const {current} = useCurrency();
     const [selectedExtras, setSelectedExtras] = useState([]);
@@ -83,7 +82,6 @@ export default function SelectExtras({car, auth_user, params}){
             }
         }
 
-        console.log(hasError);
         if (hasError) {
             setError(firstErrorMessage);
             return;
@@ -114,18 +112,14 @@ export default function SelectExtras({car, auth_user, params}){
                 return_flight_no: user.returnFlightNo,
             }
         };
-        console.log(submissionData);
         axios.post('/create-reservation', submissionData, )
             .then(res => {
-                console.log('Reservation created:', res.data);
                 alert('Reservation successfully created!');
             })
             .catch(error => {
                 if (error.response) {
-                    console.error('Validation errors:', error.response.data.errors || error.response.data);
                     alert('Error: ' + JSON.stringify(error.response.data));
                 } else {
-                    console.error('Error:', error.message);
                     alert('An unexpected error occurred.');
                 }
             })

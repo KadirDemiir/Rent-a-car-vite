@@ -40,7 +40,35 @@ class ReservationController extends Controller
     if($reqStart >= $reqEnd || $reqStart->isPast())
         return to_route('home');
 
-    $cars = Car::with(['location', 'photos', 'brandKey', 'modelKey', 'price'])
+    $cars = Car::select([
+            'id',
+            'brand_translation_key_id',
+            'model_translation_key_id',
+            'segment_id',
+            'body_type_id',
+            'fuel_id',
+            'transmission_id',
+            'current_location_id',
+            'seat_count',
+            'trunk_capacity',
+            'deposit',
+            'status',
+            'sort_order'
+        ])
+        ->with([
+            'brandKey:id,key',
+            'modelKey:id,key',
+            'photos' => function($q) {
+                $q->where('is_cover', 1)->select('car_id', 'photo_path');
+            },
+            'price' => function($query) use ($reqStart) {
+                $query->select('car_id', 'base_price', 'price', 'currency_id', 'min_days', 'max_days')
+                ->where('month', $reqStart->month) 
+                ->where('is_active', 1)  
+                ->with('currency:id,code,exchange_rate');
+    }
+        ])
+        ->where('status', '!=', 'unavailable')
         ->orderBy('sort_order', 'asc')
         ->get();
 
@@ -52,11 +80,14 @@ class ReservationController extends Controller
     $rLocation = $selectedLocations->firstWhere('id', $request->RLocation);
 
     $availableCars = [];
-
+    $drop = DropPrice::select('price', 'currency')
+        ->where('from_location_id', $request->PULocation)
+        ->where('to_location_id', $request->RLocation)
+        ->first();
     foreach ($cars as $car) {
-        // isCarAvailable içine ID yerine doğrudan $car objesini gönderin
-        if ($this->isCarAvailable($car->id, $request->startDateTime, $request->finishDateTime, $request->PULocation)) {
-            $this->CalcPrice($car, $request->startDateTime, $request->finishDateTime, $request->PULocation, $request->RLocation);
+        // Pass the Car object directly to avoid extra DB query
+        if ($this->isCarAvailable($car, $request->startDateTime, $request->finishDateTime, $request->PULocation)) {
+            $this->CalcPrice($car, $request->startDateTime, $request->finishDateTime, $request->PULocation, $request->RLocation, $drop);
 
             if($car->daily_price !== null) {
                 $availableCars[] = $car;
@@ -114,13 +145,31 @@ public function showExtras(Request $request)
         return to_route('home')->with('error', 'Oturum süreniz doldu.');
     }
 
-    $car = Car::with(['brandKey', 'modelKey', 'photos', 'location'])->findOrFail($validated['car_id']);
+    $startDateTime = Carbon::parse($validated['startDateTime']);
+    
+    $car = Car::with([
+        'brandKey', 
+        'modelKey', 
+        'photos', 
+        'location',
+        'price' => function($query) use ($startDateTime) {
+            $query->select('car_id', 'base_price', 'price', 'currency_id', 'min_days', 'max_days')
+                ->where('month', $startDateTime->month)
+                ->where('is_active', 1)
+                ->with('currency:id,code,exchange_rate');
+        }
+    ])->findOrFail($validated['car_id']);
 
-    if (!$this->isCarAvailable($car->id, $validated['startDateTime'], $validated['finishDateTime'], $validated['PULocation'])) {
+    if (!$this->isCarAvailable($car, $validated['startDateTime'], $validated['finishDateTime'], $validated['PULocation'])) {
         return to_route('home')->with('error', 'Araç artık uygun değil.');
     }
 
-    $this->CalcPrice($car, $validated['startDateTime'], $validated['finishDateTime'], $validated['PULocation'], $validated['RLocation']);
+    $drop = DropPrice::select('price', 'currency')
+        ->where('from_location_id', $validated['PULocation'])
+        ->where('to_location_id', $validated['RLocation'])
+        ->first();
+
+    $this->CalcPrice($car, $validated['startDateTime'], $validated['finishDateTime'], $validated['PULocation'], $validated['RLocation'], $drop);
 
     return Inertia::render('SelectExtras', [
         'car' => $car,
@@ -135,74 +184,92 @@ public function showExtras(Request $request)
     ]);
 }
 
-    public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, $rLocationId){
-        $start = new DateTime($startDateTime);
-        $finish = new DateTime($finishDateTime);
 
-        $month = $start->format('m');
+public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, $rLocationId, $drop = null)
+{
+    $start = Carbon::parse($startDateTime);
+    $finish = Carbon::parse($finishDateTime);
 
-        $diff = $start->diff($finish);
-        $dayCount = $diff->days;
-
-        if ($diff->h > 3)
-            $dayCount += 1;
-
-        if ($dayCount == 0) $dayCount = 1;
-
-        $car->total_days = $dayCount;
-
-        $drop = DropPrice::select('price', 'currency')
-            ->where('from_location_id', $puLocationId)
-            ->where('to_location_id', $rLocationId)
-            ->first();
-
-        $dailyPrice = Price::select('base_price', 'price', 'currency_id', 'min_days', 'max_days')
-            ->where('car_id', $car->id)
-            ->where('is_active', 1)
-            ->where('month', (int)$month)
-            ->orderByDesc('min_days')
-            ->with('currency')
-            ->get()
-            ->first(function ($price) use ($dayCount) {
-                return $dayCount >= $price->min_days && $dayCount <= $price->max_days;
-            });
-
-        if($dailyPrice) {
-            $car->daily_price = $dailyPrice->base_price;
-            $car->daily_price_currency = $dailyPrice->currency;
-        } else {
-            $car->daily_price = null;
-            $car->daily_price_currency = null;
-        }
-
-        if ($drop) {
-            $car->drop_price = $drop->price;
-            $car->drop_currency = $drop->currency;
-        } else {
-            $car->drop_price = null;
-            $car->drop_currency = null;
-        }
-
-        $baseDailyPrice = $car->daily_price ?? 0;
-        $discountData = $this->calculateDiscount($car->id, $startDateTime, $finishDateTime, $baseDailyPrice);
-
-        $discountedDailyPrice = max(0, $baseDailyPrice - $discountData['amount']);
-        $totalRentalPrice = $discountedDailyPrice * $dayCount;
-
-        $car->discount_data = $discountData;
-
-        $car->calculated_price = [
-            'base_daily_price' => $baseDailyPrice,
-            'daily_discount_amount' => $discountData['amount'],
-            'final_daily_price' => $discountedDailyPrice,
-            'total_rental_price' => $totalRentalPrice,
-            'drop_price' => $car->drop_price ?? 0,
-            'grand_total' => $totalRentalPrice + ($car->drop_price ?? 0)
-        ];
+    $dayCount = $start->diffInDays($finish);
+    
+    $diffHours = $start->diffInHours($finish) % 24; 
+    
+    if ($diffHours > 3) {
+        $dayCount += 1;
     }
 
-    public function calculateDiscount($carId, $start, $end, $unitPrice = 0){
-        $segmentId = Car::find($carId)->segment_id;
+    if ($dayCount == 0) {
+        $dayCount = 1;
+    }
+
+    $car->total_days = $dayCount;
+
+/*     $drop = DropPrice::select('price', 'currency')
+        ->where('from_location_id', $puLocationId)
+        ->where('to_location_id', $rLocationId)
+        ->first();
+ */
+/*     $dailyPrice = Price::select('base_price', 'price', 'currency_id', 'min_days', 'max_days')
+        ->where('car_id', $car->id)
+        ->where('is_active', 1)
+        ->where('month', $start->month)
+        ->where('min_days', '<=', $dayCount)
+        ->where('max_days', '>=', $dayCount)
+        ->orderBy('base_price', 'asc') 
+        ->with('currency:id,code,exchange_rate')
+        ->first(); */
+
+    //$car->daily_price = $dailyPrice->base_price ?? null;
+    //$car->daily_price_currency = $dailyPrice->currency ?? null;
+
+    $car->drop_price = $drop->price ?? null;
+    $car->drop_currency = $drop->currency ?? null;
+
+    // Find the correct price tier based on dayCount from the loaded price collection
+    $matchingPrice = null;
+    if ($car->relationLoaded('price') && $car->price) {
+        $matchingPrice = $car->price->first(function ($price) use ($dayCount) {
+            return $dayCount >= $price->min_days && $dayCount <= $price->max_days;
+        });
+    }
+
+    $baseDailyPrice = $matchingPrice->base_price ?? 0;
+    $car->daily_price = $baseDailyPrice;
+    $car->daily_price_currency = $matchingPrice->currency ?? null;
+    
+    $discountData = $this->calculateDiscount($car, $startDateTime, $finishDateTime, $baseDailyPrice);
+
+    $discountedDailyPrice = max(0, $baseDailyPrice - ($discountData['amount'] ?? 0));
+    $totalRentalPrice = $discountedDailyPrice * $dayCount;
+    $dropPriceValue = $car->drop_price ?? 0;
+
+    $car->discount_data = $discountData;
+    
+    $car->calculated_price = [
+        'base_daily_price'      => $baseDailyPrice,
+        'daily_discount_amount' => $discountData['amount'] ?? 0,
+        'final_daily_price'     => $discountedDailyPrice,
+        'total_rental_price'    => $totalRentalPrice,
+        'drop_price'            => $dropPriceValue,
+        'grand_total'           => $totalRentalPrice + $dropPriceValue
+    ];
+}
+
+    public function calculateDiscount($car, $start, $end, $unitPrice = 0){
+        // Accept either a Car object or an ID
+        if (!$car instanceof Car) {
+            $car = Car::find($car);
+            if (!$car) {
+                return [
+                    'has_discount' => false,
+                    'amount' => 0,
+                    'discount_value' => 0,
+                    'meta' => null
+                ];
+            }
+        }
+        $carId = $car->id;
+        $segmentId = $car->segment_id;
         $startDate = Carbon::parse($start);
         $endDate = Carbon::parse($end);
 
@@ -299,7 +366,7 @@ public function showExtras(Request $request)
             $drop_cost = $validated['drop_price'];
 
             $discountData = $this->calculateDiscount(
-                $validated['car_id'],
+                $validated['car_id'], // Will be fetched inside calculateDiscount
                 $validated['start_date_time'],
                 $validated['finish_date_time'],
                 $baseDailyPrice
@@ -358,7 +425,7 @@ public function showExtras(Request $request)
             DB::commit();
             $reservation->refresh();
 
-            $reservation->load(['car.brandKey', 'car.modelKey', 'pickupLocation', 'returnLocation', 'currency']);
+            $reservation->load(['car.brandKey:id,key', 'car.modelKey:id,key', 'pickupLocation:id,name', 'returnLocation:id,name', 'currency:id,symbol']);
             $lang_id = \App\Models\Language::where('code', $validated['lang'])->first()->id;
 
             $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_created', [
@@ -394,15 +461,20 @@ public function showExtras(Request $request)
         }
     }
 
-    public function isCarAvailable($carId, $startDateTime, $finishDateTime, $pickupLocationId){
+    public function isCarAvailable($car, $startDateTime, $finishDateTime, $pickupLocationId){
+        // Accept either a Car object or an ID
+        if (!$car instanceof Car) {
+            $car = Car::find($car);
+            if (!$car) return false;
+        }
 
-        if(Car::find($carId)->status === 'unavailable') return false;
+        if($car->status === 'unavailable') return false;
             $bufferHours = 4;
 
             $reqStart = Carbon::parse($startDateTime);
             $reqEnd = Carbon::parse($finishDateTime);
 
-            $hasConflict = Reservation::where('car_id', $carId)
+            $hasConflict = Reservation::where('car_id', $car->id)
                 ->whereIn('status', ['confirmed', 'pending', 'active'])
                 ->where(function ($query) use ($reqStart, $reqEnd, $bufferHours) {
                     $query->where('pickup_datetime', '<', $reqEnd)
@@ -413,7 +485,7 @@ public function showExtras(Request $request)
             if ($hasConflict)
                 return false;
 
-            $lastReservation = Reservation::where('car_id', $carId)
+            $lastReservation = Reservation::where('car_id', $car->id)
                 ->whereIn('status', ['pending',  'confirmed', 'completed', 'active'])
                 ->whereRaw("DATE_ADD(return_datetime, INTERVAL ? HOUR) <= ?", [$bufferHours, $reqStart])
                 ->orderBy('return_datetime', 'desc')
@@ -422,8 +494,7 @@ public function showExtras(Request $request)
             if ($lastReservation) {
                 return $lastReservation->return_location_id == $pickupLocationId;
             } else {
-                $car = Car::find($carId);
-                return $car && $car->status == 'available' && $car->current_location_id == $pickupLocationId;
+                return $car->status == 'available' && $car->current_location_id == $pickupLocationId;
             }
     }
 

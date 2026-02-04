@@ -61,12 +61,13 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit }, ref) => {
                 }), {});
 
                 // Form verisini güncelle (Backend'den gelen ID'leri önceliklendir)
+                // segments/bodyTypes/fuels/transmissions are now arrays of IDs [1, 2, 3]
                 const updated = {
                     ...formDataRef.current,
-                    segment: car?.segment_id ?? res.data.segments[0]?.id ?? "",
-                    bodyType: car?.body_type_id ?? res.data.bodyTypes[0]?.id ?? "",
-                    fuelType: car?.fuel_id ?? res.data.fuels[0]?.id ?? "",
-                    transmissionType: car?.transmission_id ?? res.data.transmissions[0]?.id ?? "",
+                    segment: car?.segment_id ?? res.data.segments[0] ?? "",
+                    bodyType: car?.body_type_id ?? res.data.bodyTypes[0] ?? "",
+                    fuelType: car?.fuel_id ?? res.data.fuels[0] ?? "",
+                    transmissionType: car?.transmission_id ?? res.data.transmissions[0] ?? "",
                     status: car?.status || "available",
                     brand,
                     model
@@ -202,9 +203,10 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit }, ref) => {
             </div>
 
             {/* SelectOptions Düzeltildi: Value artık array [] içinde değil ve options label/value maplendi */}
+            {/* segments/bodyTypes/fuels/transmissions are now arrays of IDs [1, 2, 3] */}
             <div>
                 <SelectOptions
-                    options={segments.map(s => ({ label: t(s.translation_key.key), value: s.id }))}
+                    options={segments.map(id => ({ label: t(`segment.${id}`), value: id }))}
                     options_name={t("adminpanel.car.car_modify.edit_car_information.segment")}
                     onChange={e => handleSelectChange("segment", e)}
                     value={[formData.segment]}
@@ -212,7 +214,7 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit }, ref) => {
             </div>
             <div>
                 <SelectOptions
-                    options={bodyTypes.map(b => ({ label: t(b.translation_key.key), value: b.id }))}
+                    options={bodyTypes.map(id => ({ label: t(`body_type.${id}`), value: id }))}
                     options_name={t("adminpanel.car.car_modify.edit_car_information.body_type")}
                     onChange={e => handleSelectChange("bodyType", e)}
                     value={[formData.bodyType]}
@@ -220,7 +222,7 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit }, ref) => {
             </div>
             <div>
                 <SelectOptions
-                    options={fuels.map(f => ({ label: t(f.translation_key.key), value: f.id }))}
+                    options={fuels.map(id => ({ label: t(`fuel.${id}`), value: id }))}
                     options_name={t("adminpanel.car.car_modify.edit_car_information.fuel_type")}
                     onChange={e => handleSelectChange("fuelType", e)}
                     value={[formData.fuelType]}
@@ -228,7 +230,7 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit }, ref) => {
             </div>
             <div>
                 <SelectOptions
-                    options={transmissions.map(tn => ({ label: t(tn.translation_key.key), value: tn.id }))}
+                    options={transmissions.map(id => ({ label: t(`transmission.${id}`), value: id }))}
                     options_name={t("adminpanel.car.car_modify.edit_car_information.transmission_type")}
                     onChange={e => handleSelectChange("transmissionType", e)}
                     value={[formData.transmissionType]}

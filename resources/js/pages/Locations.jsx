@@ -12,8 +12,8 @@ export default function Locations() {
                 if (response.data.success) {
                     setLocations(response.data.locations);
                 }
-            } catch (error) {
-                console.error("Veri çekilirken hata oluştu:", error);
+            } catch {
+                // Error fetching locations
             } finally {
                 setLoading(false);
             }
@@ -36,7 +36,7 @@ export default function Locations() {
                 <div className="w-[90%]">
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 sm:grid-col-1 gap-4">
                         {locations?.map(location => (
-                            < LocationCard location={location} />
+                            <LocationCard key={location.id} location={location} />
                         ))}
                     </div>
                 </div>

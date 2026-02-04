@@ -11,7 +11,11 @@ class TranslationKey extends Model
       'key',
       'description',
     ];
-
+    protected $hidden = [
+        'id',
+        'created_at',
+        'updated_at',
+    ];
     public function translations(): HasMany{
         return $this->hasMany(Translation::class);
     }

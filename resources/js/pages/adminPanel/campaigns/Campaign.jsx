@@ -4,7 +4,6 @@ import {Link} from "@inertiajs/react"
 
 export default function Campaign({campaign, success, languages}) {
     const titleObj = typeof campaign.title === 'string' ? JSON.parse(campaign.title) : campaign.title;
-    console.log(languages);
     return (
         <div className="w-full min-h-screen bg-gray-100">
             <Navbar >

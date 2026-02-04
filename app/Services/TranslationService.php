@@ -17,7 +17,7 @@ class TranslationService
         $cacheKey = "translations_{$langCode}";
         $cacheDuration = 3600 * 24 * 30; 
 
-        return Cache::store('file')->remember($cacheKey, $cacheDuration, function () use ($langCode) {
+        return Cache::remember($cacheKey, $cacheDuration, function () use ($langCode) {
             return Translation::with('translationKey')
                 ->whereHas('language', fn($q) => $q->where('code', $langCode))
                 ->get()
@@ -30,7 +30,7 @@ class TranslationService
 
     public static function getActiveLanguages(): array
     {
-        return Cache::store('file')->remember('active_languages_list', 3600 * 24 * 30, function () {
+        return Cache::remember('active_languages_list', 3600 * 24 * 30, function () {
             return Language::where('status', 'active')
                 ->select('id', 'code', 'name', 'flag_photo_path') // Sadece gerekli alanları çekiyoruz
                 ->get()
@@ -46,9 +46,9 @@ class TranslationService
         $languages = Language::pluck('code')->toArray();
         
         foreach ($languages as $code) {
-            Cache::store('file')->forget("translations_{$code}");
+            Cache::forget("translations_{$code}");
         }
         
-        Cache::store('file')->forget('active_languages_list');
+        Cache::forget('active_languages_list');
     }
 }

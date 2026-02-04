@@ -52,7 +52,7 @@ class AppServiceProvider extends ServiceProvider
         if (!$this->app->runningInConsole()) {
             
             try {
-                $supported = Cache::store('file')->remember('supported_locales', 3600 * 24, function () {
+                $supported = Cache::remember('supported_locales', 3600 * 24, function () {
                     // Veritabanı sorgusu SADECE cache yoksa çalışır
                     $langs = getActiveLanguages();
 

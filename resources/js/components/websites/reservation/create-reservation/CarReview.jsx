@@ -40,9 +40,9 @@ export default function CarReview({car}){
     ];
     return(
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-            <div className="grid grid-cols-1 md:grid-cols-10 lg:grid-cols-7 gap-0">
+            <div className="grid grid-cols-1 md:grid-cols-10 lg:grid-cols-7 gap-4 m-4">
                 <ReservationCarPhoto photoSrc={photoSrc}/>
-                <ReservationCarInfo segmentLabel={t(`segment.${car.segment_id}`)} title={title} features={features} requirements={requirements} />
+                <ReservationCarInfo segmentLabel={t(`segment.${car.segment_id}`)} title={title} features={features} requirements={requirements} className={`gap-6`}/>
             </div>
         </div>
     );

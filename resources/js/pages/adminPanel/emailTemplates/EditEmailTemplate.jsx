@@ -69,7 +69,7 @@ export default function EditEmailTemplate({ template, languages }) {
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-2xl font-bold text-gray-800">{t('adminpanel.email.edit_email_template')}</h1>
                     <button
-                        onClick={() => router.get('/adminpanel/email-templates')}
+                        onClick={() => router.get(`/${i18n.language}/${t('address.adminpanel')}/${t('address.email-templates')}`)}
                         className="text-gray-600 hover:text-gray-800"
                     >
                         ← {t('adminpanel.email.back')}

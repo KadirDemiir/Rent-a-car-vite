@@ -57,7 +57,6 @@ export default function SignUpForm({ onMessage, setFormType }) {
             onMessage({ type: 'error', text: response.data.message });
           }
         }).catch(error => {
-          console.error('There was an error!', error);
           onMessage({ type: 'error', text: error.response?.data?.message || 'An error occurred' });
         });
 

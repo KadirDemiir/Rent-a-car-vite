@@ -4,6 +4,7 @@ import CarReservations from "../../../components/adminPanel/car/CarReservations.
 import IncomingGraph from "../../../components/adminPanel/car/IncomingGraph.jsx";
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 export default function Car({ id }) {
     const [car, setCar] = useState(null);
@@ -11,6 +12,7 @@ export default function Car({ id }) {
     const [success, setSuccess] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const {t} = useTranslation();
 
     const fetchData = useCallback(async () => {
         try {
@@ -41,7 +43,7 @@ export default function Car({ id }) {
                 ) : (
                     <>
                         <div className="font-bold text-xl">
-                            {car.license_plate} - {car.brand} {car.model} {car.fuel_type} {car.transmission_type} {car.year} <span className="text-gray-700">({car.status})</span>
+                            {car.license_plate} - {t(car.brand_key.key)} {t(car.model_key.key)} {car.fuel_type} {car.transmission_type} {car.year} <span className="text-gray-700">({car.status})</span>
                         </div>
                         <hr className="my-4" />
 

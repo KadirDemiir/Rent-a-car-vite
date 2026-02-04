@@ -27,17 +27,17 @@ export default function FilterReservations({ onFilterChange }) {
               const fuelOptions = [
                   { label: "All", value: "" },
                   ...res.data.fuels
-                      .map(f => ({
-                          label: t(`fuel.${f.id}`),
-                          value: f.id.toString()}))];
+                      .map(id => ({
+                          label: t(`fuel.${id}`),
+                          value: id.toString()}))];
               setFuelOpt(fuelOptions);
 
               const segmentOptions = [
                   { label: "All", value: "" },
                   ...res.data.segments
-                      .map(s => ({
-                          label: t(`segment.${s.id}`),
-                          value: s.id.toString()
+                      .map(id => ({
+                          label: t(`segment.${id}`),
+                          value: id.toString()
                       }))
               ];
               setSegmentOpt(segmentOptions);
@@ -45,9 +45,9 @@ export default function FilterReservations({ onFilterChange }) {
               const transmissionOptions = [
                   { label: "All", value: "" },
                   ...res.data.transmissions
-                      .map(tr => ({
-                          label: t(`transmission.${tr.id}`),
-                          value: tr.id.toString()
+                      .map(id => ({
+                          label: t(`transmission.${id}`),
+                          value: id.toString()
                       }))
               ];
               setTransmissionOpt(transmissionOptions);

@@ -171,9 +171,9 @@ export default function FilterCar({cars, setFilteredCars}) {
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
                         <SelectOptions
                             value={segment}
-                            options={[{label: "all", value: ""}, ...segmentsOptions.map(s => ({
-                                label: t(s.translation_key.key),
-                                value: t(s.translation_key.key).toLowerCase(),
+                            options={[{label: "all", value: ""}, ...segmentsOptions.map(id => ({
+                                label: t(`segment.${id}`),
+                                value: t(`segment.${id}`).toLowerCase(),
                             }))]}
                             onChange={setSegment}
                             options_name={t("adminpanel.cars.filter.segment")}
@@ -181,9 +181,9 @@ export default function FilterCar({cars, setFilteredCars}) {
                         />
                         <SelectOptions
                             value={bodyType}
-                            options={[{label: "all", value: ""}, ...bodyTypeOptions.map(b => ({
-                                label: t(b.translation_key.key),
-                                value: t(b.translation_key.key).toLowerCase(),
+                            options={[{label: "all", value: ""}, ...bodyTypeOptions.map(id => ({
+                                label: t(`body_type.${id}`),
+                                value: t(`body_type.${id}`).toLowerCase(),
                             }))]}
                             onChange={setBodyType}
                             options_name={t("adminpanel.cars.filter.body_type")}
@@ -191,9 +191,9 @@ export default function FilterCar({cars, setFilteredCars}) {
                         />
                         <SelectOptions
                             value={transmission}
-                            options={[{label: "all", value: ""}, ...transmissionOptions.map(a => ({
-                                label: t(a.translation_key.key),
-                                value: t(a.translation_key.key).toLowerCase(),
+                            options={[{label: "all", value: ""}, ...transmissionOptions.map(id => ({
+                                label: t(`transmission.${id}`),
+                                value: t(`transmission.${id}`).toLowerCase(),
                             }))]}
                             onChange={setTransmission}
                             options_name={t("adminpanel.cars.filter.transmission_type")}
@@ -201,9 +201,9 @@ export default function FilterCar({cars, setFilteredCars}) {
                         />
                         <SelectOptions
                             value={fuelType}
-                            options={[{label: "all", value: ""}, ...fuelOptions.map(f => ({
-                                label: t(f.translation_key.key),
-                                value: t(f.translation_key.key).toLowerCase(),
+                            options={[{label: "all", value: ""}, ...fuelOptions.map(id => ({
+                                label: t(`fuel.${id}`),
+                                value: t(`fuel.${id}`).toLowerCase(),
                             }))]}
                             onChange={setFuelType}
                             options_name={t("adminpanel.cars.filter.fuel_type")}

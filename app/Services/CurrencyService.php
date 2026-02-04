@@ -11,10 +11,10 @@ class CurrencyService
 {
     public function getActiveCurrencies()
     {
-        return Cache::store('file')->remember('active_currencies', 3600, function () {
+        return Cache::remember('active_currencies', 3600, function () {
             Log::info('CACHE MISS: Fetching from TCMB ' . now());
             
-            $def = Currency::where('is_active', 1)->where('is_default', 1)->first();
+            $def = Currency::where('is_active', 1)->where('is_default', 1)->select('code', 'exchange_rate')->first();
             
             if (!$def) {
                 throw new \Exception('Default currency not found');

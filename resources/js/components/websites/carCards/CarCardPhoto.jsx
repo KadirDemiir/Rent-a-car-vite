@@ -4,7 +4,8 @@ export default function CarCardPhoto({photo_path, alt}){
             <img 
                 src={photo_path} 
                 className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110" 
-                alt={alt} 
+                alt={alt}
+                loading="lazy"
             />
         </div>
     );

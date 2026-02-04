@@ -48,6 +48,7 @@ export default function CarIndexPhotos({photos, alt}){
                     src={`/storage/${photos[currentIndex].photo_path}`}
                     alt={alt}
                     className="w-full h-full object-contain drop-shadow-sm transition-transform duration-300 group-hover:scale-105"
+                    loading="lazy"
                 />
                 
                 <button
