@@ -58,8 +58,9 @@ Route::middleware('admin')->group(function () {
     });
     Route::get('/adminpanel/get-locations', function () {
         return response()->json([
-            'locations' => Locations::with(['city.translations', 'translations'])->get(),
-            'active_locations' => Locations::where('is_active', 1)->with(['translations', 'city.translations'])->get()
+            'success' => true,
+            'locations' => Locations::where('is_active', true)->get(),
+            //'active_locations' => Locations::where('is_active', 1)->with(['translations', 'city.translations'])->get()
         ]);
     });
     Route::get('/adminpanel/get-info/locations/{id}', [LocationsController::class, 'getIndexLocationInfo']);

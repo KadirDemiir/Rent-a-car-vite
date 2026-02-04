@@ -181,7 +181,7 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit }, ref) => {
                 <LanguageProgress langOpt={supportedLangs} calculateProgress={progress} isLanguageFilled={(langValue) => formData.brand[langValue]?.trim() && formData.model[langValue]?.trim()} lang={currentLang} setLang={setCurrentLang} />
             </div>
 
-            <div className="col-span-1 md:col-span-2">
+            <div className="col-span-1">
                 <FormInput name={`brand.${currentLang}`} label={t("adminpanel.car.car_modify.edit_car_information.brand")} value={formData.brand[currentLang] || ""} onChange={handleChange} error={error.brand} />
             </div>
             <div>

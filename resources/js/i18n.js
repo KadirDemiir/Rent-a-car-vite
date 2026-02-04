@@ -2,7 +2,6 @@ import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 const initI18n = async (locale, translations, allTranslations = {}) => {
-    console.log('Initializing i18n with locale:', locale);
     
     // Build resources for all languages
     const resources = {};

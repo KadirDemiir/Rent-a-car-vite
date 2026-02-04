@@ -5,7 +5,7 @@ import ChevronNavigation from "../reservations/ChevronNavigation.jsx";
 import { useTranslation } from "react-i18next";
 
 export default function CarReservations({ allReservations, updateData, current = true, past = true }) {
-    console.log(allReservations);
+    //console.log(allReservations);
     const reservations = useMemo(() => {
         if (!allReservations) return [];
         if (current && past) return allReservations;

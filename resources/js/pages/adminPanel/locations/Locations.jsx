@@ -13,13 +13,12 @@ export default function Locations() {
     const [formData, setFormData] = useState({ name: '', city: '', phone: '', email: '', address: '', image: null });
     const [latitude, setLatitude] = useState(0);
     const [longitude, setLongitude] = useState(0);
-
     const fetchData = async () => {
         setLoading(true);
         try {
             const response = await axios.get('/adminpanel/get-locations');
             if (response.data.success) {
-                setLocations(response.data.data);
+                setLocations(response.data.locations);
             }
         } catch (error) {
             console.error(error);
