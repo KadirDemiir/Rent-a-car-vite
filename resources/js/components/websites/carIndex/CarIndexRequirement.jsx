@@ -8,12 +8,13 @@ export default function CarIndexRequirement({car}){
     const {t} = useTranslation();
     const {current, calculateTotal} = useCurrency();
     return (
-        <div className="grid grid-cols-2 gap-6 p-6 bg-white rounded-2xl shadow-md w-full border-1 border-blue-600">
-            <div className="col-span-2 flex justify-center font-bold text-xl">Requirements</div>
-
-            < CarIndexPropComp photo={<Calendar/>} title={t("website.car.requirements.required_min_age")} content={"23"}/>
-            < CarIndexPropComp photo={<User/>} title={t("website.car.requirement.experience")} content={"3"}/>
-            < CarIndexPropComp photo={<Shield/>} title={t("website.car.requirement.deposit")} content={` ${calculateTotal(car.deposit).toFixed(2)} ${current.symbol}`}/>
+        <div className="p-4 bg-white rounded-2xl shadow-lg border border-gray-100 w-full">
+            <div className="mb-4 text-center text-sm font-semibold text-gray-700">{t('website.car.requirements')}</div>
+            <div className="grid grid-cols-2 gap-4">
+                < CarIndexPropComp photo={<Calendar/>} title={t("website.car.requirements.required_min_age")} content={"23"}/>
+                < CarIndexPropComp photo={<User/>} title={t("website.car.requirement.experience")} content={"3"}/>
+                < CarIndexPropComp photo={<Shield/>} title={t("website.car.requirement.deposit")} content={` ${calculateTotal(car.deposit).toFixed(2)} ${current.symbol}`}/>
+            </div>
         </div>
     );
 }

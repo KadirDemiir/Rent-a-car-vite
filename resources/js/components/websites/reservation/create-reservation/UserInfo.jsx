@@ -143,7 +143,7 @@ export default function UserInfo({setUser, user, userErrors, setUserErrors, show
                     showErrors={showErrors}
                 />
                 <div className="col-span-1 md:col-span-2">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">...</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">NOT</label>
                     <textarea 
                         onChange={(e) => handleUserChange('notes', e.target.value, "")} 
                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors resize-none h-24"

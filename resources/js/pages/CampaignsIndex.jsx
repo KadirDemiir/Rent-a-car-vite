@@ -6,6 +6,7 @@ export default function CampaignsIndex({ campaign }) {
     const currentLang = i18n.language.split("-")[0];
     const titleObj = typeof campaign.title === 'string' ? JSON.parse(campaign.title) : campaign.title;
     const contentObj = typeof campaign.content === 'string' ? JSON.parse(campaign.content) : campaign.content;
+    console.log('CampaignsIndex => ', contentObj);
 
     return (
         <div className="bg-gray-100 min-h-screen">
@@ -23,13 +24,13 @@ export default function CampaignsIndex({ campaign }) {
                     />
                 </div>
 
-                <div className="px-8 py-6 text-gray-700 text-base leading-relaxed">
-                    {campaign.content ? (
-                        <div dangerouslySetInnerHTML={{ __html: contentObj[currentLang] }} />
-                    ) : (
-                        <p>İçerik bulunamadı.</p>
-                    )}
-                </div>
+            <div className="px-8 py-6 text-gray-700 text-base leading-relaxed">
+                {campaign.content ? (
+                    <div className="wysiwyg-content break-words" dangerouslySetInnerHTML={{ __html: contentObj[currentLang] }} />
+                ) : (
+                    <p>İçerik bulunamadı.</p>
+                )}
+            </div>
             </div>
         </div>
     );
