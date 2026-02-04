@@ -1,6 +1,5 @@
 import ReservationAction from "./ReservationAction.jsx";
 import { useTranslation } from "react-i18next";
-import {useCurrency} from "../../../providers/CurrencyContext.jsx";
 
 const DetailItem = ({ label, value, className = "" }) => (
     <div className={`flex flex-col py-2 border-b border-gray-100 last:border-0 ${className}`}>
@@ -10,9 +9,7 @@ const DetailItem = ({ label, value, className = "" }) => (
 );
 
 export default function ShowResCard({ res, updateData, closeModal, curr, past }) {
-    console.log(res);
     const { t, i18n } = useTranslation();
-    const {calculateTotal, current} = useCurrency();
     const formatDate = (date) => {
         return new Date(date).toLocaleString("tr-TR", {
             day: "numeric", month: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit"

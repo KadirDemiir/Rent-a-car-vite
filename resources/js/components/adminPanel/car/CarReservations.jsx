@@ -3,9 +3,7 @@ import Td from "../table/Td.jsx";
 import ShowResCard from "../reservations/ShowResCard.jsx";
 import ChevronNavigation from "../reservations/ChevronNavigation.jsx";
 import { useTranslation } from "react-i18next";
-
-export default function CarReservations({ allReservations, updateData, current = true, past = true }) {
-    //console.log(allReservations);
+export default function CarReservations({ allReservations, updateData, current = true, past = true, prev=false}) {
     const reservations = useMemo(() => {
         if (!allReservations) return [];
         if (current && past) return allReservations;
@@ -19,7 +17,7 @@ export default function CarReservations({ allReservations, updateData, current =
     const { t } = useTranslation();
     const [selectedReservation, setSelectedReservation] = useState(null);
     const [startIndex, setStartIndex] = useState(0);
-    const perPage = 50;
+    const perPage = prev ? 5 : 50;
 
     const TDclass = "border border-gray-500 px-4 py-2";
     const headers = [

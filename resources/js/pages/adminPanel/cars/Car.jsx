@@ -54,16 +54,16 @@ export default function Car({ id }) {
                         <div className="w-full flex flex-col gap-16">
                             <ModifyCar car={car} setCar={setCar} setSuccess={setSuccess} />
 
-                            <div className="max-h-[40vh] overflow-y-hidden">
+                            <div className="overflow-y-hidden">
                                 <span className="font-bold">Araca Ait Rezervasyonlar </span>
                                 <span className="text-sm text-gray-500">(Detaylar İçin Tıklayınız)</span>
-                                <CarReservations updateData={fetchData} allReservations={reservations} past={false} />
+                                <CarReservations updateData={fetchData} allReservations={reservations} past={false} prev={true} />
                             </div>
 
-                            <div className="max-h-[40vh] overflow-y-hidden">
+                            <div className="overflow-y-hidden">
                                 <span className="font-bold">Araca Ait Geçmiş Rezervasyonlar </span>
                                 <span className="text-sm text-gray-500">(Detaylar İçin Tıklayınız)</span>
-                                <CarReservations updateData={fetchData} allReservations={reservations} current={false} />
+                                <CarReservations updateData={fetchData} allReservations={reservations} current={false} prev={true}/>
                             </div>
 
                             <IncomingGraph />
