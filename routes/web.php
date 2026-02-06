@@ -66,7 +66,7 @@ Route::middleware('admin')->group(function () {
     });
     Route::get('/adminpanel/get-info/locations/{id}', [LocationsController::class, 'getIndexLocationInfo']);
     Route::get('/get-reservations-informations', function () {
-        $data = Reservation::with(['extras', 'car', 'pickupLocation', 'returnLocation', 'currency'])->get();
+        $data = Reservation::with(['extras.extra', 'car.brandKey', 'car.modelKey', 'pickupLocation', 'returnLocation', 'currency'])->get();
         
         if ($data->isEmpty()) {
             return response()->json(['message' => 'Veritabanında rezervasyon bulunamadı.'], 404);

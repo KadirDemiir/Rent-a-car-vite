@@ -18,19 +18,21 @@ jobs:
           script: |
             set -e
             cd /var/www/Rent-a-car-vite
-            
+
             git fetch --all
             git reset --hard origin/main
-            
+
             composer install --no-dev --optimize-autoloader
-            
+
             npm install
             npm run build
-            
+
             php artisan down
             php artisan migrate --force
+            php artisan optimize:clear
             php artisan config:clear
             php artisan config:cache
             php artisan route:clear
             php artisan view:cache
+            php artisan currency:sync
             php artisan up

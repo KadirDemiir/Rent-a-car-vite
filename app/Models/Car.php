@@ -6,23 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-/**
- * @method static where(string $string, $id)
- */
 class Car extends Model
 {
-    /** @use HasFactory<\Database\Factories\CarFactory> */
     use HasFactory;
 
     protected static function newFactory(): \Database\Factories\CarFactory
     {
         return \Database\Factories\CarFactory::new();
     }
-
-    /**
-     * Relationships to eager load by default to prevent N+1 queries
-     */
-    //protected $with = ['brandKey', 'modelKey', 'location', 'bodyType', 'segment', 'currency', 'fuel', 'transmission'];
 
     protected $fillable = [
         'location_id',
@@ -44,7 +35,14 @@ class Car extends Model
     ];
 
     public function reservations() {
-        return $this->hasMany(Reservation::class, 'car_id')->with(['extras', 'pickupLocation', 'returnLocation']);
+        return $this->hasMany(Reservation::class, 'car_id')
+            ->with([
+                'extras', 
+                'pickupLocation:id,name', 
+                'returnLocation:id,name', 
+                'currency:id,code,symbol',
+                'car:id,license_plate,brand_translation_key_id,model_translation_key_id,year,segment_id,fuel_id,transmission_id',
+            ]);
     }
 
     public function location()
@@ -97,4 +95,4 @@ class Car extends Model
     public function segment(){
         return $this->belongsTo(Segment::class, 'segment_id');
     }
-}
+}   

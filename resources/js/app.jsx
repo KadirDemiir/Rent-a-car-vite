@@ -5,13 +5,16 @@ import { InertiaProgress } from '@inertiajs/progress';
 import { I18nextProvider } from 'react-i18next';
 import initI18n from './i18n';
 import { CurrencyProvider } from "./providers/CurrencyContext.jsx";
+import LocaleSync from './components/LocaleSync.jsx';
 import axios from 'axios';
 
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 InertiaProgress.init();
-
+const cleanApp = () => {
+  document.getElementById('app').removeAttribute('data-page');
+};
 createInertiaApp({
     resolve: name => {
         const pages = import.meta.glob('./pages/**/*.jsx');
@@ -25,6 +28,7 @@ createInertiaApp({
 
             page.layout = (children) => (
                 <CurrencyProvider>
+                    <LocaleSync />
                     {defaultLayout(children)}
                 </CurrencyProvider>
             );
@@ -32,17 +36,18 @@ createInertiaApp({
             return page;
         });
     },
+    
     setup({ el, App, props }) {
-        // Props'tan sadece locale bilgisini alıyoruz. 
-        // Translations artık prop olarak gelmiyor.
-        const { locale } = props.initialPage.props;
+        cleanApp();
+        // Get locale and translations from Inertia props
+        const { locale, translations } = props.initialPage.props;
 
-        initI18n(locale).then((i18nInstance) => {
-            createRoot(el).render(
-                <I18nextProvider i18n={i18nInstance}>
-                    <App {...props} />
-                </I18nextProvider>
-            );
-        });
+        const i18nInstance = initI18n(locale, translations || {});
+
+        createRoot(el).render(
+            <I18nextProvider i18n={i18nInstance}>
+                <App {...props} />
+            </I18nextProvider>
+        );
     },
 });

@@ -31,7 +31,7 @@ export default function CarCard({ car }) {
         <div className="group relative flex flex-col w-full bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
             
             <div className="relative w-full aspect-[16/10] bg-gray-50 overflow-hidden">
-                <div className="absolute top-3 left-3 z-10">
+                <div className="absolute top-3 left-3 z-1">
                     <span className="px-3 py-1 text-xs font-bold text-white bg-gray-700/90 backdrop-blur-md rounded-full shadow-sm uppercase tracking-wider">
                         {t(`segment.${car.segment_id}`)}
                     </span>

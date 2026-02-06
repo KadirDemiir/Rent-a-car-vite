@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => ({
                     // Heavy UI libraries - split into separate chunks
                     'vendor-react': ['react', 'react-dom'],
                     'vendor-inertia': ['@inertiajs/react', '@inertiajs/progress'],
-                    'vendor-i18n': ['i18next', 'react-i18next', 'i18next-http-backend'],
+                    'vendor-i18n': ['i18next', 'react-i18next'],
                     // Rich text editors - lazy load these
                     'vendor-tiptap': [
                         '@tiptap/react',

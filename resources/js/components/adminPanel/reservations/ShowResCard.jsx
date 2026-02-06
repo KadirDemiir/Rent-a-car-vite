@@ -9,6 +9,7 @@ const DetailItem = ({ label, value, className = "" }) => (
 );
 
 export default function ShowResCard({ res, updateData, closeModal, curr, past }) {
+    console.log(res);
     const { t, i18n } = useTranslation();
     const formatDate = (date) => {
         return new Date(date).toLocaleString("tr-TR", {

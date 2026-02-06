@@ -65,17 +65,17 @@ class Reservation extends Model
     }
 
     protected function trackingUrl(): Attribute
-{
-    return Attribute::get(function () {
-        if (!$this->token) {
-            return null;
-        }
+    {
+        return Attribute::get(function () {
+            if (!$this->token) {
+                return null;
+            }
 
-        return route('reservation.track', [
-            'token' => $this->token
-        ]);
-    });
-}
+            return route('reservation.track', [
+                'token' => $this->token
+            ]);
+        });
+    }
 
     public function user()
     {
@@ -84,12 +84,13 @@ class Reservation extends Model
 
     public function car()
     {
-        return $this->belongsTo(Car::class)->with('brandKey', 'modelKey');
+        return $this->belongsTo(Car::class)
+            ->with(['brandKey:id,key', 'modelKey:id,key']);
     }
 
     public function extras()
     {
-        return $this->hasMany(ReservationExtra::class)->with('extra');
+        return $this->hasMany(ReservationExtra::class)->with('extra:id,name,description');
     }
 
     public function reservation_extras()

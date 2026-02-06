@@ -6,7 +6,7 @@ export default function CheckReservation() {
     const { t, i18n } = useTranslation();
     const { data, setData, post, processing, errors } = useForm({
         email: '',
-        reservation_id: '',
+        reservation_reference_code: '',
     });
 
     const submit = (e) => {
@@ -40,18 +40,18 @@ export default function CheckReservation() {
                         </div>
 
                         <div>
-                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="reservation_id">
+                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="reservation_reference_code">
                                 {t('website.check_reservation.id_label')} (Numeric)
                             </label>
                             <input
-                                id="reservation_id"
+                                id="reservation_reference_code"
                                 type="text"
                                 className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-                                value={data.reservation_id}
-                                onChange={(e) => setData('reservation_id', e.target.value)}
+                                value={data.reservation_reference_code}
+                                onChange={(e) => setData('reservation_reference_code', e.target.value)}
                                 placeholder={t('website.check_reservation.id_placeholder')}
                             />
-                            {errors.reservation_id && <div className="text-red-500 text-sm mt-1">{errors.reservation_id}</div>}
+                            {errors.reservation_reference_code && <div className="text-red-500 text-sm mt-1">{errors.reservation_reference_code}</div>}
                         </div>
 
                         <button

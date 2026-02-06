@@ -22,92 +22,265 @@ use Illuminate\Support\Facades\Log;
 class ReservationController extends Controller
 {
     public function searchReservations(Request $request)
-{
-    if (!$request->has(['startDateTime', 'finishDateTime', 'PULocation', 'RLocation'])) {
-        return Inertia::render('SearchReservations', ['availableCars' => []]);
-    }
+    {
+        if (!$request->has(['startDateTime', 'finishDateTime', 'PULocation', 'RLocation'])) {
+            return Inertia::render('SearchReservations', ['availableCars' => []]);
+        }
 
-    $request->validate([
-        'startDateTime' => 'required|date|after:today',
-        'finishDateTime' => 'required|date|after:startDateTime',
-        'PULocation' => 'required|exists:locations,id',
-        'RLocation' => 'required|exists:locations,id',
-    ]);
+        $request->validate([
+            'startDateTime' => 'required|date|after:today',
+            'finishDateTime' => 'required|date|after:startDateTime',
+            'PULocation' => 'required|exists:locations,id',
+            'RLocation' => 'required|exists:locations,id',
+        ]);
 
-    $reqStart = Carbon::parse($request->startDateTime);
-    $reqEnd = Carbon::parse($request->finishDateTime);
+        $reqStart = Carbon::parse($request->startDateTime);
+        $reqEnd = Carbon::parse($request->finishDateTime);
+        $pickupLocationId = (int) $request->PULocation;
+        $bufferHours = 4;
 
-    if($reqStart >= $reqEnd || $reqStart->isPast())
-        return to_route('home');
+        if($reqStart >= $reqEnd || $reqStart->isPast())
+            return to_route('home');
 
-    $cars = Car::select([
-            'id',
-            'brand_translation_key_id',
-            'model_translation_key_id',
-            'segment_id',
-            'body_type_id',
-            'fuel_id',
-            'transmission_id',
-            'current_location_id',
-            'seat_count',
-            'trunk_capacity',
-            'deposit',
-            'status',
-            'sort_order'
-        ])
-        ->with([
-            'brandKey:id,key',
-            'modelKey:id,key',
-            'photos' => function($q) {
-                $q->where('is_cover', 1)->select('car_id', 'photo_path');
-            },
-            'price' => function($query) use ($reqStart) {
-                $query->select('car_id', 'base_price', 'price', 'currency_id', 'min_days', 'max_days')
-                ->where('month', $reqStart->month) 
-                ->where('is_active', 1)  
-                ->with('currency:id,code,exchange_rate');
-    }
-        ])
-        ->where('status', '!=', 'unavailable')
-        ->orderBy('sort_order', 'asc')
-        ->get();
+        $cars = Car::select([
+                'id',
+                'brand_translation_key_id',
+                'model_translation_key_id',
+                'segment_id',
+                'body_type_id',
+                'fuel_id',
+                'transmission_id',
+                'current_location_id',
+                'seat_count',
+                'trunk_capacity',
+                'deposit',
+                'status',
+                'sort_order'
+            ])
+            ->with([
+                'brandKey:id,key',
+                'modelKey:id,key',
+                'photos' => function($q) {
+                    $q->where('is_cover', 1)->select('car_id', 'photo_path');
+                },
+                'price' => function($query) use ($reqStart) {
+                    $query->select('car_id', 'base_price', 'price', 'currency_id', 'min_days', 'max_days')
+                    ->where('month', $reqStart->month)
+                    ->where('is_active', 1)
+                    ->with('currency:id,code,exchange_rate');
+                }
+            ])
+            ->where('status', '!=', 'unavailable')
+            ->orderBy('sort_order', 'asc')
+            ->get();
 
-    // Lokasyonları tek seferde çekelim
-    $locationIds = [$request->PULocation, $request->RLocation];
-    $selectedLocations = Locations::whereIn('id', $locationIds)->get();
-    
-    $puLocation = $selectedLocations->firstWhere('id', $request->PULocation);
-    $rLocation = $selectedLocations->firstWhere('id', $request->RLocation);
+        $carIds = $cars->pluck('id')->toArray();
 
-    $availableCars = [];
-    $drop = DropPrice::select('price', 'currency')
-        ->where('from_location_id', $request->PULocation)
-        ->where('to_location_id', $request->RLocation)
-        ->first();
-    foreach ($cars as $car) {
-        // Pass the Car object directly to avoid extra DB query
-        if ($this->isCarAvailable($car, $request->startDateTime, $request->finishDateTime, $request->PULocation)) {
-            $this->CalcPrice($car, $request->startDateTime, $request->finishDateTime, $request->PULocation, $request->RLocation, $drop);
+        // OPTIMIZATION: Batch load all conflicting reservations in ONE query
+        $conflictingCarIds = Reservation::whereIn('car_id', $carIds)
+            ->whereIn('status', ['confirmed', 'pending', 'active'])
+            ->where('pickup_datetime', '<', $reqEnd)
+            ->whereRaw("DATE_ADD(return_datetime, INTERVAL ? HOUR) > ?", [$bufferHours, $reqStart])
+            ->pluck('car_id')
+            ->unique()
+            ->toArray();
+
+        // OPTIMIZATION: Batch load last reservations for all cars in ONE query
+        $lastReservations = Reservation::whereIn('car_id', $carIds)
+            ->whereIn('status', ['pending', 'confirmed', 'completed', 'active'])
+            ->whereRaw("DATE_ADD(return_datetime, INTERVAL ? HOUR) <= ?", [$bufferHours, $reqStart])
+            ->orderBy('return_datetime', 'desc')
+            ->get()
+            ->groupBy('car_id')
+            ->map(fn($reservations) => $reservations->first());
+
+        // OPTIMIZATION: Pre-load all applicable discounts in ONE query
+        $dayCount = $reqStart->diffInDays($reqEnd);
+        $diffHours = $reqStart->diffInHours($reqEnd) % 24;
+        if ($diffHours > 3) $dayCount += 1;
+        if ($dayCount == 0) $dayCount = 1;
+
+        $discountRules = $this->getApplicableDiscounts($cars, $reqStart, $reqEnd, $dayCount);
+
+        // Get locations in one query
+        $locationIds = [$request->PULocation, $request->RLocation];
+        $selectedLocations = Locations::whereIn('id', $locationIds)->select('id', 'name')->get();
+
+        $puLocation = $selectedLocations->firstWhere('id', $request->PULocation);
+        $rLocation = $selectedLocations->firstWhere('id', $request->RLocation);
+
+        $drop = DropPrice::select('price', 'currency')
+            ->where('from_location_id', $request->PULocation)
+            ->where('to_location_id', $request->RLocation)
+            ->first();
+
+        $availableCars = [];
+
+        foreach ($cars as $car) {
+            if (in_array($car->id, $conflictingCarIds)) {
+                continue; // Car has conflicting reservation
+            }
+
+            // Check location availability
+            $lastReservation = $lastReservations->get($car->id);
+            if ($lastReservation) {
+                if ($lastReservation->return_location_id != $pickupLocationId) {
+                    continue; // Car won't be at pickup location
+                }
+            } else {
+                if ($car->current_location_id != $pickupLocationId) {
+                    continue; // Car is not at pickup location
+                }
+            }
+
+            // Calculate price using pre-loaded discount data
+            $this->CalcPriceOptimized($car, $reqStart, $reqEnd, $drop, $dayCount, $discountRules);
 
             if($car->daily_price !== null) {
-                $availableCars[] = $car;
+                // Create minimal car data for frontend (removes price relation and discount meta)
+                $availableCars[] = [
+                    'id' => $car->id,
+                    'segment_id' => $car->segment_id,
+                    'body_type_id' => $car->body_type_id,
+                    'fuel_id' => $car->fuel_id,
+                    'transmission_id' => $car->transmission_id,
+                    'seat_count' => $car->seat_count,
+                    'trunk_capacity' => $car->trunk_capacity,
+                    'deposit' => $car->deposit,
+                    'sort_order' => $car->sort_order,
+                    'brand_key' => $car->brandKey,
+                    'model_key' => $car->modelKey,
+                    'photos' => $car->photos,
+                    'total_days' => $car->total_days,
+                    'daily_price' => $car->daily_price,
+                    'daily_price_currency' => $car->daily_price_currency,
+                    'drop_price' => $car->drop_price,
+                    'drop_currency' => $car->drop_currency,
+                    'calculated_price' => $car->calculated_price,
+                    'discount_data' => [
+                        'has_discount' => $car->discount_data['has_discount'] ?? false,
+                        'amount' => $car->discount_data['amount'] ?? 0,
+                        'value' => $car->discount_data['value'] ?? 0,
+                    ],
+                ];
             }
         }
+
+        return Inertia::render('SearchReservations', [
+            'availableCars' => $availableCars,
+            'reservation' => [
+                'startDate' => $reqStart->toDateString(),
+                'startTime' => $reqStart->format('H:i'),
+                'finishDate' => $reqEnd->toDateString(),
+                'finishTime' => $reqEnd->format('H:i'),
+                'selectedPULocation' => $puLocation,
+                'selectedRLocation' => $rLocation,
+            ],
+            'locations' => Locations::select('id', 'name')->where('is_active', true)->get()
+        ]);
     }
 
-    return Inertia::render('SearchReservations', [
-        'availableCars' => $availableCars,
-        'reservation' => [
-            'startDate' => $reqStart->toDateString(),
-            'startTime' => $reqStart->format('H:i'),
-            'finishDate' => $reqEnd->toDateString(),
-            'finishTime' => $reqEnd->format('H:i'),
-            'selectedPULocation' => $puLocation,
-            'selectedRLocation' => $rLocation,
-        ],
-        'locations' => Locations::all() 
-    ]);
-}
+    private function getApplicableDiscounts($cars, Carbon $startDate, Carbon $endDate, int $days): array
+    {
+        $carIds = $cars->pluck('id')->toArray();
+        $segmentIds = $cars->pluck('segment_id')->unique()->toArray();
+
+        $discounts = Discount::query()
+            ->where('status', 'active')
+            ->where('start_date', '<=', $startDate)
+            ->where('end_date', '>=', $endDate)
+            ->where('min_days', '<=', $days)
+            ->where('max_days', '>=', $days)
+            ->where(function ($query) use ($carIds, $segmentIds) {
+                $query->where(function ($q) use ($carIds) {
+                    $q->where('target_type', 'car')
+                        ->whereIn('car_id', $carIds);
+                })
+                ->orWhere(function ($q) use ($segmentIds) {
+                    $q->where('target_type', 'segment')
+                        ->whereIn('segment_id', $segmentIds);
+                })
+                ->orWhere('target_type', 'all');
+            })
+            ->orderByRaw("FIELD(target_type, 'car', 'segment', 'all')")
+            ->orderBy('discount_value', 'desc')
+            ->get();
+
+        // Index discounts by car_id and segment_id for fast lookup
+        return [
+            'by_car' => $discounts->where('target_type', 'car')->keyBy('car_id'),
+            'by_segment' => $discounts->where('target_type', 'segment')->keyBy('segment_id'),
+            'global' => $discounts->where('target_type', 'all')->first(),
+        ];
+    }
+
+    /**
+     * Optimized price calculation using pre-loaded discount data
+     */
+    private function CalcPriceOptimized($car, Carbon $start, Carbon $finish, $drop, int $dayCount, array $discountRules)
+    {
+        $car->total_days = $dayCount;
+        $car->drop_price = $drop->price ?? null;
+        $car->drop_currency = $drop->currency ?? null;
+
+        // Find the correct price tier from the loaded price collection
+        $matchingPrice = null;
+        if ($car->relationLoaded('price') && $car->price) {
+            $matchingPrice = $car->price->first(function ($price) use ($dayCount) {
+                return $dayCount >= $price->min_days && $dayCount <= $price->max_days;
+            });
+        }
+
+        $baseDailyPrice = $matchingPrice->base_price ?? 0;
+        $car->daily_price = $baseDailyPrice;
+        $car->daily_price_currency = $matchingPrice->currency ?? null;
+
+        // Get discount from pre-loaded data (NO query!)
+        $discountData = $this->getDiscountFromCache($car, $baseDailyPrice, $discountRules);
+
+        $discountedDailyPrice = max(0, $baseDailyPrice - ($discountData['amount'] ?? 0));
+        $totalRentalPrice = $discountedDailyPrice * $dayCount;
+        $dropPriceValue = $car->drop_price ?? 0;
+
+        $car->discount_data = $discountData;
+
+        $car->calculated_price = [
+            'base_daily_price'      => $baseDailyPrice,
+            'daily_discount_amount' => $discountData['amount'] ?? 0,
+            'final_daily_price'     => $discountedDailyPrice,
+            'total_rental_price'    => $totalRentalPrice,
+            'drop_price'            => $dropPriceValue,
+            'grand_total'           => $totalRentalPrice + $dropPriceValue
+        ];
+    }
+
+    private function getDiscountFromCache($car, float $unitPrice, array $discountRules): array
+    {
+        // Priority: car-specific > segment-specific > global
+        $discountRule = $discountRules['by_car']->get($car->id)
+            ?? $discountRules['by_segment']->get($car->segment_id)
+            ?? $discountRules['global'];
+
+        if (!$discountRule) {
+            return [
+                'has_discount' => false,
+                'amount' => 0,
+                'discount_value' => 0,
+                'meta' => null
+            ];
+        }
+
+        $discountAmount = $discountRule->discount_type === 'percentage'
+            ? $unitPrice * $discountRule->discount_value
+            : $discountRule->discount_value;
+
+        return [
+            'has_discount' => true,
+            'amount' => round($discountAmount, 2),
+            'value' => $discountRule->discount_value,
+            'meta' => $discountRule
+        ];
+    }
 
 
 public function initiateDraft(Request $request)
@@ -121,13 +294,13 @@ public function initiateDraft(Request $request)
     ]);
 
     $start = Carbon::parse($validated['startDateTime']);
-    
+
     if ($start < now()) {
         throw ValidationException::withMessages(['startDateTime' => 'Geçmiş tarih seçilemez.']);
     }
 
     $key = 'res_draft_' . Str::random(40);
-        
+
     Cache::put($key, $validated, now()->addMinutes(30));
 
     return response()->json([
@@ -146,11 +319,11 @@ public function showExtras(Request $request)
     }
 
     $startDateTime = Carbon::parse($validated['startDateTime']);
-    
+
     $car = Car::with([
-        'brandKey', 
-        'modelKey', 
-        'photos', 
+        'brandKey',
+        'modelKey',
+        'photos',
         'location',
         'price' => function($query) use ($startDateTime) {
             $query->select('car_id', 'base_price', 'price', 'currency_id', 'min_days', 'max_days')
@@ -179,7 +352,7 @@ public function showExtras(Request $request)
             'finishDateTime' => $validated['finishDateTime'],
             'PULocation' => Locations::find($validated['PULocation']),
             'RLocation' => Locations::find($validated['RLocation']),
-            'ref' => $ref 
+            'ref' => $ref
         ]
     ]);
 }
@@ -191,9 +364,9 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
     $finish = Carbon::parse($finishDateTime);
 
     $dayCount = $start->diffInDays($finish);
-    
-    $diffHours = $start->diffInHours($finish) % 24; 
-    
+
+    $diffHours = $start->diffInHours($finish) % 24;
+
     if ($diffHours > 3) {
         $dayCount += 1;
     }
@@ -215,7 +388,7 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
         ->where('month', $start->month)
         ->where('min_days', '<=', $dayCount)
         ->where('max_days', '>=', $dayCount)
-        ->orderBy('base_price', 'asc') 
+        ->orderBy('base_price', 'asc')
         ->with('currency:id,code,exchange_rate')
         ->first(); */
 
@@ -236,7 +409,7 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
     $baseDailyPrice = $matchingPrice->base_price ?? 0;
     $car->daily_price = $baseDailyPrice;
     $car->daily_price_currency = $matchingPrice->currency ?? null;
-    
+
     $discountData = $this->calculateDiscount($car, $startDateTime, $finishDateTime, $baseDailyPrice);
 
     $discountedDailyPrice = max(0, $baseDailyPrice - ($discountData['amount'] ?? 0));
@@ -244,7 +417,7 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
     $dropPriceValue = $car->drop_price ?? 0;
 
     $car->discount_data = $discountData;
-    
+
     $car->calculated_price = [
         'base_daily_price'      => $baseDailyPrice,
         'daily_discount_amount' => $discountData['amount'] ?? 0,
@@ -432,7 +605,7 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
                 'user_name' => $reservation->name,
                 'reference_code' => $reservation->reference_code,
                 'car_name' => Translation::where('language_id', $lang_id)->where('translation_key_id', $reservation->car->brandKey->id)->first()->value . ' ' . Translation::where('language_id', $lang_id)->where('translation_key_id', $reservation->car->modelKey->id)->first()->value,
-                'tracking_url'   => $reservation->tracking_url, 
+                'tracking_url'   => $reservation->tracking_url,
                 'pickup_location' => $reservation->pickupLocation->name,
                 'return_location' => $reservation->returnLocation->name,
                 'pickup_date' => $reservation->pickup_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
@@ -519,7 +692,7 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
         $brandName = Translation::where('language_id', $lang_id)
             ->where('translation_key_id', $reservation->car->brandKey->id)
             ->value('value');
-            
+
         $modelName = Translation::where('language_id', $lang_id)
             ->where('translation_key_id', $reservation->car->modelKey->id)
             ->value('value');
@@ -557,7 +730,7 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
         $brandName = Translation::where('language_id', $lang_id)
             ->where('translation_key_id', $reservation->car->brandKey->id)
             ->value('value');
-            
+
         $modelName = Translation::where('language_id', $lang_id)
             ->where('translation_key_id', $reservation->car->modelKey->id)
             ->value('value');
@@ -566,7 +739,7 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
             'user_name' => $reservation->name,
             'reference_code' => $reservation->reference_code,
             'car_name' => $brandName . ' ' . $modelName,
-            'tracking_url'   => $reservation->tracking_url, 
+            'tracking_url'   => $reservation->tracking_url,
             'pickup_location' => $reservation->pickupLocation->name,
             'return_location' => $reservation->returnLocation->name,
             'pickup_date' => $reservation->pickup_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
@@ -608,14 +781,14 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
         $reservation->save();
 
         $reservation->load(['car.brandKey', 'car.modelKey', 'pickupLocation', 'returnLocation', 'currency']);
-        
+
         $lang = \App\Models\Language::where('code', $langCode)->first();
         $lang_id = $lang ? $lang->id : 1;
 
         $brandName = Translation::where('language_id', $lang_id)
             ->where('translation_key_id', $reservation->car->brandKey->id)
             ->value('value');
-            
+
         $modelName = Translation::where('language_id', $lang_id)
             ->where('translation_key_id', $reservation->car->modelKey->id)
             ->value('value');
@@ -638,21 +811,21 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
             ->get();
 
         return response()->json([
-            'success' => 'Rezervasyon başarıyla iptal edildi.', 
+            'success' => 'Rezervasyon başarıyla iptal edildi.',
             'reservations' => $reservations
         ], 200);
     }
 
     public function checkReservationPage(Request $request){
 
-        if (auth()->check() && !$request->filled('reservation_id') && !$request->filled('email')) {
+        if (auth()->check()) {
             return to_route('myReservations');
-        }   
+        }
 
-        if ($request->filled('reservation_id') && $request->filled('email')) {
+/*         if ($request->filled('reservation_reference_code') && $request->filled('email')) {
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
                 'email' => 'required|email',
-                'reservation_id' => 'required|numeric',
+                'reservation_reference_code' => 'required',
             ]);
 
             if ($validator->fails()) {
@@ -662,7 +835,7 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
                 return Inertia::render('CheckReservation')->withErrors($validator);
             }
 
-            $reservation = Reservation::where('id', $request->reservation_id)
+            $reservation = Reservation::where('reference_code', $request->reservation_reference_code)
                 ->where('email', $request->email)
                 ->with(['car.photos', 'pickupLocation', 'returnLocation', 'car.brandKey', 'car.modelKey', 'currency'])
                 ->first();
@@ -675,7 +848,7 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
             return Inertia::render('CheckReservation')->withErrors([
                 'email' => 'Reservation not found or email does not match.'
             ]);
-        }
+        } */
 
         return Inertia::render('CheckReservation');
     }
@@ -710,27 +883,26 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
     public function checkReservation(Request $request){
         $validated = $request->validate([
             'email' => 'required|email',
-            'reservation_id' => 'required|numeric',
+            'reservation_reference_code' => 'required',
         ]);
 
-        $exists = Reservation::where('id', $validated['reservation_id'])
-            ->where('email', $validated['email'])
-            ->exists();
+        $res = Reservation::where('reference_code', $validated['reservation_reference_code'])
+            ->where('email', $validated['email'])->first();
 
-        if (!$exists) {
+        if (!$res) {
             return back()->withErrors([
                 'email' => 'Reservation not found or email does not match.'
             ]);
         }
 
-        return to_route('checkReservationPage', $validated);
+        return to_route('reservation.track', ['token' => $res->token]);
     }
 
   public function guestCancelReservation(Request $request, $id)
     {
         $validated = $request->validate([
             'email' => 'required|email',
-            'lang' => 'nullable|string|max:5' 
+            'lang' => 'nullable|string|max:5'
         ]);
 
         $reservation = Reservation::where('id', $id)
@@ -739,14 +911,14 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
 
         if ($reservation->status !== 'pending') {
             $msg = 'Sadece beklemedeki rezervasyonlar iptal edilebilir.';
-            return $request->wantsJson() 
-                ? response()->json(['message' => $msg, 'status' => 'error'], 422) 
+            return $request->wantsJson()
+                ? response()->json(['message' => $msg, 'status' => 'error'], 422)
                 : back()->with('error', $msg);
         }
 
         $reservation->status = 'cancelled';
         $reservation->save();
-        
+
         $reservation->load(['car.brandKey', 'car.modelKey', 'pickupLocation', 'returnLocation', 'currency']);
         $langCode = $validated['lang'] ?? app()->getLocale() ?? 'en';
         $lang = \App\Models\Language::where('code', $langCode)->first();
@@ -756,7 +928,7 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
         $brandName = Translation::where('language_id', $lang_id)
             ->where('translation_key_id', $reservation->car->brandKey->id)
             ->value('value');
-            
+
         $modelName = Translation::where('language_id', $lang_id)
             ->where('translation_key_id', $reservation->car->modelKey->id)
             ->value('value');
@@ -806,7 +978,7 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
     public function completeRental($id)
     {
         $reservation = Reservation::findOrFail($id);
-        $car = Car::findOrFail($reservation->car_id);   
+        $car = Car::findOrFail($reservation->car_id);
 
         if ($reservation->status !== 'active') {
              return response()->json(['error' => 'Cannot complete rental for an inactive reservation.'], 422);

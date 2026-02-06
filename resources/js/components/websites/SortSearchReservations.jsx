@@ -70,11 +70,6 @@ export default function SortSearchReservations({ availableCars = [], sortBy, seg
             });
 
             let targetUrl = response.data.redirect_url;
-
-/*             if (targetUrl && targetUrl.startsWith('http://')) {
-                targetUrl = targetUrl.replace('http://', 'https://');
-            } */
-
             if (targetUrl) 
                 window.location.href = targetUrl; 
             setProcessingId(null);
@@ -87,27 +82,37 @@ export default function SortSearchReservations({ availableCars = [], sortBy, seg
 
     return (
         <div className="space-y-4">
-            {filteredCars.map((filteredCar) => {
+            {filteredCars.map((filteredCar, index) => {
                 const photoSrc = `/storage/${filteredCar.photos?.[0]?.photo_path}`;
                 const title = `${t(filteredCar.brand_key.key)} ${t(filteredCar.model_key.key)} • ${t(`fuel.${filteredCar.fuel_id}`)} • ${t(`transmission.${filteredCar.transmission_id}`)}`;
 
+                // İKONLARA SABİT BOYUT VE SHRINK-0 EKLENDİ (CLS ÇÖZÜMÜ)
                 const features = [
-                    { icon: <Fuel/>, label: t(`fuel.${filteredCar.fuel_id}`) },
-                    { icon: <Settings2/>, label: t(`transmission.${filteredCar.transmission_id}`) },
-                    { icon: <Users />, label: t("website.car_card.properties.seat_count_{count}", {count: filteredCar.seat_count}) },
+                    { 
+                        icon: <Fuel size={20} className="w-5 h-5 flex-shrink-0 text-gray-500" />, 
+                        label: t(`fuel.${filteredCar.fuel_id}`) 
+                    },
+                    { 
+                        icon: <Settings2 size={20} className="w-5 h-5 flex-shrink-0 text-gray-500" />, 
+                        label: t(`transmission.${filteredCar.transmission_id}`) 
+                    },
+                    { 
+                        icon: <Users size={20} className="w-5 h-5 flex-shrink-0 text-gray-500" />, 
+                        label: t("website.car_card.properties.seat_count_{count}", {count: filteredCar.seat_count}) 
+                    },
                 ];
 
                 const requirements = [
                     {
-                        icon: <Shield />,
+                        icon: <Shield size={20} className="w-5 h-5 flex-shrink-0 text-gray-500" />,
                         label: t("website.car_card.requirement.{amount}_{currency}_deposit", {amount: calculateTotal(filteredCar.deposit).toFixed(2), currency: current.symbol}),
                     },
                     {
-                        icon: <User/>,
+                        icon: <User size={20} className="w-5 h-5 flex-shrink-0 text-gray-500" />,
                         label: t("website.car_card.requirements.required_min_{age}", {age: filteredCar.min_age ?? 22}), 
                     },
                     {
-                        icon: <User/>,
+                        icon: <User size={20} className="w-5 h-5 flex-shrink-0 text-gray-500" />,
                         label: t("website.car_card.requirements.{year}_year_experience", {year: filteredCar.min_license_year ?? 2}),
                     },
                 ];
@@ -127,11 +132,13 @@ export default function SortSearchReservations({ availableCars = [], sortBy, seg
                 return (
                     <div
                         key={filteredCar.id}
-                        className={`bg-white w-full rounded-2xl grid grid-cols-1 md:grid-cols-10 gap-4 p-6 shadow-md transition-opacity ${isProcessing ? 'opacity-70 pointer-events-none' : ''}`}
+                        // MOBİL İÇİN min-h-[200px] EKLENDİ, İÇERİK GEÇ YÜKLENSE BİLE KART ÇÖKMEZ
+                        className={`bg-white w-full h-auto min-h-[200px] md:h-[255px] rounded-2xl grid grid-cols-1 md:grid-cols-10 gap-4 p-6 shadow-md transition-opacity ${isProcessing ? 'opacity-70 pointer-events-none' : ''}`}
                     >
                         <ReservationCarPhoto
                             photoSrc={photoSrc}
                             alt={`${t(filteredCar.brand_key.key)} ${t(filteredCar.model_key.key)}`}
+                            priority={index === 0} // SADECE İLK ELEMANA ÖNCELİK
                         />
 
                         <ReservationCarInfo

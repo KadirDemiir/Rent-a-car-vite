@@ -150,6 +150,9 @@ class TranslationController extends Controller
     {
         $translations = $this->translationService->getTranslationsByLanguage($locale);
         
-        return response()->json($translations);
+        // Add HTTP cache headers - browser will cache for 1 hour
+        return response()->json($translations)
+            ->header('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400')
+            ->header('ETag', md5(json_encode($translations)));
     }
 }
