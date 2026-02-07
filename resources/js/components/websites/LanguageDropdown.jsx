@@ -11,8 +11,8 @@ export default function LanguageDropdown() {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const langs = useMemo(() => 
-        inertiaLanguages?.map(l => l.code).filter(l => l !== 'cimode') || ['tr'], 
+    const langs = useMemo(() =>
+        inertiaLanguages?.map(l => l.code).filter(l => l !== 'cimode') || ['tr'],
         [inertiaLanguages]
     );
 
@@ -37,11 +37,11 @@ export default function LanguageDropdown() {
 
         try {
             const currLang = i18n.language.split('-')[0];
-            const urlSegments = window.location.pathname.split('/').filter(Boolean);
-            
+            const urlSegments = window.location.pathname.toLocaleLowerCase().split('/').filter(Boolean);
+
             // Fetch translations for the new language BEFORE translating URL
             let newTranslations = i18n.store.data[lng]?.translation;
-            
+
             if (!newTranslations || Object.keys(newTranslations).length === 0) {
                 // Fetch from server
                 const response = await axios.get(`/locales/${lng}/translation.json`);
@@ -49,19 +49,19 @@ export default function LanguageDropdown() {
                 // Add to i18n store
                 i18n.addResourceBundle(lng, 'translation', newTranslations, true, true);
             }
-            
+
             await i18n.changeLanguage(lng);
-            
+
             let newUrl = '/' + lng;
-            
+
             const currTranslations = i18n.store.data[currLang]?.translation || {};
 
             for (let i = 1; i < urlSegments.length; i++) {
                 const segment = urlSegments[i];
                 const key = Object.keys(currTranslations).find(k => currTranslations[k] === segment);
-                
+
                 if (key && newTranslations[key]) {
-                    newUrl += '/' + newTranslations[key];
+                    newUrl += '/' + newTranslations[key].toLocaleLowerCase();
                 } else {
                     newUrl += '/' + segment;
                 }
@@ -69,7 +69,6 @@ export default function LanguageDropdown() {
 
             const searchParams = window.location.search;
             const hash = window.location.hash;
-            
             router.visit(newUrl + searchParams + hash);
         } catch (error) {
             console.error('Language switch error:', error);
@@ -104,7 +103,7 @@ export default function LanguageDropdown() {
                             <button
                                 onClick={() => {
                                     setOpen(false);
-                                    handleChangeLang(lng); 
+                                    handleChangeLang(lng);
                                 }}
                                 className={`flex items-center justify-between w-full px-3 py-2 text-sm ${current === lng ? 'bg-gray-700 text-white' : 'text-gray-700 hover:bg-gray-50'}`}>
                                 <img src={languages[lng]?.flag} alt="" className="h-5 w-5 rounded-full" />

@@ -37,6 +37,9 @@ use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
+Route::get('/test', function () {
+    return app()->getLocale();
+});
 Route::get('/locales/{locale}/translation.json', [TranslationController::class, 'fetch'])
     ->name('translations.fetch');
 Route::middleware('admin')->group(function () {
@@ -67,7 +70,7 @@ Route::middleware('admin')->group(function () {
     Route::get('/adminpanel/get-info/locations/{id}', [LocationsController::class, 'getIndexLocationInfo']);
     Route::get('/get-reservations-informations', function () {
         $data = Reservation::with(['extras.extra', 'car.brandKey', 'car.modelKey', 'pickupLocation', 'returnLocation', 'currency'])->get();
-        
+
         if ($data->isEmpty()) {
             return response()->json(['message' => 'Veritabanında rezervasyon bulunamadı.'], 404);
         }
@@ -215,7 +218,7 @@ Route::post('/reservation/approve/{id}', [ReservationController::class, 'approve
 
 Route::get('/get-locations', function () {
     return response()->json([
-        'success' => true, 
+        'success' => true,
         'locations' => Locations::select('id', 'name', 'city', 'address', 'phone', 'email', 'latitude', 'longitude', 'photo_path')
             ->where('is_active', 1)
             ->get()
@@ -256,11 +259,11 @@ Route::group([
     Route::inertia(dbTransRoute('auth'), 'auth/Auth')->name('showAuth');
     Route::get(dbTransRoute('searchReservations'), [ReservationController::class, 'searchReservations'])->name('searchReservations');
     Route::post(dbTransRoute('reservation-create'), [ReservationController::class, 'initiateDraft'])->name('reservation.init');
-    Route::get(dbTransRoute('reservation-create'), [ReservationController::class, 'showExtras'])->name('reservation-create');   
+    Route::get(dbTransRoute('reservation-create'), [ReservationController::class, 'showExtras'])->name('reservation-create');
 
     Route::get('/r/track/{token}', [ReservationController::class, 'track'])
         ->name('reservation.track');
-    
+
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::middleware('auth')->group(function () {
@@ -307,11 +310,11 @@ Route::group([
             'id' => $id
         ]);
     })->name('adminIndexLocations');
-    
+
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('reservations'), [ReservationController::class, 'showReservations'])->name('adminReservations');
     Route::post('/adminpanel/reservations/{id}/start', [ReservationController::class, 'startRental'])->name('adminStartRental');
     Route::post('/adminpanel/reservations/{id}/complete', [ReservationController::class, 'completeRental'])->name('adminCompleteRental');
-    
+
     Route::inertia(dbTransRoute('adminpanel') . '/' . dbTransRoute('add'), 'adminPanel/users/Users')->name('adminUsers');
 
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('drop-price'), [DropPriceController::class, 'showAdminDropPrice'])->name('adminShowDropPrice');
@@ -346,16 +349,16 @@ Route::group([
         return Inertia::render('adminPanel/languages/AddLanguages', ['keys' => $keys]);
     })->name('adminAddLanguagesPage');
     Route::post('/adminpanel/languages/add', [TranslationController::class, 'addLanguage'])->name('adminAddLanguages');
-    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('languages') . '/{id}', function ($id) {
-        $lang = Language::with('translations')->find($id);
-        $keys = TranslationKey::all();
+    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('languages') . '/{code}', function ($code) {
+        $lang = Language::with('translations')->where('code', $code)->first();
+        $keys = TranslationKey::all()->makeVisible(['id']);
         $campaigns = Campaigns::all();
         return Inertia::render('adminPanel/languages/IndexLanguage', ['language' => $lang, 'keys' => $keys, 'campaigns' => $campaigns]);
     })->name('adminShowIndexLanguage');
-    Route::patch('/adminpanel/languages/{id}/active', [TranslationController::class, 'setActiveLanguage'])->name('adminSetActiveLanguage');
-    Route::put('/adminpanel/languages/{id}', [TranslationController::class, 'updateLanguage'])->name('adminUpdateLanguage');
-    Route::delete('/adminpanel/languages/{id}', [TranslationController::class, 'deleteLanguage'])->name('adminDeleteLanguage');
-    Route::put('/adminpanel/languages/{id}/update-site-variable', [TranslationController::class, 'updateSiteVariable'])->name('adminUpdateSiteVariable');
+    Route::patch('/adminpanel/languages/{code}/active', [TranslationController::class, 'setActiveLanguage'])->name('adminSetActiveLanguage');
+    Route::put('/adminpanel/languages/{code}', [TranslationController::class, 'updateLanguage'])->name('adminUpdateLanguage');
+    Route::delete('/adminpanel/languages/{code}', [TranslationController::class, 'deleteLanguage'])->name('adminDeleteLanguage');
+    Route::put('/adminpanel/languages/{code}/update-site-variable', [TranslationController::class, 'updateSiteVariable'])->name('adminUpdateSiteVariable');
 
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('segments'), function () {
         $segments = Segment::all()->fresh();

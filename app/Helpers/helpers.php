@@ -18,13 +18,13 @@ if (!function_exists('dbTransRoute')) {
     {
         static $routeTranslations = null;
         static $lastLocale = null;
-        
+
         $locale = app()->getLocale();
-        
+
         // Load all route translations at once and cache them
         if ($routeTranslations === null || $lastLocale !== $locale) {
             $cacheKey = "all_route_translations_{$locale}";
-            
+
             $routeTranslations = getCacheStore()->remember($cacheKey, 86400 * 7, function () use ($locale) {
                 return Translation::query()
                     ->select('translations.value', 'translation_keys.key')
@@ -37,12 +37,10 @@ if (!function_exists('dbTransRoute')) {
             });
             $lastLocale = $locale;
         }
-        
+
         return $routeTranslations["address.{$key}"] ?? $key;
     }
 }
-
-
 // 1. Segmentler: İlişkiye (with) gerek yok, Frontend sadece ID kullanıyor.
 if (!function_exists('getSegmentsWithTranslations')) {
     function getSegmentsWithTranslations()
@@ -112,7 +110,7 @@ if (!function_exists('getAllCarPropertiesInfo')) {
                         'code' => $l->code,
                         'name' => $l->name,
                         'flag_photo_path' => $l->flag_photo_path
-                    ]), 
+                    ]),
             ];
         });
     }
@@ -121,17 +119,19 @@ if (!function_exists('getAllCarPropertiesInfo')) {
 if (!function_exists('clearTranslationCache')) {
     function clearTranslationCache() {
         $store = getCacheStore();
-        
+
         // Clear active languages cache
         $store->forget('active_languages');
-        
+
+        $store->forget('route_translations');
+
         // Clear car properties cache
         $store->forget('all_car_properties_info');
         $store->forget('all_segments');
         $store->forget('all_body_types');
         $store->forget('all_fuels');
         $store->forget('all_transmissions');
-        
+
         // Clear route translations for all locales
         $languages = Language::pluck('code')->toArray();
         foreach ($languages as $code) {

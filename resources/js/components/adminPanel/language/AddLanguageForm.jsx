@@ -6,7 +6,7 @@ import {router} from "@inertiajs/react";
 import {useTranslation} from "react-i18next";
 
 export default function AddLanguageForm({ keys}) {
-    const {t} = useTranslation();
+    const {t, i18n} = useTranslation();
     const [formLanguageData, setFormLanguageData] = useState({
         name: { value:  "", error: "" },
         code: { value:  "", error: "" },
@@ -59,13 +59,13 @@ export default function AddLanguageForm({ keys}) {
         Object.entries(validatedLanguageData).forEach(([key, d]) => data.append(key, d.value));
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
         try {
-            const response = await axios.post('/tr/adminpanel/languages/add', data, {
+            const response = await axios.post(`/${i18n.language}/adminpanel/languages/add`, data, {
                 headers: {
                     "X-CSRF-TOKEN": csrfToken,
                     "Content-Type": "multipart/form-data",
                 },
             });
-            router.visit(`/aa/adminpanel/languages/${response.data.id}` ,);
+            router.visit(`/${i18n.language}/${t(`address.adminpanel`)}/${t('address.languages')}/${response.data.code}` ,);
         } catch (err) {
             setError(err.response?.data?.error || err.message || "Bilinmeyen bir hata oluştu.");
         } finally {

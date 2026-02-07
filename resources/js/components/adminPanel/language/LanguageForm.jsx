@@ -3,16 +3,18 @@ import SiteVariableForm from "./SiteVariableForm.jsx";
 import LanguageInformationForm from "./LanguageInformationForm.jsx";
 import CampaignLanguage from "./CampaignLanguage.jsx";
 import {useTranslation} from "react-i18next";
-
-const EDIT_SECTION = [
-    {label: "Language Information", value: "lang_info"},
-    {label: "Site Variable", value: "site_variable"},
-    {label: "Related Campaigns", value: "related_camp"},
-    {label: "Cars", value: "cars"}
-];
+import { Globe, Code, Megaphone, Car } from "lucide-react";
 
 export default function LanguageForm({ language, keys, campaigns}) {
     const {t} = useTranslation();
+    
+    const EDIT_SECTION = [
+        {label: t("adminpanel.languages.edit_language.language_information"), value: "lang_info", icon: Globe},
+        {label: t("adminpanel.languages.edit_language.site_variables"), value: "site_variable", icon: Code},
+        {label: t("adminpanel.languages.edit_language.related_campaigns"), value: "related_camp", icon: Megaphone},
+        {label: t("adminpanel.languages.edit_language.cars"), value: "cars", icon: Car}
+    ];
+
     const [activeSection, setActiveSection] = useState(EDIT_SECTION[0].value);
     const [lang, setLang] = useState(language);
     const [error, setError] = useState();
@@ -36,8 +38,8 @@ export default function LanguageForm({ language, keys, campaigns}) {
     const { hasCampaignError, totalCampaign, campaignErrorCount } = useMemo(() => {
         let errors = 0;
         campaigns.forEach(cmp => {
-            const cmT = cmp.title;
-            const cmC = cmp.content
+            const cmT = JSON.parse(cmp.title, true);
+            const cmC = JSON.parse(cmp.content, true);
             if (!cmT?.[lang.code]?.trim() || !cmC?.[lang.code]?.trim()) errors++;
         });
         return {
@@ -49,22 +51,24 @@ export default function LanguageForm({ language, keys, campaigns}) {
 
     const renderTabButton = (section) => {
         const isActive = activeSection === section.value;
-        const hasError = (section.value === "site_variable" && siteVariableStats.hasError) || 
+        const hasError = (section.value === "site_variable" && siteVariableStats.hasError) ||
                         (section.value === "related_camp" && hasCampaignError);
+        const Icon = section.icon;
 
         return (
             <button
                 key={section.value}
                 onClick={() => setActiveSection(section.value)}
-                className={`relative flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
+                className={`relative flex items-center justify-center gap-2 px-4 py-3 sm:py-4 rounded-xl font-medium text-sm sm:text-base transition-all duration-200 ${
                     isActive
-                        ? 'bg-gray-700 text-white shadow-md'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        ? 'bg-gradient-to-r from-gray-700 to-gray-800 text-white shadow-lg ring-2 ring-gray-300 ring-offset-2'
+                        : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 hover:shadow-sm'
                 }`}
             >
-                {section.label}
+                <Icon size={18} className={isActive ? 'text-white' : 'text-gray-500'} />
+                <span className="hidden sm:inline">{section.label}</span>
                 {hasError && (
-                    <span className="absolute top-1 right-2 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
+                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse ring-2 ring-white"></span>
                 )}
             </button>
         );
@@ -73,48 +77,52 @@ export default function LanguageForm({ language, keys, campaigns}) {
     return (
         <div className="w-full space-y-6">
             {/* Navigation Tabs */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {EDIT_SECTION.map(renderTabButton)}
                 </div>
             </div>
 
             {/* Alert Messages */}
-            <div className="space-y-3">
-                {success && (
-                    <div className="px-4 py-3 rounded-lg bg-green-50 border border-green-200 text-green-800">
-                        {success}
-                    </div>
-                )}
-                {error && (
-                    <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-800">
-                        {error}
-                    </div>
-                )}
-            </div>
+            {(success || error) && (
+                <div className="space-y-3">
+                    {success && (
+                        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-800">
+                            <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                            <span className="text-sm sm:text-base font-medium">{success}</span>
+                        </div>
+                    )}
+                    {error && (
+                        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-800">
+                            <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                            <span className="text-sm sm:text-base font-medium">{error}</span>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Content Sections */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6">
                 {activeSection === 'lang_info' && (
-                    <LanguageInformationForm 
-                        lang={lang} 
-                        setLang={setLang} 
-                        totalCmpCount={totalCampaign} 
-                        cmpErrorCount={campaignErrorCount} 
-                        totalVariableCount={siteVariableStats.total} 
+                    <LanguageInformationForm
+                        lang={lang}
+                        setLang={setLang}
+                        totalCmpCount={totalCampaign}
+                        cmpErrorCount={campaignErrorCount}
+                        totalVariableCount={siteVariableStats.total}
                         variableErrorCount={siteVariableStats.errorCount}
                     />
                 )}
                 {activeSection === 'site_variable' && (
-                    <SiteVariableForm 
-                        keys={keys} 
-                        language={lang} 
+                    <SiteVariableForm
+                        keys={keys}
+                        language={lang}
                         setLang={setLang}
                     />
                 )}
                 {activeSection === 'related_camp' && (
-                    <CampaignLanguage 
-                        campaigns={campaigns} 
+                    <CampaignLanguage
+                        campaigns={campaigns}
                         lang={lang}
                     />
                 )}

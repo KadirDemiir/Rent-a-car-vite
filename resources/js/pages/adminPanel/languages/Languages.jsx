@@ -5,8 +5,8 @@ import {useTranslation} from "react-i18next";
 export default function Language({languages}){
     const {i18n, t} = useTranslation();
     
-    const handleClick = (id) => {
-        router.visit(`/${i18n.language}/${t('address.adminpanel')}/${t('address.languages').toLowerCase()}/${id}`, { method: 'get' })
+    const handleClick = (code) => {
+        router.visit(`/${i18n.language}/${t('address.adminpanel')}/${t('address.languages').toLowerCase()}/${code}`, { method: 'get' })
     }
 
     const renderStatusBadge = (status) => {
@@ -80,8 +80,8 @@ export default function Language({languages}){
                                 <tbody className="divide-y divide-gray-200">
                                     {languages.map((lang) => (
                                         <tr 
-                                            key={lang.id}
-                                            onClick={() => handleClick(lang.id)}
+                                            key={lang.code}
+                                            onClick={() => handleClick(lang.code)}
                                             className="hover:bg-gray-50 transition-colors duration-150 group cursor-pointer"
                                         >
                                             <td className="px-6 py-4 text-sm text-gray-900 font-medium">

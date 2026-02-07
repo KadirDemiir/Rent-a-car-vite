@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Language;
-use App\Models\Photo;
 use App\Models\Translation;
 use App\Models\TranslationKey;
 use Illuminate\Http\Request;
@@ -47,6 +46,7 @@ class TranslationController extends Controller
             }
             DB::commit();
             $this->translationService->clearCache();
+            clearTranslationCache();
                 return response()->json(['success' => 'New Language Add Successfully', 'id' => $language->id]);
         }catch (\Exception $exception){
             DB::rollBack();
@@ -55,13 +55,13 @@ class TranslationController extends Controller
         }
     }
 
-    public function setActiveLanguage(Request $request, $id){
+    public function setActiveLanguage(Request $request, $code){
         /*Log::info('Request status value:', ['status' => $request->input('status')]);*/
         try {
             $validated = $request->validate([
                 'status' => 'required',
             ]);
-            $language = Language::with('translations')->findOrFail($id);
+            $language = Language::with('translations')->where('code', $code)->first();
             $language->status = $validated['status'];
             $language->save();
             clearTranslationCache();
@@ -79,7 +79,7 @@ class TranslationController extends Controller
         }
     }
 
-    public function updateLanguage(Request $request, $id){
+    public function updateLanguage(Request $request, $code){
         /*Log::info('Request:', ['flag' => $request->input('flag')]);*/
         try {
             $validated = $request->validate([
@@ -88,48 +88,51 @@ class TranslationController extends Controller
                 'flag' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             ]);
             DB::beginTransaction();
-            $lang = Language::where('id', $id)->first();
+            $lang = Language::where('code', $code)->first();
             $lang->name = $validated['name'];
             if(isset($validated['flag'])    )
                 $lang->flag_photo_path =  $validated['flag']->store('flags', 'public');
             $lang->save();
             DB::commit();
             $this->translationService->clearCache();
+            clearTranslationCache();
             return response()->json(['success' => 'Language Updated Successfully']);
         }catch (\Exception $exception){
             DB::rollBack();
             return response()->json(['error' => $exception->getMessage()], 500);
         }
     }
-    public function deleteLanguage(Request $request, $id){
+    public function deleteLanguage(Request $request, $code){
         try {
             $languageCount = Language::count();
             if ($languageCount <= 1)
                 return response()->json(['error' => 'At least one language must remain. Deletion is not allowed.'], 400);
-            $language = Language::findOrFail($id);
+            $language = Language::where('code', $code)->first();
             if ($language->flag_photo_path && Storage::disk('public')->exists($language->flag_photo_path)) {
                 Storage::disk('public')->delete($language->flag_photo_path);
             }
             $language->delete();
             $this->translationService->clearCache();
+            clearTranslationCache();
             return response()->json(['success' => 'Language deleted successfully.']);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to delete language: ' . $e->getMessage()], 500);
         }
     }
 
-    public function updateSiteVariable(Request $request, $id){
+    public function updateSiteVariable(Request $request, $code){
         /*Log::info('Request:', ['request' => $request->all()]);*/
 
         try {
             $validated = $request->validate([
+                'language_id' => 'required|exists:languages,id',
                 'translations' => 'required',
             ]);
             DB::beginTransaction();
             foreach ($validated['translations'] as $translation) {
                 Translation::updateOrCreate(
                     [
-                        'language_id' => $id,
+                        'language_id' => $validated['language_id'],
                         'translation_key_id' => TranslationKey::where('key', $translation['key'])->first()->id,
                     ],
                     [
@@ -139,6 +142,7 @@ class TranslationController extends Controller
             }
             DB::commit();
             $this->translationService->clearCache();
+            clearTranslationCache();
             return response()->json(['success' => 'Language updated successfully.']);
         }catch (\Exception $exception){
             DB::rollBack();
@@ -149,7 +153,7 @@ class TranslationController extends Controller
     public function fetch(string $locale): JsonResponse
     {
         $translations = $this->translationService->getTranslationsByLanguage($locale);
-        
+
         // Add HTTP cache headers - browser will cache for 1 hour
         return response()->json($translations)
             ->header('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400')

@@ -2,11 +2,12 @@ import { useMemo, useState } from "react";
 import SiteVariableList from "./SiteVariableList.jsx";
 import SiteVariableSection from "./SiteVariableSection.jsx";
 import {useTranslation} from "react-i18next";
+import { Search, Sparkles, Trash2 } from "lucide-react";
 
 const SECTION_CONFIG = [
-    { key: "website", label: "Website" },
-    { key: "adminpanel", label: "Admin Panel" },
-    { key: "general", label: "General" },
+    { key: "website", label: "website" },
+    { key: "adminpanel", label: "adminpanel" },
+    { key: "general", label: "general" },
 ];
 
 export default function SiteVariable({ keys, formData, setFormData }) {
@@ -25,13 +26,13 @@ export default function SiteVariable({ keys, formData, setFormData }) {
 
     const createHandle = () => {
         setFormData(
-            Object.fromEntries(Object.entries(formData).map(([k]) => [k, { value: "deneme verisi", error: "" }]))
+            Object.fromEntries(Object.entries(formData).map(([k]) => [k, { value: "deneme verisi", error: false }]))
         );
     };
 
     const deleteHandle = () => {
         setFormData(
-            Object.fromEntries(Object.entries(formData).map(([k]) => [k, { value: "", error: "" }]))
+            Object.fromEntries(Object.entries(formData).map(([k]) => [k, { value: "", error: true }]))
         );
     };
 
@@ -40,7 +41,7 @@ export default function SiteVariable({ keys, formData, setFormData }) {
     };
 
     return (
-        <div className="w-full space-y-4 md:space-y-6">
+        <div className="w-full space-y-6">
             {/* Sections Navigation */}
             <SiteVariableSection 
                 activeSection={activeSection} 
@@ -51,26 +52,29 @@ export default function SiteVariable({ keys, formData, setFormData }) {
             />
 
             {/* Controls Bar */}
-            <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
-                <input 
-                    value={search} 
-                    onChange={handleSearch}
-                    placeholder={t("adminpanel.add_languages.input.search")}
-                    type="text" 
-                    className="flex-1 px-4 py-2 md:py-3 border border-gray-300 rounded-lg outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm md:text-base"
-                />
-                <div className="flex gap-2 md:gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                    <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input 
+                        value={search} 
+                        onChange={handleSearch}
+                        placeholder={t("adminpanel.add_languages.input.search")}
+                        type="text" 
+                        className="w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-sm sm:text-base bg-gray-50 focus:bg-white transition-all"
+                    />
+                </div>
+                <div className="flex gap-2 sm:gap-3">
                     <button 
                         onClick={createHandle}
-                        className="flex-1 sm:flex-none px-4 md:px-6 py-2 md:py-3 bg-gray-700 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors duration-200 text-sm md:text-base active:scale-95"
+                        className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-3 bg-gradient-to-r from-gray-700 to-gray-800 text-white font-semibold rounded-xl hover:from-gray-800 hover:to-gray-900 transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98]"
                     >
-                        Üret
+                        <Sparkles size={18} />
                     </button>
                     <button 
                         onClick={deleteHandle}
-                        className="flex-1 sm:flex-none px-4 md:px-6 py-2 md:py-3 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors duration-200 text-sm md:text-base active:scale-95"
+                        className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98]"
                     >
-                        Sil
+                        <Trash2 size={18} />
                     </button>
                 </div>
             </div>
