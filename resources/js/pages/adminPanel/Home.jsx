@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import Navbar from '../../components/adminPanel/navbar/Navbar.jsx';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Confirm from '../../components/Confirm.jsx';
 import axios from 'axios';
 
@@ -28,8 +28,8 @@ export default function Home({ upcomingReservations, activeReservations, lateRes
     };
 
     const handleCardClick = (reservation, type) => {
+        console.log(reservation);
         if (type === 'upcoming') {
-            // Fetch available cars first
             setLoadingCars(true);
             axios.get(`/adminpanel/reservations/${reservation.id}/available-cars`)
                 .then((response) => {
@@ -69,7 +69,6 @@ export default function Home({ upcomingReservations, activeReservations, lateRes
 
     const handleStartRental = () => {
         if (!selectedCarId || !carSelectModal) return;
-
         const reservation = carSelectModal.reservation;
         axios.post(`/adminpanel/reservations/${reservation.id}/start`, { car_id: selectedCarId })
             .then(() => {
@@ -88,7 +87,7 @@ export default function Home({ upcomingReservations, activeReservations, lateRes
         const isLate = type === 'late';
         const borderColor = isLate ? 'border-red-500' : (type === 'active' ? 'border-green-500' : 'border-gray-500');
         const badgeColor = isLate ? 'bg-red-100 text-red-800' : (type === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800');
-        const name = JSON.parse(reservation.car_group.name);
+        const name = JSON.parse(reservation?.car_group?.name);
         return (
             <div
                 onClick={() => handleCardClick(reservation, type)}
@@ -143,12 +142,13 @@ export default function Home({ upcomingReservations, activeReservations, lateRes
                     <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
                         <h3 className="text-lg font-bold text-gray-800 mb-4">Kiralamayı Tamamla</h3>
                         <p className="text-sm text-gray-600 mb-4">
-                            Aracı teslim almak için güncel kilometre bilgisini girin.
+                            <span>{completeModal.reservation.assigned_vehicle.plate_number } </span>
+                            <span>Plakalı aracı teslim almak için güncel kilometre bilgisini girin.</span>
                         </p>
                         <p>
                             Rezervasyon Öncesi KM: <span>{completeModal?.reservation?.assigned_vehicle?.current_km ?? '—'}</span>
                         </p>
-                        
+
                         <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Güncel Kilometre
@@ -161,9 +161,9 @@ export default function Home({ upcomingReservations, activeReservations, lateRes
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                             />
                         </div>
-                        
+
                         <div className="flex gap-3 mt-4">
-                            <button 
+                            <button
                                 onClick={() => {
                                     setCompleteModal(null);
                                     setCurrentKm('');
@@ -172,12 +172,12 @@ export default function Home({ upcomingReservations, activeReservations, lateRes
                             >
                                 İptal
                             </button>
-                            <button 
+                            <button
                                 onClick={handleCompleteRental}
                                 disabled={!currentKm}
                                 className={`flex-1 px-4 py-2 rounded-lg transition-colors ${
-                                    currentKm 
-                                        ? 'bg-green-600 text-white hover:bg-green-700' 
+                                    currentKm
+                                        ? 'bg-green-600 text-white hover:bg-green-700'
                                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                 }`}
                             >

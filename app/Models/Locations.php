@@ -31,7 +31,7 @@ class Locations extends Model
     {
         return $this->belongsTo(Locations::class, 'parent_id');
     }
-    public function vehicles()
+    public function cars()
     {
         return $this->hasMany(Car::class, 'current_location_id');
     }

@@ -16,23 +16,33 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class AdminCarController extends Controller
 {
     public function showAllCarGroups()
     {
-        $cars = CarGroup::with(['cars:id,car_group_id,plate_number,exact_year'])->orderBy('sort_order', 'asc')->get();
+        $cars = CarGroup::with(['cars:id,car_group_id,plate_number,exact_year', 'translationKey:id,key'])->orderBy('sort_order', 'asc')->get();
 
         return Inertia::render('adminPanel/cars/CarGroups', [
             'cars' => $cars,
         ]);
     }
 
-    public function showIndexGroup($id)
+    public function showIndexGroup($slug)
     {
+        Log::info($slug);
+        $key_id = Translation::where('value', $slug)->firstOrFail()->translation_key_id;
+        $carGroupId = DB::table('car_groups')
+            ->where('slug_translation_key_id', $key_id)
+            ->value('id');
+
+        if (!$carGroupId) {
+            abort(404, 'Araç grubu bulunamadı.');
+        }
         return Inertia::render('adminPanel/cars/CarGroup', [
-            'id' => $id,
+            'id' => $carGroupId,
             'locations' => Locations::where('is_active', true)->select('id', 'name')->get(),
         ]);
     }
@@ -80,10 +90,12 @@ class AdminCarController extends Controller
         $car = Car::with([
             'carGroup:id,name',
             'currentLocation:id,name',
-            'brandKey.translations.language',
-            'modelKey.translations.language',
+            'brandKey:id,key',
+            'modelKey:id,key',
             'reservations' => function ($q) {
-                $q->with(['carGroup:id,name', 'pickupLocation:id,name', 'returnLocation:id,name'])
+                $q->with(['carGroup:id,name', 'pickupLocation:id,name', 'returnLocation:id,name', 'currency:id,code,symbol', 'assignedVehicle' => function ($q) {
+                     $q->select('id', 'exact_year', 'plate_number')->with(['brandkey:id,key', 'modelkey:id,key']);
+                }])
                   ->orderBy('pickup_datetime', 'desc');
             },
         ])->findOrFail($id);
@@ -91,7 +103,7 @@ class AdminCarController extends Controller
         // Parse brand and model translations into language-keyed objects
         $brand = [];
         $model = [];
-        
+
         if ($car->brandKey && $car->brandKey->translations) {
             foreach ($car->brandKey->translations as $t) {
                 if ($t->language) {
@@ -99,7 +111,7 @@ class AdminCarController extends Controller
                 }
             }
         }
-        
+
         if ($car->modelKey && $car->modelKey->translations) {
             foreach ($car->modelKey->translations as $t) {
                 if ($t->language) {
@@ -119,7 +131,7 @@ class AdminCarController extends Controller
     {
         $validated = $request->validate([
             'plate_number' => 'required|string|max:50',
-            'exact_year' => 'nullable|integer|min:1990|max:' . (date('Y') + 1),
+            'exact_year' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
             'current_km' => 'nullable|integer|min:0',
             'status' => 'required|in:available,rented,unavailable,maintenance',
             'current_location_id' => 'nullable|exists:locations,id',
@@ -130,9 +142,9 @@ class AdminCarController extends Controller
 
         try {
             DB::beginTransaction();
-            
+
             $car = Car::findOrFail($id);
-            
+            Log::info($validated['current_km']);
             $car->update([
                 'plate_number' => $validated['plate_number'],
                 'exact_year' => $validated['exact_year'] ?? null,
@@ -181,9 +193,8 @@ class AdminCarController extends Controller
             }
 
             DB::commit();
-            
-            $car->load(['carGroup:id,name', 'currentLocation:id,name', 'brandKey.translations.language', 'modelKey.translations.language', 'reservations']);
 
+            $car->load(['carGroup:id,name', 'currentLocation:id,name', 'brandKey.translations.language', 'modelKey.translations.language', 'reservations']);
             $brand = [];
             $model = [];
             if ($car->brandKey && $car->brandKey->translations) {
@@ -236,14 +247,15 @@ class AdminCarController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|json',
+            'slug' => 'required|json',
             'segment' => 'required|integer|exists:segments,id',
             'body_type' => 'required|integer|exists:body_types,id',
             'seat_count' => 'required|integer|min:1|max:20',
             'trunk_capacity' => 'required|integer|min:0|max:10000',
             'fuel_type' => 'required|integer|exists:fuels,id',
             'transmission_type' => 'required|integer|exists:transmissions,id',
-            'currency' => 'required|string|exists:currencies,id',
             'deposit' => 'required|numeric|min:0',
+            'online_discount' => 'nullable|numeric|min:0|max:100',
             'price' => 'required|json',
             'photos' => 'required|array|min:1|max:10',
             'photos.*' => 'mimes:jpeg,jpg,png,gif,bmp,webp|max:10240',
@@ -251,11 +263,53 @@ class AdminCarController extends Controller
         ]);
 
         try {
-            $selectedCurrency = Currency::findOrFail($validated['currency']);
-            $rate = $selectedCurrency->exchange_rate;
-            $firstLocation = Locations::where('is_active', true)->value('id') ?? 1;
+            $defaultCurrency = Currency::where('is_default', true)->first();
+            $rate = $defaultCurrency->exchange_rate;
+            //$firstLocation = Locations::where('is_active', true)->value('id') ?? 1;
 
             DB::beginTransaction();
+
+            do {
+                $generatedKey = 'address.car.' . Str::random(6);
+            } while (TranslationKey::where('key', $generatedKey)->exists());
+
+            $languages = Language::pluck('id', 'code');
+            $slugs = is_string($validated['slug']) ? json_decode($validated['slug'], true) : $validated['slug'];
+
+            $existingSlugs = Translation::whereIn('value', array_values($slugs))
+                ->with('language')
+                ->get()
+                ->keyBy('value');
+
+            foreach ($slugs as $slugValue) {
+                if ($existingSlugs->has($slugValue)) {
+                    $langCode = $existingSlugs[$slugValue]->language->code;
+                    throw ValidationException::withMessages([
+                        "slug.{$langCode}" => "Bu link ($slugValue) zaten kullanımda."
+                    ]);
+                }
+            }
+
+            $translationKey = TranslationKey::create([
+                'key' => $generatedKey,
+                'description' => 'car group link'
+            ]);
+
+            $insertData = [];
+
+            foreach ($slugs as $langCode => $slugValue) {
+                if (isset($languages[$langCode])) {
+                    $insertData[] = [
+                        'translation_key_id' => $translationKey->id,
+                        'language_id' => $languages[$langCode],
+                        'value' => $slugValue,
+                    ];
+                }
+            }
+
+            if (!empty($insertData)) {
+                Translation::insert($insertData);
+            }
 
             $group = CarGroup::create([
                 'segment_id' => (int) $validated['segment'],
@@ -265,8 +319,10 @@ class AdminCarController extends Controller
                 'fuel_id' => (int) $validated['fuel_type'],
                 'transmission_id' => (int) $validated['transmission_type'],
                 'deposit' => $validated['deposit'],
-                'currency_id' => $validated['currency'],
+                'online_discount' => ($validated['online_discount'] ?? 0) / 100,
+                'currency_id' => $defaultCurrency->id,
                 'sort_order' => CarGroup::max('sort_order') + 1,
+                'slug_translation_key_id' => $translationKey->id,
                 'name' =>  $validated['name'],
             ]);
 
@@ -292,7 +348,7 @@ class AdminCarController extends Controller
                         'month' => (string) $month,
                         'min_days' => $minDay,
                         'max_days' => $maxDay,
-                        'currency_id' => $validated['currency'],
+                        'currency_id' => $defaultCurrency->id,
                         'price' => $priceValue,
                         'base_price' => (float) $priceValue / $rate,
                         'is_active' => true,
@@ -310,11 +366,11 @@ class AdminCarController extends Controller
             }
 
             DB::commit();
-
+            clearTranslationCache();
             return response()->json([
                 'success' => true,
                 'car_group' => $group->fresh(['photos', 'cars']),
-                'redirect_id' => $group->id,
+                'redirect_slug' => $slugs[app()->getLocale()],
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
@@ -368,22 +424,26 @@ class AdminCarController extends Controller
 
     public function updatePrice(Request $request, int $id)
     {
+        Log::info(1);
         $validated = $request->validate([
             'price' => 'required|json',
-            'currency' => 'required|integer|exists:currencies,id',
             'deposit' => 'required|numeric|min:0',
+            'online_discount' => 'nullable|numeric|min:0|max:100',
         ]);
-
+        Log::info(2);
         try {
-            $selectedCurrency = Currency::findOrFail($validated['currency']);
-            $rate = $selectedCurrency->exchange_rate;
+            $defaultCurrency = Currency::where('is_default', true)->first();
+            $rate = $defaultCurrency->exchange_rate;
             DB::beginTransaction();
-
-            $car = CarGroup::with(['photos', 'brandKey', 'modelKey', 'price' => fn ($query) => $query->where('is_active', true)])->findOrFail($id);
-
+            Log::info(3);
+            $car = CarGroup::with(['photos', 'price' => fn ($query) => $query->where('is_active', true)])->findOrFail($id);
+            Log::info(4);
             $car->price()->update(['is_active' => false]);
-            $car->update(['deposit' => $validated['deposit']]);
-
+            $car->update([
+                'deposit' => $validated['deposit'],
+                'online_discount' => ($validated['online_discount'] ?? 0) / 100,
+            ]);
+            Log::info(5);
             $prices = json_decode($validated['price'], true);
             foreach ($prices as $item => $day_price_array) {
                 foreach ($day_price_array as $day_range => $priceValue) {
@@ -406,17 +466,18 @@ class AdminCarController extends Controller
                         'month' => $item,
                         'min_days' => $minDayVal,
                         'max_days' => $maxDayVal,
-                        'currency_id' => $validated['currency'],
+                        'currency_id' => $defaultCurrency->id,
                         'price' => $priceValue,
                         'base_price' => (float) $priceValue / $rate,
                         'is_active' => true,
                     ]);
                 }
             }
-            $car->update(['currency_id' => $validated['currency']]);
+            $car->update(['currency_id' => $defaultCurrency->id]);
+            Log::info(7);
 
             DB::commit();
-            $updatedCar = CarGroup::with(['photos', 'brandKey', 'modelKey', 'price' => fn ($query) => $query->where('is_active', true)])->findOrFail($id);
+            $updatedCar = CarGroup::with(['photos', 'cars.carGroup', 'price' => fn ($query) => $query->where('is_active', true)])->findOrFail($id);
 
             return response()->json([
                 'car' => $updatedCar,
@@ -435,10 +496,6 @@ class AdminCarController extends Controller
     {
         try {
             $validated = $request->validate([
-                'license_plate' => 'nullable|string|max:20',
-                'brand' => 'required|json',
-                'model' => 'required|json',
-                'year' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
                 'seat_count' => 'required|integer|min:1|max:20',
                 'trunk_capacity' => 'required|integer|min:0|max:10000',
                 'segment' => 'required|integer|exists:segments,id',
@@ -446,19 +503,7 @@ class AdminCarController extends Controller
                 'transmission_type' => 'required|integer|exists:transmissions,id',
                 'fuel_type' => 'required|integer|exists:fuels,id',
             ]);
-
-            $car = CarGroup::with(['brandKey', 'modelKey'])->findOrFail($id);
-
-            foreach (json_decode($validated['brand'], true) as $key => $value) {
-                Translation::where('translation_key_id', $car->brandKey->id)
-                    ->where('language_id', Language::where('code', $key)->first()->id)
-                    ->update(['value' => $value]);
-            }
-            foreach (json_decode($validated['model'], true) as $key => $value) {
-                Translation::where('translation_key_id', $car->modelKey->id)
-                    ->where('language_id', Language::where('code', $key)->first()->id)
-                    ->update(['value' => $value]);
-            }
+            $car = CarGroup::findOrFail($id);
 
             $car->update([
                 'segment_id' => (int) $validated['segment'],
@@ -469,18 +514,7 @@ class AdminCarController extends Controller
                 'fuel_id' => (int) $validated['fuel_type'],
             ]);
 
-            $firstVehicle = $car->vehicles()->first();
-            if ($firstVehicle) {
-                if (array_key_exists('license_plate', $validated) && $validated['license_plate'] !== null && $validated['license_plate'] !== '') {
-                    $firstVehicle->update(['plate_number' => $validated['license_plate']]);
-                }
-                if (array_key_exists('year', $validated) && $validated['year'] !== null && $validated['year'] !== '') {
-                    $firstVehicle->update(['exact_year' => (int) $validated['year']]);
-                }
-            }
-
-            $updatedCar = CarGroup::with(['photos', 'brandKey', 'modelKey', 'vehicles', 'price' => fn ($query) => $query->where('is_active', true)])->findOrFail($id);
-
+            $updatedCar = CarGroup::with(['photos', 'cars.carGroup', 'price' => fn ($query) => $query->where('is_active', true)])->findOrFail($id);
             return response()->json([
                 'car' => $updatedCar,
                 'success' => 'Araç Detayları Başarıyla Güncellendi.',
@@ -495,7 +529,7 @@ class AdminCarController extends Controller
 
     public function updatePhoto(Request $request, int $id)
     {
-        $car = CarGroup::with(['photos', 'discount'])->findOrFail($id);
+        $car = CarGroup::with(['photos', 'cars.carGroup', 'price'])->findOrFail($id);
 
         $existingPhotos = $request->input('existing_photos', []);
         $newPhotos = $request->file('photos', []);

@@ -30,13 +30,14 @@ export default function IndexCar({ id, locations = [], carGroups = [], languages
             setLoading(true);
             const response = await axios.get(`/adminpanel/cars/${id}/info`);
             setCar(response.data.car);
+            console.log(response.data.car);
             const brandData = response.data.brand || {};
             const modelData = response.data.model || {};
             setBrandModel({ brand: brandData, model: modelData });
             setFormData({
                 plate_number: response.data.car.plate_number || '',
                 exact_year: response.data.car.exact_year || '',
-                current_km: response.data.car.current_km || '',
+                current_km: response.data.car.current_km ?? '',
                 status: response.data.car.status || 'available',
                 current_location_id: response.data.car.current_location_id || '',
                 car_group_id: response.data.car.car_group_id || '',

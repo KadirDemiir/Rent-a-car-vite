@@ -15,7 +15,7 @@ export default function Reservations({}){
             .then(response => {
                 setRes(response.data.reservations);
                 setAllRes(response.data.reservations);
-                console.log(response);
+                console.log(response.data.reservations);
             })
             .catch(error => console.log(error.response.error))
     }

@@ -89,9 +89,9 @@ const SortableCarGroupRow = ({ carGroup, index, t, onRowClick, isExpanded, onTog
 
             <td
                 className="px-6 py-3 font-semibold text-gray-900 cursor-pointer hover:text-gray-700"
-                onClick={() => onRowClick(carGroup.id)}
+                onClick={() => onRowClick(carGroup.translation_key.key)}
             >
-                {name?.[i18n.language] || `Group #${carGroup.id}`}
+                {name?.[i18n.language] || `Group #${carGroup.translation_key.key}`}
             </td>
 
             <td className="px-6 py-3 text-gray-600">
@@ -158,8 +158,9 @@ export default function CarGroupTable({ carGroups = [] }) {
         setDataToSave(carGroups);
     }, [carGroups]);
 
-    const handleRowClick = (id) => {
-        router.visit(`/${i18n.language}/${t("address.adminpanel")}/${t("address.car_groups")}/${id}`);
+    const handleRowClick = (slug) => {
+        console.log(slug);
+        router.visit(`/${i18n.language}/${t("address.adminpanel")}/${t("address.car_groups")}/${t(slug)}`);
     };
 
     const toggleExpandGroup = (groupId) => {

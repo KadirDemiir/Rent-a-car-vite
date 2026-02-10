@@ -1,10 +1,12 @@
 import {useCurrency} from "../../../../providers/CurrencyContext.jsx";
 
-export default function PriceInformationCard({drop_price, total_days, daily_price, extra_price}) {
-    const {calculateTotal, current} = useCurrency()
+export default function PriceInformationCard({drop_price, total_days, totalPrice, daily_price, extra_price, onlineTotal = 0}) {
+    const {calculateTotal, current} = useCurrency();
+    console.log(extra_price);
+    //const totalPrice = calculateTotal(total_days, daily_price, extra_price, drop_price).toFixed(2);
     return (
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-            <div className="bg-gradient-to-r from-gray-600 to-gray-700 p-4">
+            <div className="bg-linear-to-r from-gray-600 to-gray-700 p-4">
                 <div className="flex items-center gap-2 text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
@@ -12,7 +14,7 @@ export default function PriceInformationCard({drop_price, total_days, daily_pric
                     <h3 className="font-bold text-lg">Price Info</h3>
                 </div>
             </div>
-            
+
             <div className="p-5 space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-gray-100">
                     <span className="text-gray-600 font-medium">Daily Price</span>
@@ -23,12 +25,12 @@ export default function PriceInformationCard({drop_price, total_days, daily_pric
                     )}
                 </div>
 
-                {drop_price && drop_price > 0 && current?.symbol && (
+                {Number(drop_price) > 0 && current?.symbol && (
                     <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-                    <span className="text-gray-600 font-medium">Drop Price</span>
+                        <span className="text-gray-600 font-medium">Drop Price</span>
                         <span className="font-semibold text-gray-800">
-                            {`${calculateTotal(drop_price).toFixed(2)} ${current.symbol}`}
-                        </span>
+            {`${Number(calculateTotal(drop_price)).toFixed(2)} ${current.symbol}`}
+        </span>
                     </div>
                 )}
 
@@ -38,13 +40,38 @@ export default function PriceInformationCard({drop_price, total_days, daily_pric
                         {`${calculateTotal(extra_price).toFixed(2)} ${current?.symbol}`}
                     </span>
                 </div>
-                
+
                 <div className="flex items-center justify-between pt-2">
-                    <span className="text-lg font-bold text-gray-800">Total</span>
+                    <span className="text-lg font-bold text-gray-800">Ofiste Öde</span>
                     <span className="text-xl font-bold text-gray-700">
-                        {`${calculateTotal(Number(total_days) * Number(daily_price) + Number(extra_price) + Number(drop_price)).toFixed(2)} ${current?.symbol || ''}`}
+                        {`${calculateTotal(totalPrice + extra_price).toFixed(2)} ${current?.symbol || ''}`}
                     </span>
                 </div>
+
+                {onlineTotal > 0 && (
+                    <div className="flex items-center justify-between pt-2 bg-green-50 rounded-lg p-3 border border-green-200">
+                        <div className="flex flex-col">
+                            <span className="text-lg font-bold text-green-700">Şimdi Öde</span>
+                        </div>
+                        <div className="flex flex-col items-end">
+                            <span className="text-xs text-gray-400 line-through">
+                                {`${totalPrice} ${current?.symbol || ''}`}
+                            </span>
+                            <span className="text-xl font-bold text-green-700">
+                                {`${calculateTotal(onlineTotal + extra_price).toFixed(2)} ${current?.symbol || ''}`}
+                            </span>
+                        </div>
+                    </div>
+                )}
+
+                {onlineTotal === 0 && (
+                    <div className="flex items-center justify-between pt-2">
+                        <span className="text-lg font-bold text-gray-800">Şimdi Öde</span>
+                        <span className="text-xl font-bold text-gray-700">
+                            {`${totalPrice} ${current?.symbol || ''}`}
+                        </span>
+                    </div>
+                )}
             </div>
         </div>
     );

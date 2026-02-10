@@ -1,11 +1,11 @@
-import React, { useState, forwardRef, useImperativeHandle, useEffect, useRef } from "react";
+import React, { useState, forwardRef, useImperativeHandle, useEffect } from "react";
 import FormInput from "./FormInput.jsx";
 import SelectOptions from "../../../websites/filterSelectors/SelectOptions.jsx";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import LanguageProgress from "../../LanguageProgress.jsx";
 
-const CarDetailsForm = forwardRef(({ car = {}, onSubmit, groupOnly = false }, ref) => {
+const CarDetailForm = forwardRef(({ car = {}, onSubmit, groupOnly = false }, ref) => {
     const { i18n, t } = useTranslation();
     const [segments, setSegments] = useState([]);
     const [bodyTypes, setBodyTypes] = useState([]);
@@ -24,21 +24,17 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit, groupOnly = false }, re
             return {};
         }
     };
-
     const defaultData = {
         name: parseName(car?.name),
-        plate_number: car?.vehicles?.[0]?.plate_number ?? car?.license_plate ?? "",
-        seat_count: car?.seat_count || "",
-        trunk_capacity: car?.trunk_capacity || "",
+        slug: car?.slug ? (typeof car.slug === 'string' ? JSON.parse(car.slug) : car.slug) : {},
+        seat_count: car?.seat_count ?? "",
+        trunk_capacity: car?.trunk_capacity ?? "",
         segment: car?.segment_id || "",
         bodyType: car?.body_type_id || "",
         fuelType: car?.fuel_id || "",
         transmissionType: car?.transmission_id || "",
-        status: car?.status || "available"
     };
-
     const [formData, setFormData] = useState(defaultData);
-    const formDataRef = useRef(defaultData);
 
     useEffect(() => {
         let mounted = true;
@@ -61,7 +57,7 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit, groupOnly = false }, re
                 });
 
                 const updated = {
-                    ...formDataRef.current,
+                    ...defaultData,
                     segment: car?.segment_id ?? res.data.segments[0] ?? "",
                     bodyType: car?.body_type_id ?? res.data.bodyTypes[0] ?? "",
                     fuelType: car?.fuel_id ?? res.data.fuels[0] ?? "",
@@ -71,7 +67,6 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit, groupOnly = false }, re
                 };
 
                 setFormData(updated);
-                formDataRef.current = updated;
             } catch (err) {
                 console.error(err);
                 setError(err.response?.data?.error || { general: "Veriler yüklenirken hata oluştu" });
@@ -84,6 +79,7 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit, groupOnly = false }, re
         return () => { mounted = false; };
     }, []);
 
+    const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
     const handleChange = e => {
         const { name, value } = e.target;
 
@@ -91,41 +87,52 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit, groupOnly = false }, re
             return setError(p => ({ ...p, [name]: "Sadece sayı girilebilir" }));
         }
 
-        setError(p => { const c = { ...p }; delete c[name]; delete c["name"]; return c; });
+        setError(p => { const c = { ...p }; delete c[name]; delete c["name"]; delete c["slug"]; return c; });
+
+        if (name.startsWith("slug.")) {
+            const lang = name.split(".")[1];
+            // Validate slug
+            if (value && !slugRegex.test(value)) {
+                setError(p => ({ ...p, [name]: "Geçerli bir bağlantı (slug) girin: küçük harf, rakam, tire (-)" }));
+            }
+            setFormData(p => ({ ...p, slug: { ...p.slug, [lang]: value } }));
+            return;
+        }
 
         if (name.includes(".")) {
             const [main, lang] = name.split(".");
-            setFormData(p => {
-                const u = { ...p, [main]: { ...p[main], [lang]: value } };
-                formDataRef.current = u;
-                return u;
-            });
+            setFormData(p => ({ ...p, [main]: { ...p[main], [lang]: value } }));
         } else {
-            setFormData(p => {
-                const u = { ...p, [name]: value };
-                formDataRef.current = u;
-                return u;
-            });
+            setFormData(p => ({ ...p, [name]: value }));
         }
     };
 
     const handleSelectChange = (key, val) => {
         setError(p => { const c = { ...p }; delete c[key]; return c; });
-        const u = { ...formData, [key]: val };
-        setFormData(u);
-        formDataRef.current = u;
+        setFormData(p => ({ ...p, [key]: val }));
     };
 
     const handleSubmit = () => {
-        const d = formDataRef.current;
+        const d = formData;
         const errs = {};
 
-        if (supportedLangs.some(l => !d.name[l.value]?.trim())) {
+        if (supportedLangs.some(l => !d.name[l.value]?.trim()))
             errs.name = "İsim alanı tüm diller için gereklidir";
-        }
-        if (!d.seat_count) errs.seat_count = "Koltuk sayısı gerekli";
-        if (!d.trunk_capacity) errs.trunk_capacity = "Bagaj kapasitesi gerekli";
 
+        // Slug validation: required and valid for each language
+        supportedLangs.forEach(l => {
+            const val = d.slug?.[l.value] || "";
+            if (!val.trim()) {
+                errs[`slug.${l.value}`] = `Slug (${l.label}) zorunludur`;
+            } else if (!slugRegex.test(val)) {
+                errs[`slug.${l.value}`] = `Geçerli bir bağlantı (slug) girin: küçük harf, rakam, tire (-)`;
+            }
+        });
+
+        if (d.seat_count === "" || d.seat_count === null || d.seat_count === undefined)
+            errs.seat_count = "Koltuk sayısı gerekli";
+        if (d.trunk_capacity === "" || d.trunk_capacity === null || d.trunk_capacity === undefined)
+            errs.trunk_capacity = "Bagaj kapasitesi gerekli";
         setError(errs);
         if (Object.keys(errs).length) {
             window.scrollTo({ top: 0, behavior: "smooth" });
@@ -134,25 +141,27 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit, groupOnly = false }, re
 
         const fd = new FormData();
         fd.append("name", JSON.stringify(d.name));
+        fd.append("slug", JSON.stringify(d.slug));
         fd.append("seat_count", d.seat_count);
         fd.append("trunk_capacity", d.trunk_capacity);
         fd.append("segment", d.segment);
         fd.append("body_type", d.bodyType);
         fd.append("fuel_type", d.fuelType);
         fd.append("transmission_type", d.transmissionType);
-
         return fd;
     };
 
-    useImperativeHandle(ref, () => ({ submit: handleSubmit }));
+    useImperativeHandle(ref, () => ({ submit: handleSubmit }), [formData, supportedLangs]);
 
     const progress = () => {
         const b = Object.values(formData.name || {});
-        const total = supportedLangs.length;
+        const c = Object.values(formData.slug || {});
+        const total = supportedLangs.length *2;
         if (!total) return 0;
 
-        const filled = b.filter(v => v && v.trim()).length;
-        return Math.round((filled / total) * 100);
+        const filledb = b.filter(v => v && v.trim()).length;
+        const filledc = c.filter(c => c && c.trim()).length;
+        return Math.round(((filledb + filledc) / total) * 100);
     };
 
     if (loading) return <div>Yükleniyor...</div>;
@@ -191,10 +200,34 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit, groupOnly = false }, re
             </div>
 
             <div className="col-span-1">
-                <FormInput name="seat_count" label={t("adminpanel.car.car_modify.edit_car_information.seat_count")} type="number" value={formData.seat_count} onChange={handleChange} error={error.seat_count} />
+                <FormInput
+                    name={`slug.${currentLang}`}
+                    label={t("adminpanel.car_group.slug") + " (" + currentLang + ")"}
+                    value={formData.slug?.[currentLang] || ""}
+                    onChange={handleChange}
+                    error={error[`slug.${currentLang}`]}
+                />
+            </div>
+
+            <div className="col-span-1">
+                <FormInput
+                    name="seat_count"
+                    label={t("adminpanel.car.car_modify.edit_car_information.seat_count")}
+                    type="number"
+                    value={formData.seat_count}
+                    onChange={handleChange}
+                    error={error.seat_count}
+                />
             </div>
             <div className="col-span-1">
-                <FormInput name="trunk_capacity" label={t("adminpanel.car.car_modify.edit_car_information.trunk_capacity")} type="number" value={formData.trunk_capacity} onChange={handleChange} error={error.trunk_capacity} />
+                <FormInput
+                    name="trunk_capacity"
+                    label={t("adminpanel.car.car_modify.edit_car_information.trunk_capacity")}
+                    type="number"
+                    value={formData.trunk_capacity }
+                    onChange={handleChange}
+                    error={error.trunk_capacity}
+                />
             </div>
 
             <div className="col-span-1">
@@ -233,4 +266,4 @@ const CarDetailsForm = forwardRef(({ car = {}, onSubmit, groupOnly = false }, re
     );
 });
 
-export default CarDetailsForm;
+export default CarDetailForm;

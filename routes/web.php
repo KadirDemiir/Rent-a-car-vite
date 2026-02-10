@@ -69,9 +69,7 @@ Route::middleware('admin')->group(function () {
     });
     Route::get('/adminpanel/get-info/locations/{id}', [LocationsController::class, 'getIndexLocationInfo']);
     Route::get('/get-reservations-informations', function () {
-        Log::info("1");
-        $data = Reservation::with(['extras.extra', 'carGroup.photos', 'assignedVehicle', 'pickupLocation', 'returnLocation', 'currency'])->get();
-        Log::info("2");
+        $data = Reservation::with(['extras.extra', 'carGroup', 'assignedVehicle', 'pickupLocation', 'returnLocation', 'currency'])->get();
         if ($data->isEmpty()) {
             return response()->json(['message' => 'Veritabanında rezervasyon bulunamadı.'], 404);
         }
@@ -294,7 +292,7 @@ Route::group([
     Route::post(dbTransRoute('adminpanel') . '/admin', [AuthController::class, 'updateAdminPassword'])->name('adminUpdatePassword');
     Route::get(dbTransRoute('adminpanel') . '/admin', [AuthController::class, 'showAdminChangePassword'])->name('adminChangePassword');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('car_groups') . '/' . dbTransRoute('add'), [AdminCarController::class, 'showAddCarGroup'])->name('adminAddCarGroupPage');
-    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('car_groups') . '/{id}', [AdminCarController::class, 'showIndexGroup'])->name('adminShowCar');
+    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('car_groups') . '/{slug}', [AdminCarController::class, 'showIndexGroup'])->name('adminShowCar');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('car_groups'), [AdminCarController::class, 'showAllCarGroups'])->name('adminCars');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('cars') . '/' . dbTransRoute('add'), [AdminCarController::class, 'showAddCar'])->name('adminAddCarPage');
     Route::get(dbTransRoute('adminpanel') . '/'. dbTransRoute('cars'), [AdminCarController::class, 'showAllCars'])->name('adminVehicles');

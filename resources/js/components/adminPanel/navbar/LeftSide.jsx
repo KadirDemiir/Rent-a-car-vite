@@ -71,14 +71,14 @@ export default function LeftSide({ isOpen, onClose }) {
         {
             title: t("adminpanel.navigator.car_properties"),
             subSec: [
-                {name: t("adminpanel.navigator.segments"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.segments")}`},
                 {name: t("adminpanel.navigator.add_segment"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.segments")}/${t("address.add")}`},
-                {name: t("adminpanel.navigator.body_types"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.body_types")}`},
+                {name: t("adminpanel.navigator.segments"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.segments")}`},
                 {name: t("adminpanel.navigator.add_body_type"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.body_types")}/${t("address.add")}`},
-                {name: t("adminpanel.navigator.fuels"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.fuels")}`},
+                {name: t("adminpanel.navigator.body_types"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.body_types")}`},
                 {name: t("adminpanel.navigator.add_fuel"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.fuels")}/${t("address.add")}`},
-                {name: t("adminpanel.navigator.transmissions"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.transmissions")}`},
+                {name: t("adminpanel.navigator.fuels"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.fuels")}`},
                 {name: t("adminpanel.navigator.add_transmission"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.transmissions")}/${t("address.add")}`},
+                {name: t("adminpanel.navigator.transmissions"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.transmissions")}`},
             ]
         }
     ];

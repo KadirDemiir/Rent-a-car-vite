@@ -9,7 +9,7 @@ export default function GuestReservationDetails({ reservation: initialReservatio
     const { t, i18n } = useTranslation();
     const [reservation, setReservation] = useState(initialReservation);
     const [processing, setProcessing] = useState(false);
-
+    console.log(reservation);
     const handleCancel = () => {
         if (confirm(t('website.reservation_details.confirm_cancel'))) {
             setProcessing(true);
@@ -79,10 +79,10 @@ export default function GuestReservationDetails({ reservation: initialReservatio
                         <div className="flex flex-col md:flex-row gap-8 mb-8">
                             <div className="w-full md:w-1/3">
                                 <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden bg-gray-100 mb-4">
-                                     {reservation.carGroup?.photos && reservation.carGroup?.photos.length > 0 ? (
+                                     {reservation.car_group?.photos && reservation.car_group?.photos.length > 0 ? (
                                         <img
-                                            src={`/storage/${reservation.carGroup?.photos[0].photo_path}`}
-                                            alt={reservation.carGroup?.brandKey?.key + ' ' + reservation.carGroup?.modelKey?.key}
+                                            src={`/storage/${reservation.car_group?.photos[0].photo_path}`}
+                                            alt={JSON.parse(reservation.car_group.name)?.[reservation.locale]}
                                             className="object-cover w-full h-full"
                                             loading="lazy"
                                         />
@@ -91,7 +91,7 @@ export default function GuestReservationDetails({ reservation: initialReservatio
                                     )}
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-800 text-center">
-                                    {reservation.carGroup?.brandKey?.key} {reservation.carGroup?.modelKey?.key}
+                                    {JSON.parse(reservation.car_group.name)?.[reservation.locale]}
                                 </h3>
                             </div>
 

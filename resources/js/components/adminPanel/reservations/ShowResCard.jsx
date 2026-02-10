@@ -24,6 +24,17 @@ export default function ShowResCard({ res, updateData, closeModal, curr, past })
         return 'bg-yellow-100 text-yellow-700 border-yellow-200';
     };
 
+    const discountedDailyPrice = () => {
+        if (!res?.daily_price) return 0;
+        const price = Number(res.daily_price);
+        const amount = Number(res.discount_amount) || 0;
+        if (res.discount_type === "fixed")
+            return Math.max(0, price - amount);
+        if (res.discount_type === "percentage")
+            return price * (1 - amount);
+        return price;
+    }
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4 transition-all">
             <div className="bg-white w-full max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl flex flex-col relative">
@@ -101,15 +112,16 @@ export default function ShowResCard({ res, updateData, closeModal, curr, past })
                                         <>
                                            {/* <DetailItem label="ID" value={`#${res.id || '-'}`} />*/}
                                             <DetailItem label={t("adminpanel.car_group")} value={getTrans(res.car_group.name)} />
-                                            {res.assignedVehicle &&
+                                            {res.assigned_vehicle &&
                                                 <>
-                                                    <DetailItem label={t("adminpanel.car.car_modify.edit_car_information.plate") || "Plaka"} value={res.assignedVehicle?.plate_number ?? '—'} />
-                                                    <DetailItem label={t("adminpanel.car.car_modify.edit_car_information.brand")} value={`${t(res.assignedVehicle?.brandKey?.key)} ${t(res.assignedVehicle?.modelKey?.key)} ${res.assignedVehicle?.exact_year}`} />
+                                                    <span className={`font-extrabold`}>Assigned Car</span><hr className={`border-gray-200`}/>
+                                                    <DetailItem label={t("adminpanel.car.car_modify.edit_car_information.brand")} value={`${t(res.assigned_vehicle?.brandKey?.key)} ${t(res.assigned_vehicle?.modelKey?.key)} ${res.assigned_vehicle?.exact_year}`} />
+                                                    <DetailItem label={t("adminpanel.car.list.license_plate") || "Plaka"} value={res.assigned_vehicle?.plate_number ?? '—'} />
                                                     {/*<DetailItem label={t("adminpanel.car.car_modify.edit_car_information.model")} value={t(res.carGroup?.modelKey?.key)} />*/}
                                                     {/*<DetailItem label={t("adminpanel.car.car_modify.edit_car_information.year") || "Yıl"} value={res.assignedVehicle?.exact_year ?? '—'} />*/}
                                                 </>
                                             }
-                                            <DetailItem label={t("adminpanel.car.car_modify.edit_car_information.fuel_type") || "Yakıt"} value={t(`fuel.${res.carGroup?.fuel_id}`)} />
+                                            {/*<DetailItem label={t("adminpanel.car.car_modify.edit_car_information.fuel_type") || "Yakıt"} value={t(`fuel.${res.car_group?.fuel_id}`)} />*/}
                                         </>
                                     );
                                 })()}
@@ -146,10 +158,11 @@ export default function ShowResCard({ res, updateData, closeModal, curr, past })
                                         {res.payment_status}
                                     </dd>
                                 </div>
-                                <DetailItem label={t("adminpanel.reservation.reservation_modal.payment_method")} value={res.payment_type} />
                                 <DetailItem label={t("adminpanel.reservation.reservation_modal.extra_price")} value={`${(res.extras_total * res.exchange_rate).toFixed(2)} ${res.currency.symbol}`} />
+                                <DetailItem label={t("adminpanel.reservation.reservation_modal.payment_method")} value={res.payment_type} />
                                 <DetailItem label={t("adminpanel.reservation.reservation_modal.drop_price", "Drop Price")} value={`${(res.drop_price * res.exchange_rate).toFixed(2)} ${res.currency.symbol}`} />
-                                <DetailItem label={t("adminpanel.reservation.reservation_modal.day*daily_price", "Day x fDaily Price")} value={`${res.rental_days} x ${(res.daily_price * res.exchange_rate)} ${res.currency.symbol}`} />
+                                <DetailItem label={t("adminpanel.reservation.reservation_modal.day*daily_price", "Day x Daily Price")} value={`${res.rental_days} x ${((discountedDailyPrice() ) * res.exchange_rate)} ${res.currency.symbol}`} />
+                                {res?.online_discount_amount > 0 && <DetailItem label={t("adminpanel.reservation.reservation_modal.online_discount_amount", "Online Discount Amount")} value={`% ${res.online_discount_amount * 100}`} />}
                                 <div className="mt-auto pt-4 border-t border-gray-100">
                                     <dt className="text-xs font-medium text-gray-500 uppercase mb-1">{t("adminpanel.reservation.reservation_modal.total_price")}</dt>
                                     <dd className="text-2xl font-bold text-gray-900">{`${(res.total_price * res.exchange_rate).toFixed(2)} ${res.currency.symbol}`}</dd>

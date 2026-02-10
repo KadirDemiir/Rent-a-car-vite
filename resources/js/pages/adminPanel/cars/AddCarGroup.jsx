@@ -2,10 +2,10 @@ import Navbar from "../../../components/adminPanel/navbar/Navbar.jsx";
 import CarDetailForm from "../../../components/adminPanel/car/form/CarDetailForm.jsx";
 import CarPricingForm from "../../../components/adminPanel/car/form/CarPricingForm.jsx";
 import CarPhotoForm from "../../../components/adminPanel/car/form/CarPhotoForm.jsx";
-import VehicleListForm from "../../../components/adminPanel/car/form/VehicleListForm.jsx";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { useState, useRef } from "react";
+import {router} from "@inertiajs/react";
 export default function AddCarGroup({ locations = [] }) {
     const { t, i18n } = useTranslation();
     const [success, setSuccess] = useState("");
@@ -32,17 +32,16 @@ export default function AddCarGroup({ locations = [] }) {
         photoData.forEach((value, key) => formData.append(key, value));
 
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-        axios
-            .post("/adminpanel/car-groups", formData, {
+        axios.post("/adminpanel/car-groups", formData, {
                 headers: { "X-CSRF-TOKEN": csrfToken, "Accept": "application/json" },
             })
             .then((res) => {
-                if (res.data.success && res.data.redirect_id) {
+                if (res.data.success && res.data.redirect_slug) {
                     setSuccess(t("adminpanel.car_group.created") || "CarGroup group created successfully.");
                     setError(null);
                     setTimeout(() => {
-                        const base = `/${i18n.language}/${t("address.adminpanel")}/${t("address.cars")}`;
-                        window.location.href = `${base}/${res.data.redirect_id}`;
+                        const base = `/${i18n.language}/${t("address.adminpanel")}/${t("address.car_groups")}`;
+                        router.visit(`${base}/${res.data.redirect_slug}`);
                     }, 1500);
                 } else {
                     setError(res.data.error || "An error occurred.");

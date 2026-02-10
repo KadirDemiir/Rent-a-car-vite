@@ -59,7 +59,7 @@ class CarController extends Controller
     public function addCar(Request $request)
     {
         $validated = $request->validateWithBag('err', [
-            'plate_number' => 'required|string|max:255|unique:cars,plate_number',
+            'plate_number' => 'required|string|max:255|',
             'brand' => 'required|json',
             'model' => 'required|json',
             'exact_year' => 'required|integer',

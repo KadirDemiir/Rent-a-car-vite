@@ -13,7 +13,7 @@
     src: url('/public/fonts/instrument-sans/instrument-sans-500.woff2') format('woff2');
     font-weight: 500;
     font-style: normal;
-    font-display: optional;
+    font-display: swap;
 }
 
 @font-face {

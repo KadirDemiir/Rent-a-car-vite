@@ -15,7 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withSchedule(function (Schedule $schedule) {
         // Sync currency rates every hour
-        $schedule->command('currency:sync')->hourly();
+        $schedule->command('currency:sync')
+            ->weekdays()
+            ->dailyAt('15:35')
+            ->timezone('Europe/Istanbul');
     })
     ->withMiddleware(function (Middleware $middleware) {
 /*         $middleware->trustProxies(at: [

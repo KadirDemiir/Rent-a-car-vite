@@ -13,7 +13,7 @@ export default function FormInput({ name, label, value, onChange, type = "text",
                 type="text"
                 required={required}
                 name={name}
-                value={value || ""}
+                value={value === 0 ? 0 : (value || "")}
                 onChange={(type === "number") ? handleChangeNumber : onChange}
                 className={`w-full bg-white border rounded-xl p-2  outline-none
                     ${error ? "border-red-500" : "border-gray-300"}`}

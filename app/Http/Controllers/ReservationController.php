@@ -35,7 +35,7 @@ class ReservationController extends Controller
 
         $reqStart = Carbon::parse($request->startDateTime);
         $reqEnd = Carbon::parse($request->finishDateTime);
-        $bufferHours = 4;
+        $bufferHours = 7;
 
         if ($reqStart >= $reqEnd || $reqStart->isPast()) {
             return to_route('home');
@@ -51,6 +51,7 @@ class ReservationController extends Controller
             'seat_count',
             'trunk_capacity',
             'deposit',
+            'online_discount',
             'sort_order',
         ])
             ->with([
@@ -216,6 +217,8 @@ class ReservationController extends Controller
             'daily_discount_amount' => $discountData['amount'] ?? 0,
             'final_daily_price' => $discountedDailyPrice,
             'total_rental_price' => $totalRentalPrice,
+            'online_discount_amount' => $group->online_discount ?? 0,
+            'onlineTotal' => ($totalRentalPrice + $dropPriceValue) * (1 - $group->online_discount),
             'drop_price' => $dropPriceValue,
             'grand_total' => $totalRentalPrice + $dropPriceValue,
         ];
@@ -288,6 +291,12 @@ class ReservationController extends Controller
         }
 
         $startDateTime = Carbon::parse($validated['startDateTime']);
+        $finishDateTime = Carbon::parse($validated['finishDateTime']);
+
+        $dayCount = $startDateTime->diffInDays($finishDateTime);
+        $diffHours = $startDateTime->diffInHours($finishDateTime) % 24;
+        if ($diffHours > 3) $dayCount += 1;
+        if ($dayCount == 0) $dayCount = 1;
 
         $car = CarGroup::with([
             'photos',
@@ -308,7 +317,9 @@ class ReservationController extends Controller
             ->where('to_location_id', $validated['RLocation'])
             ->first();
 
-        $this->CalcPrice($car, $validated['startDateTime'], $validated['finishDateTime'], $validated['PULocation'], $validated['RLocation'], $drop);
+        $discountRules = $this->getApplicableDiscounts(collect([$car]), $startDateTime, $finishDateTime, $dayCount);
+
+        $this->CalcPriceOptimized($car, $startDateTime, $finishDateTime, $drop, $dayCount, $discountRules);
 
         return Inertia::render('SelectExtras', [
             'car' => $car,
@@ -324,7 +335,7 @@ class ReservationController extends Controller
     }
 
 
-public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, $rLocationId, $drop = null)
+    public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, $rLocationId, $drop = null)
 {
     $start = Carbon::parse($startDateTime);
     $finish = Carbon::parse($finishDateTime);
@@ -459,6 +470,7 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
 
     public function createReservation(Request $request)
     {
+        //dd($request->all());
         try {
             $validated = $request->validate([
                 'car_group_id' => 'required|exists:car_groups,id',
@@ -482,6 +494,8 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
                 'user_info.return_flight_no' => 'nullable|string',
                 'extras' => 'nullable|json',
                 'lang' => 'required|string',
+                'pay_online' => 'nullable|boolean',
+                'online_discount_amount' => 'nullable|numeric|min:0|max:1',
             ]);
 
             DB::beginTransaction();
@@ -513,8 +527,15 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
 
             $rental_cost = $validated['total_days'] * $discountedDailyPrice;
 
-            $total_price = $rental_cost + $drop_cost + $extras_total_price;
+            $total_price = $rental_cost + $drop_cost;
             $total_price = max(0, $total_price);
+
+            // Apply online discount if paying online
+            $payOnline = $validated['pay_online'] ?? false;
+            $onlineDiscountRate = $validated['online_discount_amount'] ?? 0;
+            if ($payOnline && $onlineDiscountRate > 0) {
+                $total_price = $total_price * (1 - $onlineDiscountRate);
+            }
 
             $exchange_rate = \App\Models\Currency::findOrFail($validated['currency_id'])->exchange_rate;
 
@@ -533,13 +554,16 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
                 'discount_amount' => $totalDiscountAmount,
                 'discount_type' => $discountRule ? $discountRule->discount_type : null,
                 'discount_target' => $discountRule ? $discountRule->target_type : null,
-                'total_price' => $total_price,
+                'online_discount_amount' => $validated['online_discount_amount'] ?? 0,
+                'total_price' => $total_price + ($extras_total_price * $validated['total_days']),
                 'name' => $validated['user_info']['name'],
                 'surname' => $validated['user_info']['surname'],
                 'email' => $validated['user_info']['email'],
                 'phone_number' => $validated['user_info']['phone'],
                 'address' => $validated['user_info']['address'],
                 'notes' => $validated['user_info']['notes'],
+                'payment_type' => $payOnline ? 'credit_card' : 'cash',
+                'locale' => $validated['lang'],
                 'birthday' => $validated['user_info']['birthday'],
                 'arrival_flight_no' => $validated['user_info']['arrival_flight_no'] ?? null,
                 'return_flight_no' => $validated['user_info']['return_flight_no'] ?? null,
@@ -558,13 +582,12 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
             DB::commit();
             $reservation->refresh();
 
-            $reservation->load(['carGroup.brandKey:id,key', 'carGroup.modelKey:id,key', 'pickupLocation:id,name', 'returnLocation:id,name', 'currency:id,symbol']);
-            $lang_id = \App\Models\Language::where('code', $validated['lang'])->first()->id;
-
+            $reservation->load(['carGroup', 'pickupLocation:id,name', 'returnLocation:id,name', 'currency:id,symbol']);
+            $names = json_decode($reservation->carGroup->name, true);
             $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_created', [
                 'user_name' => $reservation->name,
                 'reference_code' => $reservation->reference_code,
-                'car_name' => Translation::where('language_id', $lang_id)->where('translation_key_id', $reservation->carGroup->brandKey->id)->first()->value . ' ' . Translation::where('language_id', $lang_id)->where('translation_key_id', $reservation->carGroup->modelKey->id)->first()->value,
+                'car_name' => $names[$validated['lang']],
                 'tracking_url'   => $reservation->tracking_url,
                 'pickup_location' => $reservation->pickupLocation->name,
                 'return_location' => $reservation->returnLocation->name,
@@ -576,7 +599,8 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
 
             return response()->json([
                 'success' => true,
-                'reference_code' => $reservation->reference_code
+                'token' => $reservation->token,
+                'payment_type' => $reservation->payment_type
             ], 201);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -630,19 +654,12 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
         $lang = \App\Models\Language::where('code', $langCode)->first();
         $lang_id = $lang ? $lang->id : 1;
 
-        $reservation->load(['carGroup.brandKey', 'carGroup.modelKey', 'pickupLocation', 'returnLocation', 'currency']);
-        $brandName = Translation::where('language_id', $lang_id)
-            ->where('translation_key_id', $reservation->carGroup->brandKey->id)
-            ->value('value');
-
-        $modelName = Translation::where('language_id', $lang_id)
-            ->where('translation_key_id', $reservation->carGroup->modelKey->id)
-            ->value('value');
-
-        $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_decline', [
+        $reservation->load(['carGroup', 'pickupLocation:id,name', 'returnLocation:id,name', 'currency:id,symbol']);
+        $names = json_decode($reservation->carGroup->name, true);
+        $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_rejected', [
             'user_name' => $reservation->name,
             'reference_code' => $reservation->reference_code,
-            'car_name' => $brandName . ' ' . $modelName,
+            'car_name' => $names[$langCode],
             'pickup_location' => $reservation->pickupLocation->name,
             'return_location' => $reservation->returnLocation->name,
             'pickup_date' => $reservation->pickup_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
@@ -665,29 +682,20 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
         $reservation->payment_status = 'paid';
         $reservation->save();
 
-        $lang = \App\Models\Language::where('code', $validated['lang'])->first();
-        $lang_id = $lang ? $lang->id : 1;
+        $reservation->load(['carGroup', 'pickupLocation:id,name', 'returnLocation:id,name', 'currency:id,symbol']);
+        $names = json_decode($reservation->carGroup->name, true);
 
-        $reservation->load(['carGroup.brandKey', 'carGroup.modelKey', 'pickupLocation', 'returnLocation', 'currency']);
-        $brandName = Translation::where('language_id', $lang_id)
-            ->where('translation_key_id', $reservation->carGroup->brandKey->id)
-            ->value('value');
-
-        $modelName = Translation::where('language_id', $lang_id)
-            ->where('translation_key_id', $reservation->carGroup->modelKey->id)
-            ->value('value');
-
-        $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_confirmation', [
+        $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_approved', [
             'user_name' => $reservation->name,
             'reference_code' => $reservation->reference_code,
-            'car_name' => $brandName . ' ' . $modelName,
+            'car_name' => $names[$validated['lang']],
             'tracking_url'   => $reservation->tracking_url,
             'pickup_location' => $reservation->pickupLocation->name,
             'return_location' => $reservation->returnLocation->name,
             'pickup_date' => $reservation->pickup_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
             'return_date' => $reservation->return_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
             'total_price' => number_format($reservation->total_price * $reservation->exchange_rate, 2, ',', '.') . ' ' . $reservation->currency->symbol,
-            'lang' => $lang->code
+            'lang' => $reservation->locale ?? $validated['lang']
         ]));
 
         return response()->json(['success' => 'Reservation confirmed'], 200);
@@ -724,27 +732,19 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
 
         $reservation->load(['carGroup.brandKey', 'carGroup.modelKey', 'pickupLocation', 'returnLocation', 'currency']);
 
-        $lang = \App\Models\Language::where('code', $langCode)->first();
-        $lang_id = $lang ? $lang->id : 1;
+        $reservation->load(['carGroup', 'pickupLocation:id,name', 'returnLocation:id,name', 'currency:id,symbol']);
+        $names = json_decode($reservation->carGroup->name, true);
 
-        $brandName = Translation::where('language_id', $lang_id)
-            ->where('translation_key_id', $reservation->carGroup->brandKey->id)
-            ->value('value');
-
-        $modelName = Translation::where('language_id', $lang_id)
-            ->where('translation_key_id', $reservation->carGroup->modelKey->id)
-            ->value('value');
-
-        $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_cancelled', [
+        $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_rejected', [
             'user_name' => $reservation->name,
             'reference_code' => $reservation->reference_code,
-            'car_name' => $brandName . ' ' . $modelName,
+            'car_name' => $names[$langCode],
             'pickup_location' => $reservation->pickupLocation->name,
             'return_location' => $reservation->returnLocation->name,
             'pickup_date' => $reservation->pickup_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
             'return_date' => $reservation->return_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
             'total_price' => number_format($reservation->total_price * $reservation->exchange_rate, 2, ',', '.') . ' ' . $reservation->currency->symbol,
-            'lang' => $langCode
+            'lang' => $reservation->locale ?? $langCode
         ]));
 
         $reservations = Reservation::where('email', $user->email)
@@ -861,29 +861,19 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
         $reservation->status = 'cancelled';
         $reservation->save();
 
-        $reservation->load(['carGroup.brandKey', 'carGroup.modelKey', 'pickupLocation', 'returnLocation', 'currency']);
-        $langCode = $validated['lang'] ?? app()->getLocale() ?? 'en';
-        $lang = \App\Models\Language::where('code', $langCode)->first();
-        $lang_id = $lang ? $lang->id : 1;
+        $reservation->load(['carGroup', 'pickupLocation:id,name', 'returnLocation:id,name', 'currency:id,symbol']);
+        $names = json_decode($reservation->carGroup->name, true);
 
-        $brandName = Translation::where('language_id', $lang_id)
-            ->where('translation_key_id', $reservation->carGroup->brandKey->id)
-            ->value('value');
-
-        $modelName = Translation::where('language_id', $lang_id)
-            ->where('translation_key_id', $reservation->carGroup->modelKey->id)
-            ->value('value');
-
-        $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_decline', [
+        $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_rejected', [
             'user_name' => $reservation->name,
             'reference_code' => $reservation->reference_code,
-            'car_name' => $brandName . ' ' . $modelName,
+            'car_name' => $names[$validated['langCode']],
             'pickup_location' => $reservation->pickupLocation->name,
             'return_location' => $reservation->returnLocation->name,
             'pickup_date' => $reservation->pickup_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
             'return_date' => $reservation->return_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
             'total_price' => number_format($reservation->total_price * $reservation->exchange_rate, 2, ',', '.') . ' ' . $reservation->currency->symbol,
-            'lang' => $langCode
+            'lang' => $reservation->locale ?? $validated['langCode']
         ]));
 
         if ($request->wantsJson()) {
@@ -972,7 +962,7 @@ public function CalcPrice($car, $startDateTime, $finishDateTime, $puLocationId, 
     public function track($token)
     {
         $reservation = Reservation::where('token', $token)
-            ->with(['carGroup.photos', 'pickupLocation', 'returnLocation', 'carGroup.brandKey', 'carGroup.modelKey', 'currency', 'extras.extra'])
+            ->with(['carGroup.photos', 'pickupLocation', 'returnLocation', 'carGroup', 'currency', 'extras.extra'])
             ->firstOrFail();
 
         return inertia('GuestReservationDetails', [

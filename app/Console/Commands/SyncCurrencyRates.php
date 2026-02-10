@@ -80,7 +80,7 @@ class SyncCurrencyRates extends Command
             $this->info("Successfully updated {$updated} currencies");
             Log::info("Currency rates synced: {$updated} currencies updated");
 
-            return Command::SUCCESS;
+                return Command::SUCCESS;
 
         } catch (\Exception $e) {
             $this->error('Failed to sync: ' . $e->getMessage());

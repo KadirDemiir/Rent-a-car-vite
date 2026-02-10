@@ -7,7 +7,7 @@ import LanguageProgress from "../../LanguageProgress.jsx";
 /**
  * CarVehicleForm - Reusable form component for individual car/vehicle fields
  * Used in both AddCar and IndexCar pages
- * 
+ *
  * @param {Object} form - Form data object (includes brand, model as language-keyed objects)
  * @param {Function} onChange - Handler for input changes
  * @param {Function} onSelect - Handler for select changes
@@ -34,9 +34,9 @@ export default function CarVehicleForm({
         ? languages.map(l => ({ label: l.name || l.label, value: l.code || l.value }))
         : [{ label: "English", value: "en" }, { label: "Turkish", value: "tr" }];
 
-    const locationOptions = locations.map((loc) => ({ 
-        label: loc.name, 
-        value: loc.id 
+    const locationOptions = locations.map((loc) => ({
+        label: loc.name,
+        value: loc.id
     }));
 
     const statusOptions = [
@@ -57,18 +57,18 @@ export default function CarVehicleForm({
     const isLanguageFilled = (langValue) => {
         return form.brand?.[langValue]?.trim() && form.model?.[langValue]?.trim();
     };
-
+    console.log(form);
     return (
         <div className="space-y-4">
             {/* Brand/Model with Language Support */}
             {showBrandModel && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="col-span-1 md:col-span-2">
-                        <LanguageProgress 
-                            langOpt={supportedLangs} 
+                        <LanguageProgress
+                            langOpt={supportedLangs}
                             calculateProgress={calculateProgress}
                             isLanguageFilled={isLanguageFilled}
-                            lang={currentLang} 
+                            lang={currentLang}
                             setLang={setCurrentLang}
                         />
                     </div>
@@ -139,7 +139,7 @@ export default function CarVehicleForm({
                         name="current_km"
                         label={t("adminpanel.car.current_km") || "Current KM"}
                         type="number"
-                        value={form.current_km || ""}
+                        value={form.current_km }
                         onChange={onChange}
                         placeholder="e.g. 15000"
                         disabled={disabled}

@@ -3,18 +3,21 @@ import { usePage } from "@inertiajs/react";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 
-export default function CarModify({ closeModal = null, car = null, setCar }) {
+export default function CarModify({ closeModal = null, car = null, setCar, setSuccess }) {
     const { t, i18n } = useTranslation();
     const { success, error } = usePage().props;
 
     const handleSubmit = async (data) => {
+        console.log("Submitting data:", Object.fromEntries(data.entries()));
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         try {
             const res = await axios.post(`/adminpanel/car_groups/${car.id}`, data, {
                 headers: { 'X-CSRF-TOKEN': csrfToken },
             });
-            setCar(res.data.car);
             closeModal();
+            setSuccess("Başarıyla güncellendi");
+            setCar(res.data.car);
+            setTimeout(() => setSuccess(""), 10000);
         } catch (error) {
             console.error(error);
             closeModal();

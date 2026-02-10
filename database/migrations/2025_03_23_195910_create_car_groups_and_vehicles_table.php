@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('body_type_id')->constrained('body_types')->onDelete('restrict');
             $table->unsignedTinyInteger('seat_count');
             $table->unsignedSmallInteger('trunk_capacity');
+            $table->foreignId('slug_translation_key_id')->constrained('translation_keys')->onDelete('cascade');
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
 

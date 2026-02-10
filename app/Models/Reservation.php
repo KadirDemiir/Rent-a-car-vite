@@ -33,6 +33,7 @@ class Reservation extends Model
         'discount_amount',
         'discount_type',
         'discount_target',
+        'online_discount_amount',
         'total_price',
         'currency_id',
         'exchange_rate',
@@ -43,6 +44,7 @@ class Reservation extends Model
         'return_flight_no',
         'payment_type',
         'notes',
+        'locale',
         'payment_status',
         'status',
     ];
@@ -56,6 +58,10 @@ class Reservation extends Model
         'daily_price' => 'decimal:2',
     ];
 
+    protected $guarded = [
+        'updated_at',
+        'created_at',
+    ];
     protected $appends = ['tracking_url'];
 
     protected static function booted()
@@ -126,21 +132,17 @@ class Reservation extends Model
 
     public function scopeUpcoming($query)
     {
-        return $query->where('status', 'confirmed')
-            ->where(function ($q) {
-                $q->where('pickup_datetime', '>=', now())
-                  ->orWhereDate('return_datetime', '>=', now());
-            });
+        return $query->where('status', 'confirmed');
     }
 
     public function scopeActiveRentals($query)
     {
-        return $query->where('status', 'active')->whereDate('return_datetime', '>=', now());
+        return $query->where('status', 'active')->whereDate('return_datetime', '>', now());
     }
 
     public function scopeLateReturns($query)
     {
-        return $query->whereDate('return_datetime', '<', now())
+        return $query->whereDate('return_datetime', '<=', now())
             ->where('status', 'active');
     }
 }

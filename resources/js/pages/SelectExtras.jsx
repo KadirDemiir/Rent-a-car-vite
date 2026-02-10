@@ -9,8 +9,10 @@ import axios from "axios";
 import ReservationDatePreview from "../components/websites/reservation/ReservationDatePreview.jsx";
 import IncludedServices from "../components/websites/reservation/create-reservation/IncludeServicesList.jsx";
 import { useCurrency } from "../providers/CurrencyContext.jsx";
+import {router} from "@inertiajs/react";
 
 export default function SelectExtras({car, auth_user, params}){
+    console.log(car);
     const {t, i18n} = useTranslation();
     const {current} = useCurrency();
     const [selectedExtras, setSelectedExtras] = useState([]);
@@ -50,10 +52,10 @@ export default function SelectExtras({car, auth_user, params}){
     const validateIdentity = (value) => value.length !== 11 ? '*'+t("website.auth.signup.invalid_identity") : '';
     const validateRequired = (value) => value.trim() === '' ? '*'+t("website.auth.signup.this_area_cannot_be_empty") : '';
 
-    const handleSubmit =  () => {
+    const handleSubmit =  (payOnline = false) => {
         setError("");
         setShowErrors(true);
-        
+
         // Validate all fields and set errors
         const validationErrors = {
             name: validateName(user.name || ''),
@@ -67,9 +69,9 @@ export default function SelectExtras({car, auth_user, params}){
             returnFlightNo: '',
             notes: ''
         };
-        
+
         setUserErrors(validationErrors);
-        
+
         const requiredFields = ['name', 'surname', 'mail', 'phone', 'address', 'birthday', 'identity'];
         let hasError = false;
         let firstErrorMessage = "";
@@ -99,6 +101,8 @@ export default function SelectExtras({car, auth_user, params}){
             start_date_time: params.startDateTime,
             finish_date_time: params.finishDateTime,
             extras: JSON.stringify(selectedExtras),
+            pay_online: payOnline,
+            online_discount_amount: car.calculated_price.online_discount_amount ?? 0,
             user_info: {
                 name: user.name,
                 surname: user.surname,
@@ -114,7 +118,7 @@ export default function SelectExtras({car, auth_user, params}){
         };
         axios.post('/create-reservation', submissionData, )
             .then(res => {
-                alert('Reservation successfully created!');
+                router.visit(`/r/track/${res.data.token}`);
             })
             .catch(error => {
                 if (error.response) {
@@ -132,9 +136,9 @@ export default function SelectExtras({car, auth_user, params}){
     return(
         <>
             <Navbar/>
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-gray-50 py-8 px-4">
+            <div className="min-h-screen bg-linear-to-br from-gray-50 via-blue-50 to-gray-50 py-8 px-4">
                 <div className="max-w-7xl mx-auto">
-                     
+
 {/*                     <div className="mb-8 bg-white rounded-xl shadow-sm p-4">
                         <div className="flex items-center justify-center gap-4">
                              <div className="flex items-center gap-2">
@@ -145,7 +149,7 @@ export default function SelectExtras({car, auth_user, params}){
                             <div className="flex items-center gap-2">
                                 <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">2</div>
                                 <span className="hidden sm:inline text-sm font-medium text-blue-600">...</span>
-                            </div> 
+                            </div>
                         </div>
                     </div>  */}
 
@@ -161,20 +165,22 @@ export default function SelectExtras({car, auth_user, params}){
                         {/* Sidebar */}
                         <div className="lg:col-span-1">
                             <div className="sticky top-4 space-y-4">
-                                <ReservationDatePreview 
-                                    pickupDate={params.startDateTime} 
-                                    returnDate={params.finishDateTime} 
-                                    pickupLocation={params.PULocation.name} 
+                                <ReservationDatePreview
+                                    pickupDate={params.startDateTime}
+                                    returnDate={params.finishDateTime}
+                                    pickupLocation={params.PULocation.name}
                                     returnLocation={params.RLocation.name}
                                 />
-                                
-                                <PriceInformationCard 
+
+                                <PriceInformationCard
                                     drop_price={car.drop_price ?? 0}
-                                    total_days={car.total_days} 
-                                    daily_price={car.calculated_price.final_daily_price} 
-                                    extra_price={Object.values(selectedExtras).reduce((sum, se) => sum + (se.price ?? 0) * (se.count ?? 1), 0)}
+                                    total_days={car.total_days}
+                                    daily_price={car.calculated_price.final_daily_price}
+                                    extra_price={Object.values(selectedExtras).reduce((sum, se) => sum + (se.price ?? 0) * (se.count ?? 1), 0) * car.total_days}
+                                    totalPrice={car.calculated_price.grand_total ?? 0}
+                                    onlineTotal={car.calculated_price.onlineTotal ?? 0}
                                 />
-                                
+
                                 {error && (
                                     <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
                                         <div className="flex items-start gap-3">
@@ -185,10 +191,10 @@ export default function SelectExtras({car, auth_user, params}){
                                         </div>
                                     </div>
                                 )}
-                                
-                                <button 
-                                    onClick={handleSubmit} 
-                                    type="button" 
+
+                                <button
+                                    onClick={() => handleSubmit(false)}
+                                    type="button"
                                     disabled={isLoading}
                                     className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-blue-600 disabled:hover:to-blue-700 transform hover:scale-[1.02] active:scale-[0.98]"
                                 >
@@ -206,6 +212,30 @@ export default function SelectExtras({car, auth_user, params}){
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                             Ofiste Öde
+                                        </span>
+                                    )}
+                                </button>
+
+                                <button
+                                    onClick={() => handleSubmit(true)}
+                                    type="button"
+                                    disabled={isLoading}
+                                    className="w-full px-6 py-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-green-600 disabled:hover:to-green-700 transform hover:scale-[1.02] active:scale-[0.98]"
+                                >
+                                    {isLoading ? (
+                                        <span className="flex items-center justify-center gap-3">
+                                            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            {t('website.reservation.processing', 'İşleniyor...')}
+                                        </span>
+                                    ) : (
+                                        <span className="flex items-center justify-center gap-2">
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                            </svg>
+                                            Pay Now
                                         </span>
                                     )}
                                 </button>

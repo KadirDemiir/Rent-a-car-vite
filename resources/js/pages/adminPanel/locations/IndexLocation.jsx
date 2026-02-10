@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../../../components/adminPanel/navbar/Navbar.jsx";
 import LocationAdd from "../../../components/adminPanel/locations/LocationAdd.jsx";
-import CarTable from "../../../components/adminPanel/car/CarTable.jsx";
+import VehicleTable from "../../../components/adminPanel/car/CarTable/VehicleTable.jsx";
 
 export default function IndexLocation({ id }) {
     const [location, setLocation] = useState(null);
@@ -13,7 +13,6 @@ export default function IndexLocation({ id }) {
     const [latitude, setLatitude] = useState(0);
     const [longitude, setLongitude] = useState(0);
     const [formData, setFormData] = useState({ name: '', city: '', phone: '', email: '', address: '', image: null });
-
     useEffect(() => {
         fetchData();
     }, [id]);
@@ -23,7 +22,7 @@ export default function IndexLocation({ id }) {
             setLoading(true);
             const response = await axios.get(`/adminpanel/get-info/locations/${id}`);
             console.log("Lokasyon verisi:", response.data);
-            
+
             const loc = response.data.location;
             setLocation(loc);
             setLocations(response.data.locations);
@@ -106,7 +105,7 @@ export default function IndexLocation({ id }) {
                         Bu Ofise Ait Araçlar
                     </div>
                     <div className="shadow-xl bg-white rounded-3xl overflow-hidden border border-slate-100">
-                        <CarTable cars={location?.cars || []} />
+                        <VehicleTable vehicles={location?.cars || []} />
                     </div>
                 </section>
             </div>

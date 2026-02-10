@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import  { useRef } from "react";
 import CarDetailForm from "./CarDetailForm.jsx";
 import CarPricingForm from "./CarPricingForm.jsx";
 import CarPhotoForm from "./CarPhotoForm.jsx";
@@ -13,27 +13,44 @@ export default function CarForm({ car = null, mode, onSubmit }) {
     const handleSubmit = () => {
         let combined = new FormData();
         combined.append('mode', mode);
+
         if (mode === "create") {
             const detailData = detailRef.current.submit();
             const pricingData = pricingRef.current.submit();
             const photoData = photoRef.current.submit();
+
             if (!detailData || !pricingData || !photoData) return;
+
             for (let pair of detailData.entries()) combined.append(pair[0], pair[1]);
             for (let pair of pricingData.entries()) combined.append(pair[0], pair[1]);
             for (let pair of photoData.entries()) combined.append(pair[0], pair[1]);
+
         } else if (mode === "edit") {
             const detailData = detailRef.current.submit();
-            if (detailData)
+            if (detailData) {
                 for (let pair of detailData.entries()) combined.append(pair[0], pair[1]);
+            } else {
+                return;
+            }
+
         } else if (mode === "pricing") {
+            console.log("Submitting pricing data...");
             const pricingData = pricingRef.current.submit();
-            if (pricingData)
+            if (pricingData) {
                 for (let pair of pricingData.entries()) combined.append(pair[0], pair[1]);
+            } else {
+                return;
+            }
+
         } else if (mode === "photo") {
             const photoData = photoRef.current.submit();
-            if (photoData)
+            if (photoData) {
                 for (let pair of photoData.entries()) combined.append(pair[0], pair[1]);
+            } else {
+                return;
+            }
         }
+
         if (combined.entries().next().done) return;
         onSubmit(combined);
     };

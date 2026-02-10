@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class CarGroup extends Model
+class   CarGroup extends Model
 {
 
     protected $fillable = [
@@ -14,6 +14,7 @@ class CarGroup extends Model
         'segment_id',
         'cover_image',
         'deposit',
+        'online_discount',
         'features',
         'transmission_id',
         'fuel_id',
@@ -22,6 +23,7 @@ class CarGroup extends Model
         'seat_count',
         'trunk_capacity',
         'sort_order',
+        'slug_translation_key_id',
     ];
     protected $hidden = [
         'created_at',
@@ -46,6 +48,11 @@ class CarGroup extends Model
                 'currency:id,code,symbol',
                 'carGroup:id,segment_id,fuel_id,transmission_id',
             ]);
+    }
+
+    public function translationKey()
+    {
+        return $this->belongsTo(TranslationKey::class, 'slug_translation_key_id');
     }
 
     public function photos(): HasMany

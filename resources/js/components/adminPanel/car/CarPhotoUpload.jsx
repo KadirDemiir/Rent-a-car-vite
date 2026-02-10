@@ -4,7 +4,7 @@ import axios from "axios";
 export default function CarPhotoUpload({ car, closeModal, setCar, setSuccess }) {
     const submitHandler = (data) => {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        axios.post(`/adminpanel/cars/${car.id}`, data, {
+        axios.post(`/adminpanel/car_groups/${car.id}`, data, {
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
             }
@@ -13,6 +13,7 @@ export default function CarPhotoUpload({ car, closeModal, setCar, setSuccess }) 
                 closeModal();
                 setSuccess("Başarıyla güncellendi");
                 setCar(res.data.car);
+                setTimeout(() => setSuccess(""), 10000);
             }).catch(e => console.error(e.response?.data?.error));
     };
 
