@@ -75,14 +75,14 @@ export default function GuestReservationDetails({ reservation: initialReservatio
                     </div>
 
                     <div className="p-6">
-                        {/* Car Details Info Block */}
+                        {/* CarGroup Details Info Block */}
                         <div className="flex flex-col md:flex-row gap-8 mb-8">
                             <div className="w-full md:w-1/3">
                                 <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden bg-gray-100 mb-4">
-                                     {reservation.car.photos && reservation.car.photos.length > 0 ? (
+                                     {reservation.carGroup?.photos && reservation.carGroup?.photos.length > 0 ? (
                                         <img
-                                            src={`/storage/${reservation.car.photos[0].photo_path}`}
-                                            alt={reservation.car.brandKey?.key + ' ' + reservation.car.modelKey?.key}
+                                            src={`/storage/${reservation.carGroup?.photos[0].photo_path}`}
+                                            alt={reservation.carGroup?.brandKey?.key + ' ' + reservation.carGroup?.modelKey?.key}
                                             className="object-cover w-full h-full"
                                             loading="lazy"
                                         />
@@ -91,7 +91,7 @@ export default function GuestReservationDetails({ reservation: initialReservatio
                                     )}
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-800 text-center">
-                                    {reservation.car.brandKey?.key} {reservation.car.modelKey?.key}
+                                    {reservation.carGroup?.brandKey?.key} {reservation.carGroup?.modelKey?.key}
                                 </h3>
                             </div>
 

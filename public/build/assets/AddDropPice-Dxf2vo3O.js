@@ -1,0 +1,1 @@
+import{j as r}from"./app-DTOUyN4q.js";import{N as o}from"./Navbar-CKbXoiCY.js";import"./vendor-inertia-B45ElSyl.js";/* empty css            */import"./vendor-i18n-Chr7C2QM.js";import"./CurrencyDropDown-DrwZjNT1.js";function e(){return r.jsx("div",{className:"w-full h-600",children:r.jsx(o,{})})}export{e as default};

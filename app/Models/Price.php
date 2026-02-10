@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Price extends Model
 {
     protected $fillable = [
-        'car_id',
+        'car_group_id',
         'month',
         'min_days',
         'max_days',
@@ -17,16 +17,16 @@ class Price extends Model
         'is_active',
     ];
 
-    public function car()
+    public function carGroup()
     {
-        return $this->belongsTo(Car::class);
+        return $this->belongsTo(CarGroup::class, 'car_group_id');
     }
 
     protected static function booted()
     {
         static::saving(function ($price) {
             if ($price->is_active) {
-                $exists = static::where('car_id', $price->car_id)
+                $exists = static::where('car_group_id', $price->car_group_id)
                     ->where('month', $price->month)
                     ->where('min_days', $price->min_days)
                     ->where('max_days', $price->max_days)
@@ -41,7 +41,8 @@ class Price extends Model
         });
     }
 
-    public function currency(){
+    public function currency()
+    {
         return $this->belongsTo(Currency::class);
     }
 }

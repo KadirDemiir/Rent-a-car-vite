@@ -78,7 +78,7 @@ const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen = false }, ref) 
             const fd = new FormData();
             fd.append("deposit", formData.deposit);
             fd.append("price", JSON.stringify(formData.price));
-            fd.append("currency", formData.currency);
+            fd.append("currency", 1);
             return fd;
         },
     }));

@@ -9,7 +9,7 @@ const CarPhotoForm = forwardRef(({ defPhotos, maxFiles = 4, onSubmit }, ref) => 
             url: p.url ? p.url : `/storage/${p.photo_path}`,
             photo_path: p.photo_path,
             is_cover: p.is_cover,
-            car_id: p.car_id,
+            car_group_id: p.car_group_id,
         }))
     );
     const [coverIndex, setCoverIndex] = useState(() =>

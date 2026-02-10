@@ -13,30 +13,14 @@ return new class extends Migration
     {
         // Reservations table - critical for availability checks
         Schema::table('reservations', function (Blueprint $table) {
-            // Composite index for availability checking (most important for performance)
-            $table->index(['car_id', 'status', 'pickup_datetime', 'return_datetime'], 'reservations_availability_idx');
             // Index for location-based queries
             $table->index(['return_location_id', 'return_datetime'], 'reservations_return_location_idx');
-        });
-
-        // Cars table
-        Schema::table('cars', function (Blueprint $table) {
-            // Index for filtering and sorting
-            $table->index(['status', 'sort_order'], 'cars_status_sort_idx');
-            $table->index('current_location_id', 'cars_current_location_idx');
-        });
-
-        // Prices table - frequently queried for pricing
-        Schema::table('prices', function (Blueprint $table) {
-            // Composite index for price lookups
-            $table->index(['car_id', 'is_active', 'month', 'min_days', 'max_days'], 'prices_car_lookup_idx');
         });
 
         // Discounts table
         Schema::table('discounts', function (Blueprint $table) {
             // Composite index for discount lookups
             $table->index(['status', 'start_date', 'end_date', 'min_days', 'max_days'], 'discounts_date_range_idx');
-            $table->index(['target_type', 'car_id'], 'discounts_target_car_idx');
             $table->index(['target_type', 'segment_id'], 'discounts_target_segment_idx');
         });
 
@@ -58,22 +42,11 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('reservations', function (Blueprint $table) {
-            $table->dropIndex('reservations_availability_idx');
             $table->dropIndex('reservations_return_location_idx');
-        });
-
-        Schema::table('cars', function (Blueprint $table) {
-            $table->dropIndex('cars_status_sort_idx');
-            $table->dropIndex('cars_current_location_idx');
-        });
-
-        Schema::table('prices', function (Blueprint $table) {
-            $table->dropIndex('prices_car_lookup_idx');
         });
 
         Schema::table('discounts', function (Blueprint $table) {
             $table->dropIndex('discounts_date_range_idx');
-            $table->dropIndex('discounts_target_car_idx');
             $table->dropIndex('discounts_target_segment_idx');
         });
 

@@ -16,25 +16,30 @@ export default function Categories({clickHandle, index, isOpenSection, menuSecti
 
             {isOpenSection && (
                 <ul className="ml-8 mt-2 text-sm text-white space-y-2">
-                    {menuSection.subSec.map((sec) => {
-                        const hrefNormalized = sec.href.toLowerCase().replace(/\s+/g, '');
-                        const isActive = currentPath === hrefNormalized;
+                    {(() => {
+                        const firstMatchingSection = menuSection.subSec.find((sec) => {
+                            const hrefNormalized = sec.href.toLowerCase().replace(/\s+/g, '');
+                            return currentPath === hrefNormalized || currentPath.startsWith(`${hrefNormalized}/`);
+                        });
+                        return menuSection.subSec.map((sec) => {
+                            const isActive = firstMatchingSection === sec;
 
-                        return (
-                            <li key={sec.name}>
-                                <Link
-                                    href={sec.href}
-                                    preserveState={true}
-                                    preserveScroll={true}
-                                    className={`block cursor-pointer px-2 py-1 rounded-2xl hover:underline ${
-                                        isActive ? "bg-red-800" : ""
-                                    }`}
-                                >
-                                    {sec.name}
-                                </Link>
-                            </li>
-                        );
-                    })}
+                            return (
+                                <li key={sec.name}>
+                                    <Link
+                                        href={sec.href}
+                                        preserveState={true}
+                                        preserveScroll={true}
+                                        className={`block cursor-pointer px-2 py-1 rounded-2xl hover:underline ${
+                                            isActive ? "bg-red-800" : ""
+                                        }`}
+                                    >
+                                        {sec.name}
+                                    </Link>
+                                </li>
+                            );
+                        });
+                    })()}
                 </ul>
             )}
         </li>

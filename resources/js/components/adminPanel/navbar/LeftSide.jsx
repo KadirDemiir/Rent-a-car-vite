@@ -9,8 +9,10 @@ export default function LeftSide({ isOpen, onClose }) {
         {
             title: t("adminpanel.navigator.vehicle"),
             subSec: [
-                { name: t("adminpanel.navigator.vehicles"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.cars")}` },
-                { name: t("adminpanel.navigator.add_vehicles"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.cars")}/${t("address.add")}` },
+                { name: t("adminpanel.navigator.add_car_group") || "Add CarGroup Group", href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.car_groups")}/${t("address.add")}`},
+                { name: t("adminpanel.navigator.add_vehicles") || "Add CarGroup", href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.cars")}/${t("address.add")}` },
+                { name: t("adminpanel.navigator.car_groups") || "CarGroup Groups", href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.car_groups")}` },
+                { name: t("adminpanel.navigator.vehicles") || "CarGroups", href: `/${i18n.language}/${t("address.adminpanel")}/${t('address.cars')}` },
             ],
         },
         {
@@ -47,12 +49,12 @@ export default function LeftSide({ isOpen, onClose }) {
                 {name: t("adminpanel.navigator.locations"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.locations")}`},
             ]
         },
-        {
+/*        {
             title: t("adminpanel.navigator.users"),
             subSec: [
                 {name: t("adminpanel.navigator.users"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.users")}`}
             ]
-        },
+        },*/
         {
             title: t("adminpanel.navigator.email_templates"),
             subSec: [
@@ -112,13 +114,13 @@ export default function LeftSide({ isOpen, onClose }) {
                     {menuSections.map((menuSection, index) => (
                         <Categories
                             key={index}
-                        clickHandle={isOpenHandler}
-                        index={index}
-                        isOpenSection={isOpenSection[index]}
-                        menuSection={menuSection}
-                        setActiveSection={setActiveSection}
-                        activeSection={activeSection}
-                    />
+                            clickHandle={isOpenHandler}
+                            index={index}
+                            isOpenSection={isOpenSection[index]}
+                            menuSection={menuSection}
+                            setActiveSection={setActiveSection}
+                            activeSection={activeSection}
+                        />
                 ))}
             </ul>
         </div>

@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Locations extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'name',
         'parent_id',
@@ -33,9 +31,9 @@ class Locations extends Model
     {
         return $this->belongsTo(Locations::class, 'parent_id');
     }
-    public function cars()
+    public function vehicles()
     {
-        return $this->hasMany(Car::class, 'location_id');
+        return $this->hasMany(Car::class, 'current_location_id');
     }
 
     /*public function reservations()

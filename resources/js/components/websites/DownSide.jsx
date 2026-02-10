@@ -11,7 +11,7 @@ export default function DownSide({ isMobileMenuOpen }) {
             .join(' ');
     }
     return (
-        <nav className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:flex bg-gradient-to-r from-gray-600 to-gray-700 items-center justify-center`}>
+        <nav className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:flex bg-linear-to-r from-gray-600 to-gray-700 items-center justify-center`}>
             <ul className={`flex flex-col md:flex-row items-center justify-center gap-1 container mx-auto py-3 md:py-0`}>
                 <li className="w-full md:w-auto">
                     <Link href={`/${lang}/${t('address.cars')}`} className="block px-4 py-3 md:py-3.5 text-white hover:bg-blue-500 transition-colors rounded text-sm font-medium text-center">{upperFirstLetter(t('website.navigator.cars'))}</Link>

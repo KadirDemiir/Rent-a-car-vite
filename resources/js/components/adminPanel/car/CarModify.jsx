@@ -10,7 +10,7 @@ export default function CarModify({ closeModal = null, car = null, setCar }) {
     const handleSubmit = async (data) => {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         try {
-            const res = await axios.post(`/adminpanel/cars/${car.id}`, data, {
+            const res = await axios.post(`/adminpanel/car_groups/${car.id}`, data, {
                 headers: { 'X-CSRF-TOKEN': csrfToken },
             });
             setCar(res.data.car);

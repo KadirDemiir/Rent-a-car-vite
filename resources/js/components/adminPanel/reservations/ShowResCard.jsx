@@ -64,7 +64,7 @@ export default function ShowResCard({ res, updateData, closeModal, curr, past })
                             </dl>
                         </div>
 
-                        {/* Car Info Card */}
+                        {/* CarGroup Info Card */}
                         <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
                             <div className="flex justify-center items-center gap-2 mb-4 pb-2 border-b border-gray-100">
                                 <div className="p-2 bg-orange-50 text-orange-600 rounded-lg">
@@ -74,12 +74,12 @@ export default function ShowResCard({ res, updateData, closeModal, curr, past })
                                     </svg>
                                 </div>
                             </div>
-                            
-                            {res.car?.photos?.length > 0 && (
+
+                            {res.carGroup?.photos?.length > 0 && (
                                 <div className="mb-4 rounded-lg overflow-hidden h-32 w-full bg-gray-100">
-                                    <img 
-                                        src={`/storage/${res.car.photos.find(p => p.is_cover)?.photo_path || res.car.photos[0].photo_path}`} 
-                                        alt="Car" 
+                                    <img
+                                        src={`/storage/${res.carGroup?.photos.find(p => p.is_cover)?.photo_path || res.carGroup?.photos[0]?.photo_path}`}
+                                        alt="CarGroup"
                                         className="w-full h-full object-cover"
                                     />
                                 </div>
@@ -99,12 +99,17 @@ export default function ShowResCard({ res, updateData, closeModal, curr, past })
                                     };
                                     return (
                                         <>
-                                            <DetailItem label="ID" value={`#${res.car?.id || '-'}`} />
-                                            <DetailItem label={t("adminpanel.car.car_modify.edit_car_information.plate") || "Plaka"} value={res.car?.license_plate} />
-                                            <DetailItem label={t("adminpanel.car.car_modify.edit_car_information.brand")} value={t(res.car?.brand_key.key)} />
-                                            <DetailItem label={t("adminpanel.car.car_modify.edit_car_information.model")} value={t(res.car?.model_key.key)} />
-                                            <DetailItem label={t("adminpanel.car.car_modify.edit_car_information.year") || "Yıl"} value={res.car?.year} />
-                                            <DetailItem label={t("adminpanel.car.car_modify.edit_car_information.fuel_type") || "Yakıt"} value={t(`fuel.${res.car?.fuel_id}`)} />
+                                           {/* <DetailItem label="ID" value={`#${res.id || '-'}`} />*/}
+                                            <DetailItem label={t("adminpanel.car_group")} value={getTrans(res.car_group.name)} />
+                                            {res.assignedVehicle &&
+                                                <>
+                                                    <DetailItem label={t("adminpanel.car.car_modify.edit_car_information.plate") || "Plaka"} value={res.assignedVehicle?.plate_number ?? '—'} />
+                                                    <DetailItem label={t("adminpanel.car.car_modify.edit_car_information.brand")} value={`${t(res.assignedVehicle?.brandKey?.key)} ${t(res.assignedVehicle?.modelKey?.key)} ${res.assignedVehicle?.exact_year}`} />
+                                                    {/*<DetailItem label={t("adminpanel.car.car_modify.edit_car_information.model")} value={t(res.carGroup?.modelKey?.key)} />*/}
+                                                    {/*<DetailItem label={t("adminpanel.car.car_modify.edit_car_information.year") || "Yıl"} value={res.assignedVehicle?.exact_year ?? '—'} />*/}
+                                                </>
+                                            }
+                                            <DetailItem label={t("adminpanel.car.car_modify.edit_car_information.fuel_type") || "Yakıt"} value={t(`fuel.${res.carGroup?.fuel_id}`)} />
                                         </>
                                     );
                                 })()}
@@ -175,7 +180,7 @@ export default function ShowResCard({ res, updateData, closeModal, curr, past })
                     <div className="p-6 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
                         <ReservationAction closeModal={closeModal} updateData={updateData} res={res} />
                     </div>
-                )}x
+                )}
             </div>
         </div>
     );

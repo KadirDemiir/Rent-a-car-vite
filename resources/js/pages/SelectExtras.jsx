@@ -89,7 +89,7 @@ export default function SelectExtras({car, auth_user, params}){
         setIsLoading(true);
         const submissionData = {
             lang: i18n.language,
-            car_id: car.id,
+            car_group_id: car.id,
             drop_price: car.drop_price ?? 0,
             total_days: car.total_days,
             daily_price: car.daily_price,

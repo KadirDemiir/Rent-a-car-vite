@@ -14,7 +14,7 @@ use App\Http\Controllers\TranslationController;
 use App\Http\Controllers\TransmissionController;
 use App\Models\BodyType;
 use App\Models\Campaigns;
-use App\Models\Car;
+use App\Models\CarGroup;
 use App\Models\Currency;
 use App\Models\Discount;
 use App\Models\Fuel;
@@ -37,15 +37,15 @@ use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
-Route::get('/test', function () {
-    return app()->getLocale();
-});
+
 Route::get('/locales/{locale}/translation.json', [TranslationController::class, 'fetch'])
     ->name('translations.fetch');
 Route::middleware('admin')->group(function () {
     Route::post('/adminpanel/cars/update-sort', [AdminCarController::class, 'updateSortOrder'])->name('adminUpdateCarSort');
     Route::post('/adminpanel/car/add', [CarController::class, 'addCar'])->name('adminAddCar');
-    Route::post('/adminpanel/cars/{id}', [AdminCarController::class, 'updateCar'])->name('adminUpdateCar');
+    Route::post('/adminpanel/car-groups', [AdminCarController::class, 'storeCarGroup'])->name('adminStoreCarGroup');
+    Route::post('/adminpanel/car-groups/{id}/vehicles', [AdminCarController::class, 'storeVehicle'])->name('adminStoreVehicle');
+    Route::post('/adminpanel/car_groups/{id}', [AdminCarController::class, 'updateCarGroup'])->name('adminUpdateCar');
     Route::post('/adminpanel/locations/add', [LocationsController::class, 'addLocation'])->name('adminAddLocation');
     Route::post('/adminpanel/locations/update/{id}', [LocationsController::class, 'updateLocation'])->name('adminUpdateLocation');
     Route::post('/adminpanel/campaigns', [CampaignsController::class, 'deleteCampaign'])->name('adminDeleteCampaign');
@@ -69,19 +69,19 @@ Route::middleware('admin')->group(function () {
     });
     Route::get('/adminpanel/get-info/locations/{id}', [LocationsController::class, 'getIndexLocationInfo']);
     Route::get('/get-reservations-informations', function () {
-        $data = Reservation::with(['extras.extra', 'car.brandKey', 'car.modelKey', 'pickupLocation', 'returnLocation', 'currency'])->get();
-
+        Log::info("1");
+        $data = Reservation::with(['extras.extra', 'carGroup.photos', 'assignedVehicle', 'pickupLocation', 'returnLocation', 'currency'])->get();
+        Log::info("2");
         if ($data->isEmpty()) {
             return response()->json(['message' => 'Veritabanında rezervasyon bulunamadı.'], 404);
         }
-
         return response()->json(['reservations' => $data], 200);
     });
 });
 
 Route::get('/get-car-information/{id}', function ($id) {
-    $car = Car::where('id', $id)
-        ->with(['reservations', 'photos', 'brandKey', 'modelKey'])
+    $car = CarGroup::where('id', $id)
+        ->with(['reservations', 'photos', 'cars.carGroup'])
         ->with(['price' => function ($query) {
             $query->where('is_active', 1);
         }])
@@ -91,7 +91,8 @@ Route::get('/get-car-information/{id}', function ($id) {
         return response()->json(['error' => 'Araba bulunamadı'], 404);
     }
     return response()->json(['car' => $car]);
-});
+})->middleware('admin');
+
 Route::get('/supported-languages', function () {
     $languages = getActiveLanguages()->pluck('code');
     return response()->json($languages);
@@ -203,7 +204,6 @@ Route::get('get-session', function () {
     dd(session()->all());
 });
 Route::get('/get-all-cars-info', function () {
-    // Helper fonksiyonunu burada çağırıyoruz
     return response()->json(getAllCarPropertiesInfo());
 })->withoutMiddleware([\App\Http\Middleware\HandleInertiaRequests::class]);
 Route::get('/get-extras', function () {
@@ -281,9 +281,9 @@ Route::group([
 
     Route::middleware('admin')->group(function () {
         Route::get(dbTransRoute('adminpanel'), function () {
-        $upcoming = Reservation::upcoming()->with(['car.brandKey', 'car.modelKey', 'user'])->orderBy('pickup_datetime')->get();
-        $active = Reservation::activeRentals()->with(['car.brandKey', 'car.modelKey', 'user'])->orderBy('return_datetime')->get();
-        $late = Reservation::lateReturns()->with(['car.brandKey', 'car.modelKey', 'user'])->orderBy('return_datetime')->get();
+        $upcoming = Reservation::upcoming()->with(['carGroup:id,name', 'user'])->orderBy('pickup_datetime')->get();
+        $active = Reservation::activeRentals()->with(['carGroup:id,name', 'assignedVehicle', 'user'])->orderBy('return_datetime')->get();
+        $late = Reservation::lateReturns()->with(['carGroup:id,name', 'assignedVehicle', 'user'])->orderBy('return_datetime')->get();
 
         return Inertia::render('adminPanel/Home', [
             'upcomingReservations' => $upcoming,
@@ -293,9 +293,15 @@ Route::group([
     })->name('adminHome');
     Route::post(dbTransRoute('adminpanel') . '/admin', [AuthController::class, 'updateAdminPassword'])->name('adminUpdatePassword');
     Route::get(dbTransRoute('adminpanel') . '/admin', [AuthController::class, 'showAdminChangePassword'])->name('adminChangePassword');
-    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('cars'), [AdminCarController::class, 'showAll'])->name('adminCars');
-    Route::inertia(dbTransRoute('adminpanel') . '/' . dbTransRoute('cars') . '/' . dbTransRoute('add'), 'adminPanel/cars/AddCar')->name('adminAddCarPage');
-    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('cars') . '/{id}', [AdminCarController::class, 'showIndex'])->name('adminShowCar');
+    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('car_groups') . '/' . dbTransRoute('add'), [AdminCarController::class, 'showAddCarGroup'])->name('adminAddCarGroupPage');
+    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('car_groups') . '/{id}', [AdminCarController::class, 'showIndexGroup'])->name('adminShowCar');
+    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('car_groups'), [AdminCarController::class, 'showAllCarGroups'])->name('adminCars');
+    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('cars') . '/' . dbTransRoute('add'), [AdminCarController::class, 'showAddCar'])->name('adminAddCarPage');
+    Route::get(dbTransRoute('adminpanel') . '/'. dbTransRoute('cars'), [AdminCarController::class, 'showAllCars'])->name('adminVehicles');
+    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('cars') . '/{id}', [AdminCarController::class, 'showIndexCar'])->name('adminShowVehicle');
+    Route::get('/adminpanel/cars/{id}/info', [AdminCarController::class, 'getCarInfo'])->name('adminGetCarInfo');
+    Route::post('/adminpanel/cars/{id}/update', [AdminCarController::class, 'updateCar'])->name('adminUpdateVehicle');
+    Route::delete('/adminpanel/cars/{id}', [AdminCarController::class, 'deleteCar'])->name('adminDeleteVehicle');
 
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('campaigns'), [CampaignsController::class, 'showAllAdminPanel'])->name('showAllCampaignsAdminPanel');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('campaigns') . '/' . dbTransRoute('add'), function () {
@@ -312,6 +318,7 @@ Route::group([
     })->name('adminIndexLocations');
 
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('reservations'), [ReservationController::class, 'showReservations'])->name('adminReservations');
+    Route::get('/adminpanel/reservations/{id}/available-cars', [ReservationController::class, 'getAvailableCarsForReservation'])->name('adminGetAvailableCars');
     Route::post('/adminpanel/reservations/{id}/start', [ReservationController::class, 'startRental'])->name('adminStartRental');
     Route::post('/adminpanel/reservations/{id}/complete', [ReservationController::class, 'completeRental'])->name('adminCompleteRental');
 
@@ -321,7 +328,7 @@ Route::group([
     Route::post('/adminpanel/drop-price', [DropPriceController::class, 'addDropPrice'])->name('adminAddDropPrice');
 
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('discounts'), function () {
-        $discounts = Discount::with('car')->get();
+        $discounts = Discount::with('carGroup')->get();
         return Inertia::render('adminPanel/price/Discounts', ['data' => $discounts]);
     })->name('adminShowDiscounts');
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('discounts') . '/' . dbTransRoute('add'), function () {

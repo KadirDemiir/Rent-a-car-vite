@@ -5,11 +5,11 @@ import {User, Users, Fuel, Shield, Settings2} from 'lucide-react';
 import {useCurrency} from "../../../../providers/CurrencyContext.jsx";
 
 export default function CarReview({car}){
-    const {t} = useTranslation();
+    const {t, i18n} = useTranslation();
     const {current, calculateTotal} = useCurrency();
     const coverPhoto = car.photos?.find(p => p.is_cover)?.photo_path;
     const photoSrc = coverPhoto ? `/storage/${coverPhoto}` : undefined;
-    const title = `${t(car.brand_key.key)} ${t(car.model_key.key)} • ${t(`fuel.${car.fuel_id}`)} • ${t(`transmission.${car.transmission_id}`)}`;
+    const title = JSON.parse(car.name)?.[i18n.language];
     const features = [
         {
             icon: <Fuel/>,

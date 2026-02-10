@@ -96,7 +96,7 @@ if (!function_exists('getAllCarPropertiesInfo')) {
     {
         // Cache the entire result for maximum performance
         // Use pluck to get only IDs as simple arrays (much smaller payload)
-        return getCacheStore()->remember('all_car_properties_info_v2', 3600 * 24, function () {
+        return getCacheStore()->remember('all_car_properties_info', 3600 * 24, function () {
             return [
                 'segments'      => Segment::pluck('id'),
                 'bodyTypes'     => BodyType::pluck('id'),

@@ -155,7 +155,7 @@ class CampaignsController extends Controller
         }
 
         if ($selectedDiscount === 'car') {
-            $discountModel->car_id = $targetData;
+            $discountModel->car_group_id = $targetData;
         }
 
         $discountModel->start_date = $startDate;

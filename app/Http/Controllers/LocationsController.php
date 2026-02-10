@@ -20,10 +20,9 @@ class LocationsController extends Controller
 
     public function getIndexLocationInfo($id)
     {
-        $location = Locations::with(['cars.price', 'cars.brandKey', 'cars.modelKey'])->findOrFail($id);
-        Log::info($location);
+        $location = Locations::with(['vehicles' => fn ($q) => $q->with(['carGroup.price', 'carGroup.brandKey', 'carGroup.modelKey'])])->findOrFail($id);
+        $location->cars = $location->vehicles->pluck('carGroup')->unique('id')->values();
         $locations = Locations::all();
-        Log::info($locations);
         return response()->json(['location' => $location, 'locations' => $locations]);
     }
 

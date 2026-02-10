@@ -11,13 +11,13 @@ class Photo extends Model
     use HasFactory;
 
     protected $fillable = [
-        'car_id',
+        'car_group_id',
         'photo_path',
         'is_cover',
     ];
 
-    public function car(): BelongsTo
+    public function carGroup(): BelongsTo
     {
-        return $this->belongsTo(Car::class, 'car_id');
+        return $this->belongsTo(CarGroup::class, 'car_group_id');
     }
 }

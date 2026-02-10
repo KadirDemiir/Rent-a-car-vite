@@ -10,7 +10,8 @@ return new class extends Migration
     {
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('car_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('car_group_id')->nullable()->constrained('car_groups')->nullOnDelete();
+            $table->foreignId('assigned_vehicle_id')->nullable()->constrained('vehicles')->nullOnDelete();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('name');
             $table->string('surname');
@@ -39,6 +40,8 @@ return new class extends Migration
             $table->enum('payment_status', ['pending', 'paid', 'failed'])->default('pending');
             $table->enum('status', ['pending', 'confirmed', 'cancelled', 'active', 'completed'])->default('pending');
             $table->timestamps();
+
+            $table->index(['car_group_id', 'status', 'pickup_datetime', 'return_datetime'], 'reservations_availability_group_idx');
         });
     }
 

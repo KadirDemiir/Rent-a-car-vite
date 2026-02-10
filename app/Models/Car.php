@@ -4,74 +4,52 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Car extends Model
 {
     use HasFactory;
 
-    protected static function newFactory(): \Database\Factories\CarFactory
-    {
-        return \Database\Factories\CarFactory::new();
-    }
-
     protected $fillable = [
-        'location_id',
+        'car_group_id',
         'current_location_id',
+        'location_id',
         'brand_translation_key_id',
         'model_translation_key_id',
-        'year',
-        'segment_id',
-        'body_type_id',
-        'seat_count',
-        'currency_id',
-        'deposit',
-        'trunk_capacity',
-        'fuel_id',
-        'transmission_id',
+        'plate_number',
+        'exact_year',
+        'chassis_number',
+        'current_km',
         'status',
-        'license_plate',
-        'sort_order'
     ];
 
-    public function reservations() {
-        return $this->hasMany(Reservation::class, 'car_id')
-            ->with([
-                'extras', 
-                'pickupLocation:id,name', 
-                'returnLocation:id,name', 
-                'currency:id,code,symbol',
-                'car:id,license_plate,brand_translation_key_id,model_translation_key_id,year,segment_id,fuel_id,transmission_id',
-            ]);
-    }
+    protected $casts = [
+        'exact_year' => 'integer',
+        'current_km' => 'integer',
+        'current_location_id' => 'integer',
+        'location_id' => 'integer',
+        'car_group_id' => 'integer',
+    ];
 
-    public function location()
+    public function carGroup(): BelongsTo
     {
-        return $this->belongsTo(Locations::class);
+        return $this->belongsTo(CarGroup::class);
     }
 
-    public function photos(): HasMany
+    public function currentLocation(): BelongsTo
     {
-        return $this->hasMany(Photo::class);
+        return $this->belongsTo(Locations::class, 'current_location_id');
     }
 
-    public function discount(): HasMany{
-        return $this->hasMany(Discount::class);
-    }
-
-    public function bodyType()
+    public function location(): BelongsTo
     {
-        return $this->belongsTo(BodyType::class);
+        return $this->belongsTo(Locations::class, 'location_id');
     }
 
-    public function fuel()
+    public function reservations(): HasMany
     {
-        return $this->belongsTo(Fuel::class, 'fuel_id');
-    }
-
-    public function transmission()
-    {
-        return $this->belongsTo(Transmission::class, 'transmission_id');
+        return $this->hasMany(Reservation::class, 'assigned_vehicle_id');
     }
 
     public function brandKey()
@@ -83,16 +61,4 @@ class Car extends Model
     {
         return $this->belongsTo(TranslationKey::class, 'model_translation_key_id');
     }
-
-    public function price() {
-        return $this->hasMany(Price::class, 'car_id');
-    }
-
-    public function currency(){
-        return $this->belongsTo(Currency::class, 'currency_id');
-    }
-
-    public function segment(){
-        return $this->belongsTo(Segment::class, 'segment_id');
-    }
-}   
+}

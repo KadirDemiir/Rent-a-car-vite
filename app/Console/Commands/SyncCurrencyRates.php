@@ -41,7 +41,7 @@ class SyncCurrencyRates extends Command
             foreach ($xml->Currency as $c) {
                 $tcmbRates->push([
                     'code' => (string)$c['CurrencyCode'],
-                    'forexBuying' => (float)str_replace(',', '.', $c->ForexBuying),
+                    'forexBuying' => (float)str_replace(',', '.', (string)$c->ForexBuying),
                 ]);
             }
 

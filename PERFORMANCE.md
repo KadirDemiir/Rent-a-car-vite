@@ -106,7 +106,7 @@ location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {
 
 | Component | Size | Gzipped |
 |-----------|------|---------|
-| Cars (14) | 9 KB | ~1.5 KB |
+| CarGroups (14) | 9 KB | ~1.5 KB |
 | Translations | 26 KB | ~4 KB |
 | Locations | 0.2 KB | ~0.1 KB |
 | **Total** | **~37 KB** | **~6 KB** |

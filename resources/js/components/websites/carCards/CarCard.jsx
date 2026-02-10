@@ -1,36 +1,34 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCurrency } from '../../../providers/CurrencyContext.jsx';
-import { 
-    Fuel, 
-    Settings2, 
-    Users, 
-    Briefcase, 
-    ShieldCheck, 
-    ArrowRight 
+import {
+    Fuel,
+    Settings2,
+    Users,
+    Briefcase,
+    ShieldCheck,
+    ArrowRight
 } from 'lucide-react';
 
 export default function CarCard({ car }) {
-    const { t } = useTranslation();
+    const { t, i18n} = useTranslation();
     const { calculateTotal, current } = useCurrency();
+    const name = JSON.parse(car.name)?.[i18n.language];
 
-    // Yardımcı: İlk harfi büyütme (CSS capitalize daha performanslıdır ama JS tarafında gerekirse)
     const formatText = (key, params = {}) => {
         const text = t(key, params);
         return text.charAt(0).toUpperCase() + text.slice(1);
     };
 
-    // Kapak fotoğrafını bul
     const coverPhoto = car.photos.find(c => c.is_cover === 1) || car.photos[0];
 
-    // Depozito Hesabı
     const depositAmount = calculateTotal(car.deposit).toFixed(2);
     const currencySymbol = current?.symbol || '$';
 
     return (
         <div className="group relative flex flex-col w-full bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-            
-            <div className="relative w-full aspect-[16/10] bg-gray-50 overflow-hidden">
+
+            <div className="relative w-full aspect-16/10 bg-gray-50 overflow-hidden">
                 <div className="absolute top-3 left-3 z-1">
                     <span className="px-3 py-1 text-xs font-bold text-white bg-gray-700/90 backdrop-blur-md rounded-full shadow-sm uppercase tracking-wider">
                         {t(`segment.${car.segment_id}`)}
@@ -38,9 +36,9 @@ export default function CarCard({ car }) {
                 </div>
 
                 <div className="w-full h-full flex items-center justify-center p-6 transition-transform duration-500 group-hover:scale-110">
-                    <img 
-                        src={`/storage/${coverPhoto?.photo_path}`} 
-                        alt={`${t(car.brand_key.key)} ${t(car.model_key.key)}`}
+                    <img
+                        src={`/storage/${coverPhoto?.photo_path}`}
+                        alt={name}
                         className="w-full h-full object-contain drop-shadow-lg"
                         loading="lazy"
                     />
@@ -51,7 +49,8 @@ export default function CarCard({ car }) {
                 {/* Marka & Model */}
                 <div className="mb-4">
                     <h3 className="text-gray-900 text-xl font-bold leading-tight group-hover:text-gray-700 transition-colors">
-                        {t(car.brand_key.key)} <span className="font-normal text-gray-600">{t(car.model_key.key)}</span>
+                        {name}
+                        <span className="ml-1.5 inline-block px-2 py-0.5 text-xs font-medium text-gray-500 bg-gray-100 rounded whitespace-nowrap">Or Similar</span>
                     </h3>
                     <p className="text-sm text-gray-400 mt-1 capitalize">
                         {t(`body_type.${car.body_type_id}`)}

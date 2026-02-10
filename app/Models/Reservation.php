@@ -15,7 +15,8 @@ class Reservation extends Model
     protected $fillable = [
         'reference_code',
         'token',
-        'car_id',
+        'car_group_id',
+        'assigned_vehicle_id',
         'user_id',
         'name',
         'surname',
@@ -56,7 +57,7 @@ class Reservation extends Model
     ];
 
     protected $appends = ['tracking_url'];
-    
+
     protected static function booted()
     {
         static::creating(function ($reservation) {
@@ -82,10 +83,14 @@ class Reservation extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function car()
+    public function carGroup()
     {
-        return $this->belongsTo(Car::class)
-            ->with(['brandKey:id,key', 'modelKey:id,key']);
+        return $this->belongsTo(CarGroup::class, 'car_group_id');
+    }
+
+    public function assignedVehicle()
+    {
+        return $this->belongsTo(Car::class, 'assigned_vehicle_id');
     }
 
     public function extras()

@@ -25,8 +25,9 @@ class Currency extends Model
         return $this->hasMany(Price::class);
     }
 
-    public function cars(){
-        return $this->hasMany(Car::class);
+    public function carGroups()
+    {
+        return $this->hasMany(CarGroup::class);
     }
 
 

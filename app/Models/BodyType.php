@@ -15,8 +15,8 @@ class BodyType extends Model
         return $this->belongsTo(TranslationKey::class, 'translation_key_id');
     }
 
-    public function car()
+    public function carGroups()
     {
-        return $this->hasMany(Car::class);
+        return $this->hasMany(CarGroup::class, 'body_type_id');
     }
 }

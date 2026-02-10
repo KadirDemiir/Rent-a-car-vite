@@ -25,10 +25,10 @@
             "website.navigator.about_us" => "Text for the about us navigation menu item",
             "website.navigator.check_reservation" => "Text for the check reservation menu item",
 
-            "website.car_card.properties.properties_label" => "Car Card Properties label",
-            "website.car_card.properties.seat_count_{count}" => "Car Card Properties seat count",
-            "website.car_card.properties.trunk_capacity_{trunk_capacity}" => "Car Card Properties trunk capacity",
-            "website.car_card.requirements.requirements_label" => "Car Card Requirements label",
+            "website.car_card.properties.properties_label" => "CarGroup Card Properties label",
+            "website.car_card.properties.seat_count_{count}" => "CarGroup Card Properties seat count",
+            "website.car_card.properties.trunk_capacity_{trunk_capacity}" => "CarGroup Card Properties trunk capacity",
+            "website.car_card.requirements.requirements_label" => "CarGroup Card Requirements label",
             "website.car_card.requirements.required_min_{age}" => "Minimum age requirement with dynamic age parameter",
             "website.car_card.requirements.{year}_year_experience" => "Years of experience requirement with dynamic year parameter",
             "website.car_card.requirement.{amount}_{currency}_deposit" => "Deposit amount with dynamic currency and amount parameters",
@@ -116,6 +116,8 @@
             "adminpanel.navigator.transmissions" => "Admin menu item for cars transmissions",
             "adminpanel.navigator.add_transmission" => "Admin menu item for add cars transmissions",
             "adminpanel.navigator.email_templates" => "Admin menu item for email templates",
+            "adminpanel.navigator.add_car_group" => "Admin menu item for add cars group",
+            "adminpanel.navigator.car_groups" => "Admin menu item for cars groups",
             // Email Templates
             "adminpanel.email.edit_email_template" => "Edit Email Template",
             "adminpanel.email.back" => "Back",
@@ -145,6 +147,12 @@
             "adminpanel.email.confirm_delete_template" => "Are you sure you want to delete this template?",
             "adminpanel.email.failed_delete_template" => "Failed to delete template",
 
+            "adminpanel.car.current_km" => "Current KM",
+            "adminpanel.car.status" => "CarGroup Status",
+            "adminpanel.car.select_group" => "Select CarGroup Group",
+            "adminpanel.car.available" => "Müsait",
+            "adminpanel.car.rented" => "Kirada",
+            "adminpanel.car.unavailable" => "Müsait Değil",
 
             "adminpanel.cars.filter.filter_label" => "Label for filter section",
             "adminpanel.cars.filter.filter_tip" => "Tooltip text for filter functionality",
@@ -168,6 +176,10 @@
             "adminpanel.car.list.body_type" => "Label for body type input",
             "adminpanel.car.list.fuel_type" => "Label for fuel type input",
             "adminpanel.car.list.transmission_type" => "Label for transmission type input",
+            "adminpanel.car.list.count" => "Label for car count",
+            "adminpanel.car.list.releted_car_group" => "Araç Grubu",
+            "adminpanel.car.list.current_locations" => "Güncel Lokasyon",
+
 
             "adminpanel.car.car_modify.operations" => "Heading for car modification operations",
             "adminpanel.car.car_modify.edit_price_information.edit_price_information" => "Heading for price information editing",
@@ -197,9 +209,16 @@
             /*"adminpanel.car.car_modify.edit_photos.save" => "Text for save button in photo editing",*/
             "adminpanel.car.car_modify.delete" => "Text for delete button/option",
 
+            "adminpanel.car_group.add_car_group" => "Add CarGroup Group",
+            "adminpanel.car_group.name" => "CarGroup Group Name",
+            "adminpanel.car_group" => "Araç Grubu",
+            "adminpanel.car_group.create_group" => "CarGroup Group Create",
+
             "adminpanel.add_car.add_car" => "Heading for add car page",
             "adminpanel.add_car.edit_car_information" => "Heading for car information section",
+            "adminpanel.add_car.select_car_group" => "Select CarGroup Group",
             "adminpanel.add_car.license_plate" => "Label for license plate input",
+            "adminpanel.add_car.select_location" => "Select location",
             "adminpanel.add_car.brand" => "Label for brand input",
             "adminpanel.add_car.model" => "Label for model input",
             "adminpanel.add_car.year" => "Label for year input",
@@ -367,7 +386,7 @@
             "adminpanel.languages.edit_language.language_information" => "Language information",
             "adminpanel.languages.edit_language.site_variables" => "Site variables header",
             "adminpanel.languages.edit_language.related_campaigns" => "Related Campaigns",
-            "adminpanel.languages.edit_language.cars" => "Cars languages",
+            "adminpanel.languages.edit_language.cars" => "CarGroups languages",
             "adminpanel.languages.edit_language.button.active" => "Active language",
             "adminpanel.languages.edit_language.button.deactive" => "Deactive language",
             "adminpanel.languages.edit_language.button.delete" => "Delete language",
@@ -433,7 +452,8 @@
             "adminpanel.update_transmission.update_transmission" => "Update transmission",
             "adminpanem.update_transmission.button.save" => "save buutton for update transmission",
 
-            "address.cars" => "Cars url",
+            "address.cars" => "CarGroups url",
+            "address.car_groups" => "arac-gruplari",
             "address.locations" => "Locations url",
             "address.campaigns" => "Campaigns url",
             "address.carporateRental" => "Carporate Rental url",
@@ -457,7 +477,7 @@
             "address.reservation-create" => "Reservation Create URL",
             "address.checkReservation" => "Check reservation url",
             "address.email-templates" => "Email Templates url",
-            
+
             "website.check_reservation.title" => "Check Reservation Title",
             "website.check_reservation.email_label" => "Email label for check reservation",
             "website.check_reservation.email_placeholder" => "Placeholder for email input",
@@ -496,7 +516,7 @@
             "website.navigator.cars" => "Araçlar",
             "website.navigator.locations" => "Lokasyonlar",
             "website.navigator.campaigns" => "Kampanyalar",
-            "website.navigator.car_porte_car_rental" => "Car Porte Kiralama",
+            "website.navigator.car_porte_car_rental" => "CarGroup Porte Kiralama",
             "website.navigator.about_us" => "Hakkımızda",
             "website.navigator.check_reservation" => "Rezervasyon Kontrolü",
 
@@ -590,6 +610,8 @@
             "adminpanel.navigator.transmissions" => "Vites Tipleri",
             "adminpanel.navigator.add_transmission" => "Vites Tipi Ekle",
             "adminpanel.navigator.email_templates" => "E-posta Şablonları",
+            "adminpanel.navigator.add_car_group" => "Araç Grubu Ekle",
+            "adminpanel.navigator.car_groups" => "Araç Grubuları",
             // Email Templates Turkish
             "adminpanel.email.edit_email_template" => "E-posta Şablonunu Düzenle",
             "adminpanel.email.back" => "Geri",
@@ -619,7 +641,12 @@
             "adminpanel.email.confirm_delete_template" => "Bu şablonu silmek istediğinizden emin misiniz?",
             "adminpanel.email.failed_delete_template" => "Şablon silinemedi",
 
-
+            "adminpanel.car.current_km" => "Güncel KM",
+            "adminpanel.car.status" => "Durum",
+            "adminpanel.car.select_group" => "Araç Grubu Seçiniz",
+            "adminpanel.car.available" => "Müsait",
+            "adminpanel.car.rented" => "Kirada",
+            "adminpanel.car.unavailable" => "Müsait Değil",
 
             "adminpanel.cars.filter.filter_label" => "Filtrele",
             "adminpanel.cars.filter.filter_tip" => "Filtreleme seçenekleri",
@@ -643,6 +670,9 @@
             "adminpanel.car.list.body_type" => "Kasa Tipi",
             "adminpanel.car.list.fuel_type" => "Yakıt Türü",
             "adminpanel.car.list.transmission_type" => "Vites Türü",
+            "adminpanel.car.list.count" => "Araç Sayısı",
+            "adminpanel.car.list.releted_car_group" => "Araç Grubu",
+            "adminpanel.car.list.current_locations" => "Güncel Lokasyon",
 
             "adminpanel.car.car_modify.operations" => "İşlemler",
             "adminpanel.car.car_modify.edit_price_information.edit_price_information" => "Fiyat Bilgilerini Düzenle",
@@ -670,9 +700,16 @@
             "adminpanel.car.car_modify.edit_photos.cover_photo" => "Kapak Fotoğrafı",
             "adminpanel.car.car_modify.delete" => "Sil",
 
+            "adminpanel.car_group.add_car_group" => "Araç Grubu Ekle",
+            "adminpanel.car_group.name" => "Araç Grubu İsmi",
+            "adminpanel.car_group" => "Araç Grubu",
+            "adminpanel.car_group.create_group" => "Grup Ekle",
+
             "adminpanel.add_car.add_car" => "Araç Ekle",
             "adminpanel.add_car.edit_car_information" => "Araç Bilgilerini Düzenle",
             "adminpanel.add_car.license_plate" => "Plaka",
+            "adminpanel.add_car.select_car_group" => "Araç Grubu Seçiniz",
+            "adminpanel.add_car.select_location" => "Lokasyon Seçiniz",
             "adminpanel.add_car.brand" => "Marka",
             "adminpanel.add_car.model" => "Model",
             "adminpanel.add_car.year" => "Yıl",
@@ -905,6 +942,7 @@
             "adminpanem.update_transmission.button.save" => "Güncelle",
 
             "address.cars" => "arabalar",
+            "address.car_groups" => "arac-gruplari",
             "address.locations" => "lokasyonlar",
             "address.campaigns" => "kampanyalar",
             "address.carporateRental" => "kurumsal-arac-kiralamalar",
@@ -937,7 +975,7 @@
             "website.check_reservation.button_check" => "Rezervasyonu Kontrol Et",
             "website.check_reservation.button_checking" => "Kontrol Ediliyor...",
 
-            "website.reservation_details.title" => "Rezervasyon #{{id}}", 
+            "website.reservation_details.title" => "Rezervasyon #{{id}}",
             "website.reservation_details.created_on" => "Oluşturulma Tarihi: {{date}}",
             "website.reservation_details.back_to_search" => "Aramaya Dön",
             "website.reservation_details.status.pending" => "Bekliyor",
@@ -960,6 +998,11 @@
             "website.reservation_details.cancelling" => "İptal Ediliyor...",
             "website.reservation_details.cancelled_alert" => "Bu rezervasyon iptal edilmiştir.",
             "website.reservation_details.confirm_cancel" => "Bu rezervasyonu iptal etmek istediğinizden emin misiniz?",
+
+            "general.all" => "Hepsi",
+            "general.active" => "Aktif",
+            "general.passive" => "Pasif",
+            "general.sort" => "Sırala",
         ];
         public function run(): void
         {

@@ -43,7 +43,7 @@ class DiscountController extends Controller
                 $scopeQuery->where('target_type', $request->target_type);
 
                 if ($request->target_type === 'car') {
-                    $scopeQuery->where('car_id', $request->car_id);
+                    $scopeQuery->where('car_group_id', $request->car_group_id);
                 } elseif ($request->target_type === 'segment') {
                     $scopeQuery->where('segment_id', $request->segment_id);
                 }
@@ -79,6 +79,9 @@ class DiscountController extends Controller
 
                 if ($validated['selectedDiscount'] === "segment") {
                     $newDiscount->segment_id = $validated['discountTarget'];
+                }
+                if ($validated['selectedDiscount'] === "car") {
+                    $newDiscount->car_group_id = $validated['discountTarget'];
                 }
 
                 $newDiscount->start_date = $start;
