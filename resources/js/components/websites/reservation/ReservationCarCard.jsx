@@ -12,7 +12,7 @@ const ReservationCarCard = memo(({ car, isProcessing, onRent, priority }) => {
 
     const name = JSON.parse(car.name);
     const photoSrc = `/storage/${car.photos?.[0]?.photo_path}`;
-    const title = `${name?.[i18n.language]} Or Similar • ${t(`fuel.${car.fuel_id}`)} • ${t(`transmission.${car.transmission_id}`)}`;
+    const title = `${name?.[i18n.language]} • ${t(`fuel.${car.fuel_id}`)} • ${t(`transmission.${car.transmission_id}`)}`;
     const currencySymbol = current?.symbol ?? "";
 
     const features = [

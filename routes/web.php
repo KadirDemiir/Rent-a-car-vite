@@ -244,7 +244,11 @@ Route::group([
 ], function () {
 
     Route::get('', function () {
-        return Inertia::render('Home', ['locations' => Locations::select('id', 'name')->where('is_active', true)->get()]);
+        $carGroups = CarGroup::with(['photos'])->get();
+        return Inertia::render('Home', [
+            'locations' => Locations::select('id', 'name', 'photo_path')->where('is_active', true)->get(),
+            'carGroups' => $carGroups,
+            ]);
     })->name('home');
     Route::get(dbTransRoute('cars'), [CarController::class, 'showAllCars'])->name('showCars');
     Route::get(dbTransRoute('cars') . '/{id}', [CarController::class, 'showCar'])->name('showIndexCar');

@@ -22,12 +22,13 @@ class ReservationController extends Controller
 {
     public function searchReservations(Request $request)
     {
+        \Illuminate\Support\Facades\Log::info('SearchReservations called with params START', $request->all());
         if (!$request->has(['startDateTime', 'finishDateTime', 'PULocation', 'RLocation'])) {
             return Inertia::render('SearchReservations', ['availableCars' => []]);
         }
 
         $request->validate([
-            'startDateTime' => 'required|date|after:today',
+            'startDateTime' => 'required|date|after_or_equal:today',
             'finishDateTime' => 'required|date|after:startDateTime',
             'PULocation' => 'required|exists:locations,id',
             'RLocation' => 'required|exists:locations,id',
@@ -139,7 +140,7 @@ class ReservationController extends Controller
                 ];
             }
         }
-
+\Illuminate\Support\Facades\Log::info('SearchReservations called with params END', $request->all());
         return Inertia::render('SearchReservations', [
             'availableCars' => $availableCars,
             'reservation' => [

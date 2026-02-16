@@ -1,85 +1,103 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useRef } from 'react';
+import {
+    useFloating,
+    autoUpdate,
+    offset,
+    flip,
+    shift,
+    useDismiss,
+    useInteractions,
+} from '@floating-ui/react';
 
-export default function ClockSelector({ onClockChange, selectedClock }) {
-  const clocks = [
-    "00.00", "00.30", "01.00", "01.30", "02.00", "02.30", "03.00", "03.30",
-    "04.00", "04.30", "05.00", "05.30", "06.00", "06.30", "07.00", "07.30",
-    "08.00", "08.30", "09.00", "09.30", "10.00", "10.30", "11.00", "11.30",
-    "12.00", "12.30", "13.00", "13.30", "14.00", "14.30", "15.00", "15.30",
-    "16.00", "16.30", "17.00", "17.30", "18.00", "18.30", "19.00", "19.30",
-    "20.00", "20.30", "21.00", "21.30", "22.00", "22.30", "23.00", "23.30"
-  ];
+export default function ClockSelector({ selectedClock, onClockChange }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const listRef = useRef(null);
+    const selectedItemRef = useRef(null);
 
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-  const listRef = useRef(null);
+    const times = [];
+    for (let i = 0; i < 24; i++) {
+        const hour = i.toString().padStart(2, '0');
+        times.push(`${hour}:00`);
+        times.push(`${hour}:30`);
+    }
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+    const { refs, floatingStyles, context } = useFloating({
+        open: isOpen,
+        onOpenChange: setIsOpen,
+        placement: 'bottom-start',
+        whileElementsMounted: autoUpdate,
+        middleware: [
+            offset(5),
+            flip({ padding: 10 }),
+            shift({ padding: 10 }),
+        ],
+    });
+
+    const dismiss = useDismiss(context);
+
+    const { getReferenceProps, getFloatingProps } = useInteractions([
+        dismiss,
+    ]);
+
+    useEffect(() => {
+        if (isOpen && selectedItemRef.current) {
+            selectedItemRef.current.scrollIntoView({ block: 'center', behavior: 'instant' });
+        }
+    }, [isOpen]);
+
+    const handleSelect = (time) => {
+        onClockChange(time);
         setIsOpen(false);
-      }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
-useEffect(() => {
-  if (isOpen && listRef.current) {
-    setTimeout(() => {
-      const index = clocks.indexOf(selectedClock);
-      if (index > -1) {
-        const element = listRef.current?.children[index];
-        if (element) {
-          element.scrollIntoView({ block: "center", behavior: "smooth" });
-        }
-      } else {
-        const firstElement = listRef.current?.children[10*2];
-        if (firstElement) {
-          firstElement.scrollIntoView({ block: "center", behavior: "smooth" });
-        }
-      }
-    }, 0);
-  }
-}, [isOpen, selectedClock]);
-
-  return (
-    <div ref={dropdownRef} className="max-h-48 w-full flex items-center">
-      <button
-        type="button"
-        onClick={(e) => {
-          e.preventDefault(); 
-          setIsOpen(!isOpen);
-        }}
-        className="relative h-12 z-10 w-full flex items-center justify-center px-2 rounded-md text-left cursor-pointer"
-      >
-        <span className="block truncate">{selectedClock || "00.00"}</span>
-{/*         <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-        </svg> */}
-      </button>
-
-      {isOpen && (
-        <ul className="absolute z-50 w-20 max-h-48 overflow-y-auto bg-white mt-1 shadow-md rounded-md"
-          ref={listRef}
-          >
-          {clocks.map((clock) => (
-            <li
-              key={clock}
-              onClick={() => {
-                onClockChange(clock);
-                setIsOpen(false);
-              }}
-              className={`px-2 py-1 hover:bg-blue-500 hover:text-white cursor-pointer border-b border-gray-300 ${
-                clock === selectedClock ? "bg-blue-100" : ""
-              }`}
-
+    return (
+        <>
+            <div
+                ref={refs.setReference}
+                {...getReferenceProps()}
+                onClick={() => setIsOpen(!isOpen)}
+                className={`w-full h-12 px-3 rounded-xl flex items-center justify-between bg-white cursor-pointer border transition-all select-none shadow-sm group
+                    ${isOpen ? 'border-gray-800 ring-1 ring-gray-200' : 'border-transparent hover:border-gray-300'}`}
             >
-              <span className="block truncate">{clock}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
+                <div className="flex items-center gap-2 text-gray-800 font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-gray-500 group-hover:text-gray-700 transition-colors">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    <span>{selectedClock}</span>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                </svg>
+            </div>
+
+            {isOpen && (
+                <div
+                    ref={refs.setFloating}
+                    style={floatingStyles}
+                    {...getFloatingProps()}
+                    className="z-50 w-32 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+                >
+                    <div className="max-h-60 overflow-y-auto py-1 scrollbar-hide" ref={listRef}>
+                        {times.map((time) => (
+                            <div
+                                key={time}
+                                ref={time === selectedClock ? selectedItemRef : null}
+                                onClick={() => handleSelect(time)}
+                                className={`px-4 py-2 text-sm cursor-pointer transition-colors flex items-center gap-2
+                                    ${time === selectedClock 
+                                        ? 'bg-gray-100 text-gray-900 font-bold' 
+                                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                    }`}
+                            >
+                                {time === selectedClock && (
+                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-600"></div>
+                                )}
+                                {time}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </>
+    );
 }
