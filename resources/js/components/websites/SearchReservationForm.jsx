@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { addDays, startOfDay } from 'date-fns';
 import ClockSelector from './clockSelector/ClockSelector.jsx';
 import LocationSelector from './locationSelector/LocationSelector.jsx';
-import RangeDatePicker from './RangeDatePicker.jsx'; 
+import RangeDatePicker from './RangeDatePicker.jsx';
 
 export default function SearchReservation({ locations, defPickupLocation, defReturnLocation, defReturnDate, defReturnClock, defPickupClock, defPickupDate, home = true }) {
-    
+
     const { i18n, t } = useTranslation();
 
     const [dateRange, setDateRange] = useState({
@@ -17,10 +17,10 @@ export default function SearchReservation({ locations, defPickupLocation, defRet
 
     const [selectedPULocation, setSelectedPULocation] = useState(defPickupDate ? defPickupLocation : locations?.[0] ?? "");
     const [selectedRLocation, setSelectedRLocation] = useState(defReturnLocation ? defReturnLocation : locations?.[0] ?? "");
-    
+
     const [startClock, setStartClock] = useState(defPickupClock ? defPickupClock : "10:00");
     const [finishClock, setFinishClock] = useState(defReturnClock ? defReturnClock : "10:00");
-    
+
     const [isPUOpen, setIsPUOpen] = useState(false);
     const [isROpen, setIsROpen] = useState(false);
 
@@ -39,7 +39,7 @@ export default function SearchReservation({ locations, defPickupLocation, defRet
 
     const submitHandler = (e) => {
         e.preventDefault();
-        
+
         if (!dateRange?.from || !dateRange?.to) return;
 
         const startDateTime = formatDateTime(dateRange.from, startClock);
@@ -53,12 +53,12 @@ export default function SearchReservation({ locations, defPickupLocation, defRet
             PULocation,
             RLocation
         };
-        
+
         router.get(`/${i18n.language}/${t('address.searchReservations')}`, formData);
     };
 
     return (
-        <div className={`${!home ? 'w-full' : 'max-w-6xl'} mx-auto bg-black/40 backdrop-blur-md rounded-3xl shadow-2xl p-6 md:p-8 border border-white/10 relative z-10`}>
+        <div className={`${!home ? 'w-full' : 'max-w-6xl'} mx-auto bg-black/40 backdrop-blur-md rounded-3xl shadow-2xl p-6 md:p-8 border border-white/10 relative z-30  `}>
             {home &&
                 <div className="mb-8 flex flex-col items-center">
                     <h2 className="text-2xl md:text-3xl font-bold text-white tracking-wide text-center drop-shadow-md">
@@ -68,7 +68,7 @@ export default function SearchReservation({ locations, defPickupLocation, defRet
                 </div>
             }
             <form onSubmit={submitHandler} className={`grid grid-cols-1 gap-6 ${home ? "md:grid-cols-2 lg:gap-8" : "md:flex md:flex-wrap md:items-end"}`}>
-                
+
                 <div className={`min-w-[200px] ${!home && 'md:flex-1'}`}>
                     <label className="flex items-center gap-2 mb-2 text-xs font-bold text-gray-300 uppercase tracking-wider">
                         <div className="p-1 rounded bg-blue-500/20">
@@ -79,12 +79,12 @@ export default function SearchReservation({ locations, defPickupLocation, defRet
                         </div>
                         {upperFirstLetter(t('website.home.pick_up_location'))}
                     </label>
-                    <div className="shadow-lg rounded-xl overflow-hidden transition-transform hover:scale-[1.01]">
+                    <div className="shadow-lg rounded-xl transition-transform hover:scale-[1.01] relative z-20">
                         <LocationSelector selectedLocation={selectedPULocation} isOpen={isPUOpen} locations={locations} setSelectedLocation={setSelectedPULocation} setIsOpen={setIsPUOpen} />
                     </div>
                 </div>
 
-                <div className={`min-w-[200px] ${!home && 'md:flex-1'}`}>
+                <div className={`min-w-50 ${!home && 'md:flex-1'}`}>
                     <label className="flex items-center gap-2 mb-2 text-xs font-bold text-gray-300 uppercase tracking-wider">
                         <div className="p-1 rounded bg-blue-500/20">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 text-blue-400">
@@ -94,7 +94,7 @@ export default function SearchReservation({ locations, defPickupLocation, defRet
                         </div>
                         {upperFirstLetter(t('website.home.return_location'))}
                     </label>
-                    <div className="shadow-lg rounded-xl overflow-hidden transition-transform hover:scale-[1.01]">
+                    <div className="shadow-lg rounded-xl transition-transform hover:scale-[1.01] relative z-20">
                         <LocationSelector selectedLocation={selectedRLocation} isOpen={isROpen} locations={locations} setSelectedLocation={setSelectedRLocation} setIsOpen={setIsROpen} />
                     </div>
                 </div>

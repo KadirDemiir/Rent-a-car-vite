@@ -41,19 +41,19 @@ export default function LocationSelector({ locations, selectedLocation, isOpen, 
 
     return (
         <div className="relative">
-            <button 
+            <button
                 ref={buttonRef} // Add ref to button
-                type="button" 
-                onClick={() => setIsOpen(!isOpen)} 
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
                 className={`w-full h-12 px-4 bg-white border-2 rounded-xl font-medium text-gray-700 flex items-center justify-between transition-all ${
                     isOpen ? 'border-blue-500 shadow-md ring-2 ring-blue-100' : 'border-gray-200 hover:border-gray-300'
                 }`}
             >
                 <span className="truncate">{selectedLocation.name}</span>
-                <svg 
-                    className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
-                    fill="none" 
-                    stroke="currentColor" 
+                <svg
+                    className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                 >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

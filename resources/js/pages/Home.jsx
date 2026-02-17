@@ -4,6 +4,7 @@ import SearchReservationForm from '../components/websites/SearchReservationForm.
 import { useTranslation } from "react-i18next";
 import CarCard from "../components/websites/carCards/CarCard.jsx";
 import { ChevronLeft, ChevronRight, MapPin, ArrowRight } from 'lucide-react';
+import { Link } from "@inertiajs/react";
 
 const BG_IMAGE = "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?q=80&w=2070&auto=format&fit=crop";
 
@@ -15,7 +16,7 @@ const FEATURES = [
 ];
 
 export default function Home({ locations, carGroups }) {
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation();
     const sliderRef = useRef(null);
 
     const scroll = useCallback((direction) => {
@@ -44,7 +45,7 @@ export default function Home({ locations, carGroups }) {
                         src={BG_IMAGE}
                         alt="Araç Kiralama"
                         className="w-full h-full object-cover"
-                        fetchpriority="high"
+                        fetchPriority="high"
                     />
                     <div className="absolute inset-0 bg-black/60 md:bg-black/50"></div>
                 </div>
@@ -56,7 +57,7 @@ export default function Home({ locations, carGroups }) {
 
                     <div className="grow flex flex-col items-center justify-center md:justify-center px-4 pb-6 gap-2 md:gap-8">
                         <div className="text-center w-full max-w-4xl mx-auto shrink-0">
-                            <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight drop-shadow-xl tracking-tight">
+                            <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight drop-shadow-md">
                                 Yolculuğun <span className="text-red-500">Ayrıcalıklı</span> Hali
                             </h1>
                             <p className="hidden md:block mt-4 text-lg md:text-xl text-gray-200 font-light max-w-2xl mx-auto drop-shadow-md">
@@ -64,8 +65,8 @@ export default function Home({ locations, carGroups }) {
                             </p>
                         </div>
 
-                        <div className="w-full max-w-6xl mx-auto shrink-0">
-                            <div className="origin-top transform scale-90 sm:scale-100 transition-transform">
+                        <div className="w-full max-w-6xl mx-auto shrink-0 min-h-[180px]">
+                            <div className="origin-top">
                                 <SearchReservationForm locations={locations} home={true} />
                             </div>
                         </div>
@@ -122,9 +123,9 @@ export default function Home({ locations, carGroups }) {
                                 </button>
                             </div>
                             <div className="h-6 w-px bg-gray-300 mx-2"></div>
-                            <a href="#" className="text-red-600 font-semibold hover:text-red-700 transition-colors whitespace-nowrap">
+                            <Link href={`/${i18n.language}/${t('address.cars')}`} className="text-red-600 font-semibold hover:text-red-700 transition-colors whitespace-nowrap">
                                 Tüm Filoyu Gör →
-                            </a>
+                            </Link>
                         </div>
                     </div>
 
@@ -139,7 +140,7 @@ export default function Home({ locations, carGroups }) {
 
                         <div
                             ref={sliderRef}
-                            className="flex gap-6 overflow-x-auto pb-10 snap-x scroll-smooth scrollbar-hide"
+                            className="flex gap-6 overflow-x-auto pb-10 snap-x scroll-none whitespace-nowrap scrollbar-hide"
                         >
                             {carGroups.map((car, index) => (
                                 <div
@@ -212,6 +213,74 @@ export default function Home({ locations, carGroups }) {
                         <a href="#" className="inline-block px-6 py-3 border border-red-600 text-red-600 font-semibold rounded-lg">
                             Tüm Lokasyonları Gör
                         </a>
+                    </div>
+                </div>
+            </div>
+
+            <div className="py-20 bg-white relative overflow-hidden">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex flex-col lg:flex-row items-center gap-16">
+                        <div className="w-full lg:w-1/2 relative">
+                            <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl">
+                                <img
+                                    src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=2070&auto=format&fit=crop"
+                                    alt="Ofisimiz ve Ekibimiz"
+                                    className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700"
+                                />
+                            </div>
+                            <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-gray-100 rounded-3xl -z-10"></div>
+                            <div className="absolute -top-6 -left-6 w-48 h-48 bg-red-50 rounded-3xl -z-10"></div>
+
+                            <div className="absolute bottom-8 left-8 bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-white/20 hidden md:block">
+                                <div className="flex items-center gap-4">
+                                    <div className="bg-red-600 text-white p-3 rounded-xl">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p className="text-3xl font-bold text-gray-900">10+</p>
+                                        <p className="text-sm text-gray-600 font-medium">Yıllık Tecrübe</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="w-full lg:w-1/2">
+                            <h2 className="text-base text-red-600 font-bold tracking-wide uppercase mb-2">Biz Kimiz?</h2>
+                            <h3 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-6">
+                                Yolculuğunuzun <br />
+                                <span className="text-transparent bg-clip-text bg-linear-to-r from-red-600 to-red-800">Güvenilir Partneri</span>
+                            </h3>
+
+                            <p className="text-lg text-gray-600 mb-6 leading-relaxed">
+                                Sektördeki 10 yılı aşkın tecrübemizle, araç kiralama deneyimini sadece bir "ulaşım" aracı olmaktan çıkarıp, konfor ve güvenle harmanlanmış bir hizmete dönüştürüyoruz.
+                            </p>
+
+                            <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+                                Geniş araç filomuz, 7/24 destek hattımız ve şeffaf fiyat politikamızla, hem bireysel hem de kurumsal müşterilerimize kusursuz bir yolculuk vaat ediyoruz. Sizin için sadece en iyisini sunuyoruz.
+                            </p>
+
+                            <div className="grid grid-cols-2 gap-6 mb-8">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-2 h-2 bg-red-600 rounded-full"></div>
+                                    <span className="font-semibold text-gray-800">Müşteri Odaklılık</span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-2 h-2 bg-red-600 rounded-full"></div>
+                                    <span className="font-semibold text-gray-800">Sürdürülebilirlik</span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-2 h-2 bg-red-600 rounded-full"></div>
+                                    <span className="font-semibold text-gray-800">Güvenilirlik</span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-2 h-2 bg-red-600 rounded-full"></div>
+                                    <span className="font-semibold text-gray-800">Yenilikçilik</span>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </div>
