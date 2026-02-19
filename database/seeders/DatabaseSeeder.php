@@ -118,6 +118,9 @@
             "adminpanel.navigator.email_templates" => "Admin menu item for email templates",
             "adminpanel.navigator.add_car_group" => "Admin menu item for add cars group",
             "adminpanel.navigator.car_groups" => "Admin menu item for cars groups",
+            "adminpanel.navigator.website" => "Admin menu item for website",
+            "adminpanel.navigator.website_settings" => "Admin menu item for website settings",
+            "adminpanel.navigator.page_settings" => "Admin menu item for page settings",
             // Email Templates
             "adminpanel.email.edit_email_template" => "Edit Email Template",
             "adminpanel.email.back" => "Back",
@@ -384,7 +387,7 @@
             "adminpanel.add_languages.apply_all" => "language key apply all",
 
             "adminpanel.languages.edit_language.language_information" => "Language information",
-            "adminpanel.languages.edit_language.site_variables" => "Site variables header",
+            "adminpanel.languages.edit_language.site_variables" => "Seciton variables header",
             "adminpanel.languages.edit_language.related_campaigns" => "Related Campaigns",
             "adminpanel.languages.edit_language.cars" => "CarGroups languages",
             "adminpanel.languages.edit_language.button.active" => "Active language",
@@ -477,6 +480,8 @@
             "address.reservation-create" => "Reservation Create URL",
             "address.checkReservation" => "Check reservation url",
             "address.email-templates" => "Email Templates url",
+            "address.website_settings" => "settings for website url",
+            "address.page_settings" => "page settings url",
 
             "website.check_reservation.title" => "Check Reservation Title",
             "website.check_reservation.email_label" => "Email label for check reservation",
@@ -612,6 +617,9 @@
             "adminpanel.navigator.email_templates" => "E-posta Şablonları",
             "adminpanel.navigator.add_car_group" => "Araç Grubu Ekle",
             "adminpanel.navigator.car_groups" => "Araç Grubuları",
+            "adminpanel.navigator.website" => "Website",
+            "adminpanel.navigator.website_settings" => "Website Ayarları",
+            "adminpanel.navigator.page_settings" => "Sayfa İşlemleri",
             // Email Templates Turkish
             "adminpanel.email.edit_email_template" => "E-posta Şablonunu Düzenle",
             "adminpanel.email.back" => "Geri",
@@ -873,7 +881,7 @@
             "adminpanel.add_languages.apply_all" => "Tümüne uygula",
 
             "adminpanel.languages.edit_language.language_information" => "Dil Bilgisi",
-            "adminpanel.languages.edit_language.site_variables" => "Site Değişkenleri",
+            "adminpanel.languages.edit_language.site_variables" => "Seciton Değişkenleri",
             "adminpanel.languages.edit_language.related_campaigns" => "İlgili Kampanyalar",
             "adminpanel.languages.edit_language.cars" => "Araçlar",
             "adminpanel.languages.edit_language.button.active" => "Aktif Et",
@@ -966,6 +974,8 @@
             "address.reservation-create" => "rezervasyon-ekle",
             "address.checkReservation" => "rezervasyon-kontrol",
             "address.email-templates" => "email-sablonlari",
+            "address.website_settings" => "webiste-ayarlari",
+            "address.page_settings" => "sayfa-ayarlari",
 
             "website.check_reservation.title" => "Rezervasyon Kontrolü",
             "website.check_reservation.email_label" => "E-posta Adresi",

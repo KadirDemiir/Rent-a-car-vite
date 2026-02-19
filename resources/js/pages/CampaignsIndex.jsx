@@ -26,7 +26,7 @@ export default function CampaignsIndex({ campaign }) {
 
             <div className="px-8 py-6 text-gray-700 text-base leading-relaxed">
                 {campaign.content ? (
-                    <div className="wysiwyg-content break-words" dangerouslySetInnerHTML={{ __html: contentObj[currentLang] }} />
+                    <div className="campaign-content wysiwyg-content wrap-break-words" dangerouslySetInnerHTML={{ __html: contentObj[currentLang] }} />
                 ) : (
                     <p>İçerik bulunamadı.</p>
                 )}

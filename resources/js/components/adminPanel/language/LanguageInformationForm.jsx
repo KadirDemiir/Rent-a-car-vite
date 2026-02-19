@@ -36,7 +36,7 @@ export default function LanguageInformationForm({lang, setLang, totalCmpCount, c
             .then(response => setSuccess(response.data.success))
             .catch(error => setError(error.response.data.error));
     }
-    
+
     const campaignProgress = totalCmpCount > 0 ? ((totalCmpCount - cmpErrorCount) / totalCmpCount) * 100 : 0;
     const variableProgress = totalVariableCount > 0 ? ((totalVariableCount - variableErrorCount) / totalVariableCount) * 100 : 0;
 
@@ -90,7 +90,7 @@ export default function LanguageInformationForm({lang, setLang, totalCmpCount, c
                         )}
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div 
+                        <div
                             className={`h-2 rounded-full transition-all duration-500 ${
                                 cmpErrorCount === 0 ? 'bg-green-500' : 'bg-purple-500'
                             }`}
@@ -99,7 +99,7 @@ export default function LanguageInformationForm({lang, setLang, totalCmpCount, c
                     </div>
                 </div>
 
-                {/* Site Variables Stats */}
+                {/* Seciton Variables Stats */}
                 <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border border-blue-100 p-4 sm:p-5">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -122,7 +122,7 @@ export default function LanguageInformationForm({lang, setLang, totalCmpCount, c
                         )}
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div 
+                        <div
                             className={`h-2 rounded-full transition-all duration-500 ${
                                 variableErrorCount === 0 ? 'bg-green-500' : 'bg-blue-500'
                             }`}
@@ -135,7 +135,7 @@ export default function LanguageInformationForm({lang, setLang, totalCmpCount, c
             {/* Actions Section */}
             <div className="bg-gray-50 rounded-xl p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                    <button 
+                    <button
                         onClick={handleSubmit}
                         className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-gray-700 to-gray-800 text-white font-semibold rounded-xl hover:from-gray-800 hover:to-gray-900 transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98]"
                     >

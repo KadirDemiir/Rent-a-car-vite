@@ -4,14 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Campaigns;
 use App\Models\Discount;
-use App\Models\Language;
 use App\Models\Currency;
-use App\Models\Segment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Illuminate\Support\Str;
+use DOMDocument;
 
 class CampaignsController extends Controller
 {
@@ -77,9 +77,16 @@ class CampaignsController extends Controller
             $endDate = Carbon::parse($validated['end_date']);
             $currentDate = Carbon::now();
 
+            $contentArray = json_decode($validated['content'], true);
+            $processedContent = [];
+
+            foreach ($contentArray as $lang => $htmlContent) {
+                $processedContent[$lang] = $this->processContentImages($htmlContent);
+            }
+
             $campaign = new Campaigns();
             $campaign->title = json_decode($validated['title'], true);
-            $campaign->content = json_decode($validated['content'], true);
+            $campaign->content = $processedContent;
             $campaign->start_date = $startDate;
             $campaign->end_date = $endDate;
             $campaign->status = $currentDate->between($startDate, $endDate) ? 'active' : 'inactive';
@@ -113,11 +120,50 @@ class CampaignsController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-
             return Inertia::render('adminPanel/campaigns/AddCampaign', [
                 'error' => 'Bir hata oluştu: ' . $e->getMessage(),
             ]);
         }
+    }
+
+    private function processContentImages($htmlContent)
+    {
+        if (empty($htmlContent)) {
+            return $htmlContent;
+        }
+
+        $dom = new DOMDocument();
+        @$dom->loadHTML(mb_convert_encoding($htmlContent, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+        $images = $dom->getElementsByTagName('img');
+
+        foreach ($images as $img) {
+            $src = $img->getAttribute('src');
+
+            if (preg_match('/^data:image\/(\w+);base64,/', $src, $type)) {
+                $data = substr($src, strpos($src, ',') + 1);
+                $type = strtolower($type[1]);
+
+                if (!in_array($type, ['jpg', 'jpeg', 'gif', 'png', 'webp'])) {
+                    continue;
+                }
+
+                $data = base64_decode($data);
+                if ($data === false) {
+                    continue;
+                }
+
+                $fileName = 'campaign_content_' . time() . '_' . Str::random(10) . '.' . $type;
+                $filePath = 'uploads/campaign_content/' . $fileName;
+
+                Storage::disk('public')->put($filePath, $data);
+
+                $img->removeAttribute('src');
+                $img->setAttribute('src', Storage::url($filePath));
+            }
+        }
+
+        return $dom->saveHTML();
     }
 
     private function addDiscountToCampaign(
@@ -143,12 +189,11 @@ class CampaignsController extends Controller
         $discountModel->discount_type = $discount['discount_type'];
         $discountModel->currency_id = $cur_id;
         $discountModel->target_type = $selectedDiscount;
-        
+
         if($discount['discount_type'] === "percentage")
             $discountModel->discount_value = (float) ($discount['discount_amount'] / 100);
         else
             $discountModel->discount_value = $discount['discount_amount'];
-        
 
         if ($selectedDiscount === 'segment') {
             $discountModel->segment_id = $targetData;
@@ -173,11 +218,7 @@ class CampaignsController extends Controller
 
         $campaign = Campaigns::findOrFail($request->id);
 
-        if (
-            $campaign->photo_path &&
-            str_starts_with($campaign->photo_path, 'campaigns/') &&
-            Storage::disk('public')->exists($campaign->photo_path)
-        ) {
+        if ($campaign->photo_path && Storage::disk('public')->exists($campaign->photo_path)) {
             Storage::disk('public')->delete($campaign->photo_path);
         }
 
@@ -209,8 +250,15 @@ class CampaignsController extends Controller
             $endDate = Carbon::parse($validated['end_date']);
             $currentDate = Carbon::now();
 
-            $campaign->title = $validated['title'];
-            $campaign->content = $validated['content'];
+            $contentArray = json_decode($validated['content'], true);
+            $processedContent = [];
+
+            foreach ($contentArray as $lang => $htmlContent) {
+                $processedContent[$lang] = $this->processContentImages($htmlContent);
+            }
+
+            $campaign->title = json_decode($validated['title'], true);
+            $campaign->content = $processedContent;
             $campaign->start_date = $startDate;
             $campaign->end_date = $endDate;
             $campaign->status = $currentDate->between($startDate, $endDate) ? 'active' : 'inactive';
@@ -219,7 +267,6 @@ class CampaignsController extends Controller
                 if ($campaign->photo_path && Storage::disk('public')->exists($campaign->photo_path)) {
                     Storage::disk('public')->delete($campaign->photo_path);
                 }
-
                 $campaign->photo_path = $request->file('image')->store('campaigns', 'public');
             }
 
@@ -229,7 +276,6 @@ class CampaignsController extends Controller
 
             if ($validated['hasDiscount']) {
                 $discounts = json_decode($validated['dayDiscounts'], true);
-
                 foreach ($discounts as $discount) {
                     $this->addDiscountToCampaign(
                         $campaign->id,

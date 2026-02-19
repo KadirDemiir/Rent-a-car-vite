@@ -10,6 +10,7 @@ import ReservationDatePreview from "../components/websites/reservation/Reservati
 import IncludedServices from "../components/websites/reservation/create-reservation/IncludeServicesList.jsx";
 import { useCurrency } from "../providers/CurrencyContext.jsx";
 import {router} from "@inertiajs/react";
+import MetaData from "../components/websites/MetaData.jsx";
 
 export default function SelectExtras({car, auth_user, params}){
     console.log(car);
@@ -135,6 +136,7 @@ export default function SelectExtras({car, auth_user, params}){
 
     return(
         <>
+            <MetaData/>
             <Navbar/>
             <div className="min-h-screen bg-linear-to-br from-gray-50 via-blue-50 to-gray-50 py-8 px-4">
                 <div className="max-w-7xl mx-auto">

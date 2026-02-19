@@ -1,6 +1,7 @@
 import CampaignTextEditor from "./ContentEditor.jsx";
 import {useTranslation} from "react-i18next";
 export default function AddCampaignInfo({image, title, titleOnChange, handleImageChange, content, setOnChange, currLan}){
+    console.log(content);
     const {t} = useTranslation();
     return(
         <>

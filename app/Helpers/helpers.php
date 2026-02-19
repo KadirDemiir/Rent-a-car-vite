@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Page;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Translation;
 use App\Models\Language;
@@ -9,8 +10,16 @@ use App\Models\Fuel;
 use App\Models\Transmission;
 
 function getCacheStore() {
-    // Use default cache store from config (database/redis/file based on .env)
     return Cache::store();
+}
+
+if(!function_exists('getPagesCache')){
+    function getPagesCache()
+    {
+        return \Illuminate\Support\Facades\Cache::rememberForever('pages_cache', function () {
+            return \App\Models\Page::select('id', 'meta_title', 'meta_description', 'meta_keywords', 'route_group_name', 'is_active')->get();
+        });
+    }
 }
 
 if (!function_exists('dbTransRoute')) {

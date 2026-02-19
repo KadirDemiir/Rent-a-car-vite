@@ -2,6 +2,7 @@ import Navbar from '../components/websites/Navbar.jsx';
 import LocationCard from '../components/websites/locationCard/LocationCard.jsx';
 import {useEffect, useState} from "react";
 import axios from "axios";
+import MetaData from "../components/websites/MetaData.jsx";
 export default function Locations() {
     const [locations, setLocations] = useState();
     const [loading, setLoading] = useState(true);
@@ -25,7 +26,8 @@ export default function Locations() {
     //if (loading) return <p>Yükleniyor...</p>;
 
     return (
-        <div>
+        <>
+            <MetaData/>
             < Navbar />
             {loading ? (
             <div className="flex items-center justify-center min-h-screen">
@@ -42,6 +44,6 @@ export default function Locations() {
                 </div>
             </div>
             )}
-        </div>
+        </>
     );
 }

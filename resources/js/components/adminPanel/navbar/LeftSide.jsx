@@ -80,6 +80,13 @@ export default function LeftSide({ isOpen, onClose }) {
                 {name: t("adminpanel.navigator.add_transmission"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.transmissions")}/${t("address.add")}`},
                 {name: t("adminpanel.navigator.transmissions"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.transmissions")}`},
             ]
+        },
+        {
+            title: t("adminpanel.navigator.website"),
+            subSec: [
+                {name: t("adminpanel.navigator.website_settings"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.website_settings")}`},
+                {name: t("adminpanel.navigator.page_settings"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.page_settings")}`}
+            ]
         }
     ];
     const [activeSection, setActiveSection] = useState("home");

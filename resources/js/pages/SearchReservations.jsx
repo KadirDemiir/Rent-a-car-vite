@@ -3,6 +3,7 @@ import Navbar from "../components/websites/Navbar.jsx";
 import SearchReservationsFrom from "../components/websites/SearchReservationForm.jsx";
 import SortSearchReservations from '../components/websites/SortSearchReservations.jsx';
 import FilterReservations from "../components/websites/FilterReservations.jsx"
+import MetaData from "../components/websites/MetaData.jsx";
 
 export default function SearchReservations({ availableCars, reservation, locations }){
     const [sortBy, setSortBy] = useState("increase");
@@ -17,7 +18,8 @@ export default function SearchReservations({ availableCars, reservation, locatio
         setSegment(segment);
     };
     return(
-        <div >
+        <>
+            <MetaData/>
             <Navbar />
             <br />
             <div className="flex flex-col items-center justify-center">
@@ -42,7 +44,7 @@ export default function SearchReservations({ availableCars, reservation, locatio
 
                 </div>
             </div>
-        </div>
+        </>
 
     );
 }

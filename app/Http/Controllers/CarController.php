@@ -39,7 +39,6 @@ class CarController extends Controller
             ])
             ->orderBy('sort_order', 'asc')
             ->get();
-
         return Inertia::render('Cars', [
             'cars' => $cars,
             'locations' => Locations::where('is_active', true)->select(['id', 'name'])->get(),

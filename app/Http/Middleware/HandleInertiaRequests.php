@@ -31,6 +31,7 @@ class HandleInertiaRequests extends Middleware
             'languages' => fn () => $this->getLanguages(),
             // Pass translations inline to avoid extra HTTP request from i18next
             'translations' => fn () => $this->getTranslations(),
+            'activePages' => getPagesCache()->where('is_active', true)->pluck('route_group_name')->toArray(),
         ]);
     }
 
@@ -54,7 +55,7 @@ class HandleInertiaRequests extends Middleware
             ->select('id', 'code', 'symbol', 'exchange_rate')
             ->get()
             ->toArray();
-        
+
         Cache::put('active_currencies_simple', $currencies, 3600);
         return $currencies;
     }

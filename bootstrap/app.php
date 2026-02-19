@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckPageGroupIsActive;
 use App\Http\Middleware\DetectBrowserLocale;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
@@ -37,6 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'localeViewPath'          => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class,
             'detectBrowserLocale'     => DetectBrowserLocale::class,
             'admin'                   => \App\Http\Middleware\AdminMiddleware::class,
+            'check.page.group'        => CheckPageGroupIsActive::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

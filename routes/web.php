@@ -10,6 +10,7 @@ use App\Http\Controllers\EmailTemplateController;
 use App\Http\Controllers\ExtraServicesController;
 use App\Http\Controllers\FuelController;
 use App\Http\Controllers\SegmentController;
+use App\Http\Controllers\SectionController;
 use App\Http\Controllers\TranslationController;
 use App\Http\Controllers\TransmissionController;
 use App\Models\BodyType;
@@ -25,7 +26,6 @@ use App\Models\Segment;
 use App\Models\Translation;
 use App\Models\TranslationKey;
 use App\Models\Transmission;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -36,8 +36,6 @@ use App\Http\Controllers\ReservationController;
 use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
-
-
 Route::get('/locales/{locale}/translation.json', [TranslationController::class, 'fetch'])
     ->name('translations.fetch');
 Route::middleware('admin')->group(function () {
@@ -249,19 +247,29 @@ Route::group([
             'locations' => Locations::select('id', 'name', 'photo_path')->where('is_active', true)->get(),
             'carGroups' => $carGroups,
             ]);
-    })->name('home');
-    Route::get(dbTransRoute('cars'), [CarController::class, 'showAllCars'])->name('showCars');
-    Route::get(dbTransRoute('cars') . '/{id}', [CarController::class, 'showCar'])->name('showIndexCar');
-    Route::inertia(dbTransRoute('locations'), 'Locations')->name('locations');
-    Route::get(dbTransRoute('campaigns'), [CampaignsController::class, 'showAll'])->name('allCampaigns');
-    Route::get(dbTransRoute('campaigns') . '/{id}', [CampaignsController::class, 'showIndex'])->name('showCampaign');
-    Route::inertia(dbTransRoute('carporateRental'), 'CorporateRental')->name('carporateRental');
-    Route::inertia(dbTransRoute('about'), 'About')->name('about');
-    Route::inertia(dbTransRoute('blog'), 'Blog')->name('blog');
-    Route::inertia(dbTransRoute('auth'), 'auth/Auth')->name('showAuth');
-    Route::get(dbTransRoute('searchReservations'), [ReservationController::class, 'searchReservations'])->name('searchReservations');
+    })->middleware('check.page.group:home')->name('home');
+
+    Route::get(dbTransRoute('cars'), [CarController::class, 'showAllCars'])->middleware('check.page.group:cars')->name('showCars');
+
+    //Route::get(dbTransRoute('cars') . '/{id}', [CarController::class, 'showCar'])->name('showIndexCar');
+    Route::inertia(dbTransRoute('locations'), 'Locations')->middleware('check.page.group:locations')->name('locations');
+
+    Route::middleware('check.page.group:campaigns')->group(function () {
+        Route::get(dbTransRoute('campaigns'), [CampaignsController::class, 'showAll'])->name('allCampaigns');
+        Route::get(dbTransRoute('campaigns') . '/{id}', [CampaignsController::class, 'showIndex'])->name('showCampaign');
+    });
+
+    Route::inertia(dbTransRoute('carporateRental'), 'CorporateRental')->middleware('check.page.group:corporate')->name('carporateRental');
+
+    Route::inertia(dbTransRoute('about'), 'About')->middleware('check.page.group:about')->name('about');
+
+    Route::inertia(dbTransRoute('blog'), 'Blog')->middleware('check.page.group:blog')->name('blog');
+
+    Route::inertia(dbTransRoute('auth'), 'auth/Auth')->middleware('check.page.group:auth')->name('showAuth');
+
+    Route::get(dbTransRoute('searchReservations'), [ReservationController::class, 'searchReservations'])->middleware('check.page.group:reservation-search')->name('searchReservations');
     Route::post(dbTransRoute('reservation-create'), [ReservationController::class, 'initiateDraft'])->name('reservation.init');
-    Route::get(dbTransRoute('reservation-create'), [ReservationController::class, 'showExtras'])->name('reservation-create');
+    Route::get(dbTransRoute('reservation-create'), [ReservationController::class, 'showExtras'])->middleware('check.page.group:reservation-create')->name('reservation-create');
 
     Route::get('/r/track/{token}', [ReservationController::class, 'track'])
         ->name('reservation.track');
@@ -439,10 +447,17 @@ Route::group([
     Route::post('/adminpanel/email-templates', [EmailTemplateController::class, 'store'])->name('adminStoreEmailTemplate');
     Route::put('/adminpanel/email-templates/{id}', [EmailTemplateController::class, 'update'])->name('adminUpdateEmailTemplate');
     Route::delete('/adminpanel/email-templates/{id}', [EmailTemplateController::class, 'destroy'])->name('adminDeleteEmailTemplate');
+    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('website_settings'), [SectionController::class, 'showPage'])->name('adminShowSiteSettings');
+    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('page_settings'), [\App\Http\Controllers\PageController::class, 'showPage'])->name('adminShowSiteSettings');
+
+    // API endpoints for admin panel pages
+    Route::get('/adminpanel/pages', [\App\Http\Controllers\PageController::class, 'index'])->name('adminGetPages');
+    Route::post('/adminpanel/pages/{id}/toggle-status', [\App\Http\Controllers\PageController::class, 'toggleStatus'])->name('adminTogglePageStatus');
+    Route::put('/pages/{page}', [\App\Http\Controllers\PageController::class, 'update'])->name('admin.pages.update');
     });
 });
 
 
 Route::get('{any?}', function () {
     return Inertia::render('NotFound');
-})->where('any', '.*');
+})->where('any', '.*')->name('pageNotFound');

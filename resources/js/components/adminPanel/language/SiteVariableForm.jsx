@@ -81,7 +81,7 @@ export default function SiteVariableForm({keys, language}){
                 </button>
             </div>
 
-            {/* Site Variables */}
+            {/* Seciton Variables */}
             <SiteVariable keys={keys} formData={formData} setFormData={setFormData}/>
         </div>
     );

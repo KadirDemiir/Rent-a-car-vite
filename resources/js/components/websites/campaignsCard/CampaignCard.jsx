@@ -1,7 +1,7 @@
 export default function CampaignCard({campaign, isAdmin, currentLang}){
     const titleObj = typeof campaign.title === 'string' ? JSON.parse(campaign.title) : campaign.title;
     const contentObj = typeof campaign.content === 'string' ? JSON.parse(campaign.content) : campaign.content;
-    
+
     const formatDate = (dateString) => {
         if (!dateString) return null;
         const date = new Date(dateString);
@@ -14,8 +14,8 @@ export default function CampaignCard({campaign, isAdmin, currentLang}){
             {isAdmin && (
                 <div className="absolute top-3 left-3 z-10">
                     <div className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${
-                        campaign.status === 'active' 
-                            ? 'bg-green-100 text-green-700' 
+                        campaign.status === 'active'
+                            ? 'bg-green-100 text-green-700'
                             : 'bg-red-100 text-red-700'
                     }`}>
                         {campaign.status}
@@ -51,12 +51,12 @@ export default function CampaignCard({campaign, isAdmin, currentLang}){
                 </h3>
 
                 {/* Description Preview */}
-                {contentObj?.[currentLang] && (
-                    <div 
+{/*                {contentObj?.[currentLang] && (
+                    <div
                         className="rte-content text-gray-600 text-xs md:text-sm line-clamp-2 flex-1"
                         dangerouslySetInnerHTML={{ __html: contentObj[currentLang] }}
                     />
-                )}
+                )}*/}
 
                 {/* Footer Action */}
                 <div className="pt-2 md:pt-3 border-t border-gray-100 text-blue-600 font-medium text-xs md:text-sm group-hover:text-blue-700 transition-colors duration-200">
