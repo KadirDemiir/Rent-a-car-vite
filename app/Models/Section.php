@@ -12,9 +12,11 @@ class Section extends Model
     protected $fillable = [
         'page_id',
         'title',
+        'description',
         'content',
         'sort_order',
         'is_active',
+        'is_default',
     ];
 
     protected $casts = [
@@ -22,6 +24,12 @@ class Section extends Model
         'content' => 'array',
         'sort_order' => 'integer',
         'is_active' => 'boolean',
+        'is_default' => 'boolean',
+    ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
     ];
 
     public function page(): BelongsTo

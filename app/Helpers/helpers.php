@@ -22,6 +22,15 @@ if(!function_exists('getPagesCache')){
     }
 }
 
+if(!function_exists('getSectionsCache')){
+    function getSectionsCache()
+    {
+        return \Illuminate\Support\Facades\Cache::rememberForever('sections_cache', function () {
+            return \App\Models\Section::all()->sortBy('sort_order')->values();
+        });
+    }
+}
+
 if (!function_exists('dbTransRoute')) {
     function dbTransRoute(string $key): ?string
     {

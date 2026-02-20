@@ -19,6 +19,7 @@ import TaskItem from '@tiptap/extension-task-item';
 import Placeholder from '@tiptap/extension-placeholder';
 import BulletList from '@tiptap/extension-bullet-list';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
 
 const CustomBulletList = BulletList.configure({
     itemTypeName: 'listItem',
@@ -41,7 +42,7 @@ const ToolbarButton = ({ onClick, isActive, disabled, children, title, className
         onClick={onClick}
         disabled={disabled}
         title={title}
-        className={`p-1.5 rounded text-sm font-medium transition-colors min-w-[32px] flex items-center justify-center ${
+        className={`p-1.5 rounded text-sm font-medium transition-colors min-w-8 flex items-center justify-center ${
             isActive ? 'bg-gray-800 text-white' : 'text-gray-600 hover:bg-gray-100'
         } ${disabled ? 'opacity-30 cursor-not-allowed' : ''} ${className}`}
         type="button"
@@ -215,7 +216,7 @@ const EditorToolbar = ({ editor, onImageUpload }) => {
     );
 };
 
-export default function CampaignTextEditor({ content, setContent, currLan, label, showCount = true }) {
+export default function CampaignTextEditor({ content, setContent, currLan, label, showCount = true, page="campaign" }) {
     const { t } = useTranslation();
     const fileInputRef = useRef(null);
 
@@ -244,7 +245,7 @@ export default function CampaignTextEditor({ content, setContent, currLan, label
                         },
                     }
                 },
-            }).configure({ inline: true, allowBase64: true }),
+            }).configure({ inline: true, allowBase64: false }),
             Table.configure({ resizable: true }),
             TableRow,
             TableHeader,
@@ -274,17 +275,29 @@ export default function CampaignTextEditor({ content, setContent, currLan, label
         fileInputRef.current?.click();
     };
 
-    const handleFileChange = (event) => {
+    const handleFileChange = async (event) => {
         const file = event.target.files?.[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const base64 = e.target.result;
-            if (base64 && editor) {
-                editor.chain().focus().setImage({ src: base64 }).run();
+
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('source', page);
+
+        try {
+            const response = await axios.post('/make-url', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            if (response.data.url && editor) {
+                editor.chain().focus().setImage({ src: response.data.url }).run();
             }
-        };
-        reader.readAsDataURL(file);
+        } catch (error) {
+            console.error("Resim yükleme hatası:", error);
+            alert("Resim yüklenirken bir hata oluştu. Lütfen dosya boyutunu kontrol edin.");
+        }
+
         event.target.value = '';
     };
 

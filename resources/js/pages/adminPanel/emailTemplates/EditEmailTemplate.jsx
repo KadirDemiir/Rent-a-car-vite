@@ -128,10 +128,11 @@ export default function EditEmailTemplate({ template, languages }) {
                                 currLan={lang}
                                 label={t('adminpanel.email.body')}
                                 showCount={false}
+                                page="email_temp"
                             />
                             <p className="mt-1 text-sm text-gray-500">{t('adminpanel.email.email_body_placeholder')}</p>
                         </div>
-{/* 
+{/*
                         <div className="flex items-center gap-2">
                             <input
                                 type="checkbox"

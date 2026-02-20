@@ -36,6 +36,29 @@ use App\Http\Controllers\ReservationController;
 use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+
+Route::post('/make-url', function (Request $request) {
+    $request->validate([
+        'image' => 'required|image|max:5120',
+        'source' => 'required|string'
+    ]);
+
+    $source = Str::slug($request->input('source'));
+    $file = $request->file('image');
+
+    $hash = md5_file($file->getRealPath());
+    $extension = $file->getClientOriginalExtension();
+    $fileName = $hash . '.' . $extension;
+
+    $path = $file->storeAs("uploads/{$source}", $fileName, 'public');
+
+    return response()->json([
+        'url' => asset("storage/{$path}"),
+        'path' => $path
+    ]);
+});
 Route::get('/locales/{locale}/translation.json', [TranslationController::class, 'fetch'])
     ->name('translations.fetch');
 Route::middleware('admin')->group(function () {
@@ -244,6 +267,7 @@ Route::group([
     Route::get('', function () {
         $carGroups = CarGroup::with(['photos'])->get();
         return Inertia::render('Home', [
+            'sections' => getSectionsCache(),
             'locations' => Locations::select('id', 'name', 'photo_path')->where('is_active', true)->get(),
             'carGroups' => $carGroups,
             ]);
@@ -447,10 +471,14 @@ Route::group([
     Route::post('/adminpanel/email-templates', [EmailTemplateController::class, 'store'])->name('adminStoreEmailTemplate');
     Route::put('/adminpanel/email-templates/{id}', [EmailTemplateController::class, 'update'])->name('adminUpdateEmailTemplate');
     Route::delete('/adminpanel/email-templates/{id}', [EmailTemplateController::class, 'destroy'])->name('adminDeleteEmailTemplate');
-    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('website_settings'), [SectionController::class, 'showPage'])->name('adminShowSiteSettings');
-    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('page_settings'), [\App\Http\Controllers\PageController::class, 'showPage'])->name('adminShowSiteSettings');
 
-    // API endpoints for admin panel pages
+    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('website_settings'), [SectionController::class, 'showPage'])->name('adminShowSiteSettings');
+    Route::put('/adminpanel/sections/{id}', [SectionController::class, 'update'])->name('adminUpdateSection');
+    Route::post('/adminpanel/sections', [SectionController::class, 'store'])->name('adminStoreSection');
+    Route::delete('/adminpanel/sections/{id}', [SectionController::class, 'destroy'])->name('adminDeleteSection');
+    Route::post('/adminpanel/sections/reorder', [SectionController::class, 'reorderSections'])->name('adminReorderSections');
+
+    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('page_settings'), [\App\Http\Controllers\PageController::class, 'showPage'])->name('adminShowSiteSettings');
     Route::get('/adminpanel/pages', [\App\Http\Controllers\PageController::class, 'index'])->name('adminGetPages');
     Route::post('/adminpanel/pages/{id}/toggle-status', [\App\Http\Controllers\PageController::class, 'toggleStatus'])->name('adminTogglePageStatus');
     Route::put('/pages/{page}', [\App\Http\Controllers\PageController::class, 'update'])->name('admin.pages.update');

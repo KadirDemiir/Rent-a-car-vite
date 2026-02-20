@@ -75,7 +75,7 @@ export default function EmailTemplates({ templates, languages }) {
 
     const handleDelete = async (id) => {
         if (!confirm(t('adminpanel.email.confirm_delete_template'))) return;
-        
+
         try {
             await axios.delete(`/adminpanel/email-templates/${id}`);
             router.reload();
@@ -108,7 +108,7 @@ export default function EmailTemplates({ templates, languages }) {
                                     {formError}
                                 </div>
                             )}
-                                
+
                             <LanguageProgress
                                 langOpt={langOpt}
                                 calculateProgress={languageProgress}
@@ -153,6 +153,7 @@ export default function EmailTemplates({ templates, languages }) {
                                     currLan={lang}
                                     label={t('adminpanel.email.body')}
                                     showCount={false}
+                                    page="email_temp"
                                 />
                                 <p className="mt-1 text-sm text-gray-500">{t('adminpanel.email.email_body_placeholder')}</p>
                             </div>
