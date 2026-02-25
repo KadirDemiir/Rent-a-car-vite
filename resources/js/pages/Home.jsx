@@ -89,7 +89,7 @@ export default function Home({locations, carGroups, sections}) {
                                     <img src={`/storage/${loc.photo_path}`} alt={getTranslatedText(loc.name)}
                                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"/>
                                     <div
-                                        className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                                        className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent"></div>
                                     <div className="absolute bottom-6 left-6 text-white">
                                         <div className="flex items-center gap-2">
                                             <MapPin size={20} className="text-red-500"/>
@@ -124,24 +124,28 @@ export default function Home({locations, carGroups, sections}) {
         <>
             <MetaData/>
             <div className="w-full flex flex-col min-h-screen">
-                <header className="relative w-full h-dvh flex flex-col shrink-0">
-                    <div className="absolute inset-0 z-0">
+                {/* DEĞİŞİKLİK 1: h-dvh ve overflow-hidden kaldırıldı, sadece min-h-dvh bırakıldı */}
+                <header className="relative w-full min-h-dvh flex flex-col shrink-0">
+                    <div className="absolute inset-0 z-0 h-full w-full">
                         <img
                             src={BG_IMAGE}
                             alt="Araç Kiralama"
-                            className="w-full h-full object-cover"
-                            fetchPriority="high"
+                            // DEĞİŞİKLİK 2: object-center yapıldı ki her durumda ortalansın
+                            className="w-full h-full object-cover object-center"
+                            fetchpriority="high"
                         />
                         <div className="absolute inset-0 bg-black/60 md:bg-black/50"></div>
                     </div>
 
-                    <div className="relative z-10 w-full h-full flex flex-col">
+                    {/* DEĞİŞİKLİK 3: h-full kaldırıldı, grow eklendi */}
+                    <div className="relative z-10 w-full grow flex flex-col">
                         <div className="shrink-0">
                             <NavBar/>
                         </div>
 
+                        {/* DEĞİŞİKLİK 4: overflow-hidden kaldırıldı, padding artırıldı (py-16 md:py-24) */}
                         <div
-                            className="grow flex flex-col items-center justify-center px-4 pb-6 gap-2 md:gap-8">
+                            className="grow flex flex-col items-center justify-center px-4 py-16 md:py-24 gap-2 md:gap-8">
                             <div className="text-center w-full max-w-4xl mx-auto shrink-0">
                                 <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight drop-shadow-md">
                                     Yolculuğun <span className="text-red-500">Ayrıcalıklı</span> Hali
@@ -151,7 +155,7 @@ export default function Home({locations, carGroups, sections}) {
                                 </p>
                             </div>
 
-                            <div className="w-full max-w-6xl mx-auto shrink-0 min-h-[180px]">
+                            <div className="w-full max-w-6xl mx-auto shrink-0">
                                 <div className="origin-top">
                                     <SearchReservationForm locations={locations} home={true}/>
                                 </div>

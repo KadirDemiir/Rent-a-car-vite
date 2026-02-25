@@ -85,7 +85,8 @@ export default function LeftSide({ isOpen, onClose }) {
             title: t("adminpanel.navigator.website"),
             subSec: [
                 {name: t("adminpanel.navigator.website_settings"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.website_settings")}`},
-                {name: t("adminpanel.navigator.page_settings"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.page_settings")}`}
+                {name: t("adminpanel.navigator.page_settings"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.page_settings")}`},
+                {name: t("adminpanel.navigator.about_page"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.about_page")}`},
             ]
         }
     ];

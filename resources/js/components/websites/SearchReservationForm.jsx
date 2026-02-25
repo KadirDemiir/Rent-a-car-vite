@@ -79,7 +79,7 @@ export default function SearchReservation({ locations, defPickupLocation, defRet
                         </div>
                         {upperFirstLetter(t('website.home.pick_up_location'))}
                     </label>
-                    <div className="shadow-lg rounded-xl transition-transform hover:scale-[1.01] relative z-20">
+                    <div className={`shadow-lg rounded-xl transition-transform hover:scale-[1.01] relative ${isPUOpen ? 'z-40' : 'z-20'}`}>
                         <LocationSelector selectedLocation={selectedPULocation} isOpen={isPUOpen} locations={locations} setSelectedLocation={setSelectedPULocation} setIsOpen={setIsPUOpen} />
                     </div>
                 </div>
@@ -94,7 +94,7 @@ export default function SearchReservation({ locations, defPickupLocation, defRet
                         </div>
                         {upperFirstLetter(t('website.home.return_location'))}
                     </label>
-                    <div className="shadow-lg rounded-xl transition-transform hover:scale-[1.01] relative z-20">
+                    <div className={`shadow-lg rounded-xl transition-transform hover:scale-[1.01] relative ${isROpen ? 'z-40' : 'z-20'}`}>
                         <LocationSelector selectedLocation={selectedRLocation} isOpen={isROpen} locations={locations} setSelectedLocation={setSelectedRLocation} setIsOpen={setIsROpen} />
                     </div>
                 </div>

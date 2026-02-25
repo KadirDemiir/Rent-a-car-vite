@@ -121,6 +121,7 @@
             "adminpanel.navigator.website" => "Admin menu item for website",
             "adminpanel.navigator.website_settings" => "Admin menu item for website settings",
             "adminpanel.navigator.page_settings" => "Admin menu item for page settings",
+            "adminpanel.navigator.about_page" => "Admin menu item for about page settings",
             // Email Templates
             "adminpanel.email.edit_email_template" => "Edit Email Template",
             "adminpanel.email.back" => "Back",
@@ -482,6 +483,7 @@
             "address.email-templates" => "Email Templates url",
             "address.website_settings" => "settings for website url",
             "address.page_settings" => "page settings url",
+            "address.about_page" => "about page settings url",
 
             "website.check_reservation.title" => "Check Reservation Title",
             "website.check_reservation.email_label" => "Email label for check reservation",
@@ -620,6 +622,7 @@
             "adminpanel.navigator.website" => "Website",
             "adminpanel.navigator.website_settings" => "Website Ayarları",
             "adminpanel.navigator.page_settings" => "Sayfa İşlemleri",
+            "adminpanel.navigator.about_page" => "Hakkımızda Sayfası",
             // Email Templates Turkish
             "adminpanel.email.edit_email_template" => "E-posta Şablonunu Düzenle",
             "adminpanel.email.back" => "Geri",
@@ -976,6 +979,7 @@
             "address.email-templates" => "email-sablonlari",
             "address.website_settings" => "webiste-ayarlari",
             "address.page_settings" => "sayfa-ayarlari",
+            "address.about_page" => "hakkimizda-sayfasi",
 
             "website.check_reservation.title" => "Rezervasyon Kontrolü",
             "website.check_reservation.email_label" => "E-posta Adresi",

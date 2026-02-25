@@ -285,7 +285,7 @@ Route::group([
 
     Route::inertia(dbTransRoute('carporateRental'), 'CorporateRental')->middleware('check.page.group:corporate')->name('carporateRental');
 
-    Route::inertia(dbTransRoute('about'), 'About')->middleware('check.page.group:about')->name('about');
+    Route::get(dbTransRoute('about'), [\App\Http\Controllers\AboutController::class, 'show'])->middleware('check.page.group:about')->name('about');
 
     Route::inertia(dbTransRoute('blog'), 'Blog')->middleware('check.page.group:blog')->name('blog');
 
@@ -482,6 +482,9 @@ Route::group([
     Route::get('/adminpanel/pages', [\App\Http\Controllers\PageController::class, 'index'])->name('adminGetPages');
     Route::post('/adminpanel/pages/{id}/toggle-status', [\App\Http\Controllers\PageController::class, 'toggleStatus'])->name('adminTogglePageStatus');
     Route::put('/pages/{page}', [\App\Http\Controllers\PageController::class, 'update'])->name('admin.pages.update');
+
+    Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('about_page'), [\App\Http\Controllers\AboutController::class, 'showPage'] )->name('adminAboutPage');
+    Route::post('/adminpanel/about_page', [\App\Http\Controllers\AboutController::class, 'add'])->name('admin.pages.update');
     });
 });
 
