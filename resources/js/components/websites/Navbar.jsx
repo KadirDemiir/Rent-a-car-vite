@@ -62,6 +62,11 @@ const Navbar = () => {
                                 {upperFirstLetter(t('website.navigator.about_us'))}
                             </Link>
                         )}
+                        {activePages?.includes('blog') && (
+                            <Link href={`/${lang}/${t('address.blog')}`} className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-white hover:bg-blue-500 rounded-lg transition-colors">
+                                {upperFirstLetter(t('website.navigator.blog'))}
+                            </Link>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-2">

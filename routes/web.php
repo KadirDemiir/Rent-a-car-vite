@@ -287,7 +287,8 @@ Route::group([
 
     Route::get(dbTransRoute('about'), [\App\Http\Controllers\AboutController::class, 'show'])->middleware('check.page.group:about')->name('about');
 
-    Route::inertia(dbTransRoute('blog'), 'Blog')->middleware('check.page.group:blog')->name('blog');
+    Route::get(dbTransRoute('blog'), [\App\Http\Controllers\BlogController::class, 'showBlogs'])->middleware('check.page.group:blog')->name('showBlogs');
+    Route::get(dbTransRoute('blog') .'/{slug}', [\App\Http\Controllers\BlogController::class, 'showIndexBlog'])->middleware('check.page.group:blog')->name('showIndexBlog');
 
     Route::inertia(dbTransRoute('auth'), 'auth/Auth')->middleware('check.page.group:auth')->name('showAuth');
 
@@ -485,6 +486,11 @@ Route::group([
 
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('about_page'), [\App\Http\Controllers\AboutController::class, 'showPage'] )->name('adminAboutPage');
     Route::post('/adminpanel/about_page', [\App\Http\Controllers\AboutController::class, 'add'])->name('admin.pages.update');
+
+    Route::get(dbTransRoute('adminpanel') . '/'. dbTransRoute('blog_page'), [\App\Http\Controllers\BlogController::class, 'showAdminPage'] )->name('showAdminBlogPage');
+    Route::get(dbTransRoute('adminpanel') . '/'. dbTransRoute('blog_page') . '/' . dbTransRoute('add') , [\App\Http\Controllers\BlogController::class, 'showAdminAddPage'] )->name('showAdminAddBlogPage');
+    Route::post('/adminpanel/blogs', [\App\Http\Controllers\BlogController::class, 'add'])->name('admin.pages.add');
+
     });
 });
 

@@ -4,7 +4,7 @@ import CampaignCard from "./CampaignCard.jsx";
 import { AlertCircle, TrendingUp } from 'lucide-react';
 
 export default function CampaignsCards({ campaigns, isAdmin = false }) {
-    const { i18n } = useTranslation();
+    const {t, i18n } = useTranslation();
     const currentLang = i18n.language;
 
     if (!campaigns || campaigns.length === 0) {
@@ -35,7 +35,7 @@ export default function CampaignsCards({ campaigns, isAdmin = false }) {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
                 {campaigns.map((campaign, index) => (
                     <Link
-                        href={isAdmin ? `/${i18n.language}/adminpanel/campaigns/${campaign.id}` : `/${i18n.language}/${'campaigns'}/${campaign.id}`}
+                        href={isAdmin ? `/${i18n.language}/${t('address.adminpanel')}/${t('address.campaigns')}/${campaign.id}` : `/${i18n.language}/${t('address.campaigns')}/${campaign.id}`}
                         key={campaign.id}
                         className="group"
                         style={{
@@ -44,9 +44,9 @@ export default function CampaignsCards({ campaigns, isAdmin = false }) {
                             opacity: 0
                         }}
                     >
-                        <CampaignCard 
-                            campaign={campaign} 
-                            isAdmin={isAdmin} 
+                        <CampaignCard
+                            campaign={campaign}
+                            isAdmin={isAdmin}
                             currentLang={currentLang}
                         />
                     </Link>

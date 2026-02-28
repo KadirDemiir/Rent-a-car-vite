@@ -1,8 +1,15 @@
 @import 'tailwindcss';
 @plugin "tailwind-scrollbar-hide";
 
+/* --- GÜNCELLENEN KISIM: Görsel Hizalama (Inline Stiller Eklendi) --- */
 .campaign-content img.align-left,
-.ProseMirror img.align-left {
+.ProseMirror img.align-left,
+.campaign-content img[style*="float: left"],
+.campaign-content img[style*="text-align: left"],
+.campaign-content p[style*="text-align: left"] img,
+.ProseMirror img[style*="float: left"],
+.ProseMirror img[style*="text-align: left"],
+.ProseMirror p[style*="text-align: left"] img {
     float: left !important;
     margin-right: 2rem;
     margin-bottom: 1rem;
@@ -11,7 +18,13 @@
 }
 
 .campaign-content img.align-right,
-.ProseMirror img.align-right {
+.ProseMirror img.align-right,
+.campaign-content img[style*="float: right"],
+.campaign-content img[style*="text-align: right"],
+.campaign-content p[style*="text-align: right"] img,
+.ProseMirror img[style*="float: right"],
+.ProseMirror img[style*="text-align: right"],
+.ProseMirror p[style*="text-align: right"] img {
     float: right !important;
     margin-left: 2rem;
     margin-bottom: 1rem;
@@ -20,21 +33,36 @@
 }
 
 .campaign-content img.align-center,
-.ProseMirror img.align-center {
+.ProseMirror img.align-center,
+.campaign-content img[style*="text-align: center"],
+.campaign-content p[style*="text-align: center"] img,
+.ProseMirror img[style*="text-align: center"],
+.ProseMirror p[style*="text-align: center"] img {
     display: block;
     margin-left: auto;
     margin-right: auto;
     float: none !important;
 }
 
+/* --- GÜNCELLENEN KISIM: İki Sütunlu Yapı (data-type eklendi) --- */
 .campaign-content ul.two-columns,
-.ProseMirror ul.two-columns {
+.ProseMirror ul.two-columns,
+.campaign-content [data-type="columns"],
+.ProseMirror [data-type="columns"] {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 0.5rem 2rem;
     list-style: none !important;
     padding-left: 0 !important;
     margin: 1.5rem 0;
+}
+
+/* YENİ EKLENEN: Tiptap kolon iç yapısı */
+.campaign-content [data-type="column"],
+.ProseMirror [data-type="column"] {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
 }
 
 .campaign-content ul.two-columns li,
@@ -166,6 +194,10 @@
     pointer-events: none;
 }
 
+.campaign-content li, .ProseMirror li {
+    display: list-item !important;
+}
+
 .campaign-content blockquote, .ProseMirror blockquote {
     border-left: 4px solid #cbd5e1;
     padding: 0.5rem 1rem;
@@ -232,11 +264,24 @@
 .ProseMirror[style*="text-align: center"], .ProseMirror .text-center { text-align: center; }
 .ProseMirror[style*="text-align: justify"], .ProseMirror .text-justify { text-align: justify; }
 
+/* --- GÜNCELLENEN KISIM: Mobil Görünüm (Responsive Hatalar Giderildi) --- */
 @media (max-width: 768px) {
     .campaign-content img.align-left,
     .campaign-content img.align-right,
     .ProseMirror img.align-left,
-    .ProseMirror img.align-right {
+    .ProseMirror img.align-right,
+    .campaign-content img[style*="float: left"],
+    .campaign-content img[style*="text-align: left"],
+    .campaign-content p[style*="text-align: left"] img,
+    .campaign-content img[style*="float: right"],
+    .campaign-content img[style*="text-align: right"],
+    .campaign-content p[style*="text-align: right"] img,
+    .ProseMirror img[style*="float: left"],
+    .ProseMirror img[style*="text-align: left"],
+    .ProseMirror p[style*="text-align: left"] img,
+    .ProseMirror img[style*="float: right"],
+    .ProseMirror img[style*="text-align: right"],
+    .ProseMirror p[style*="text-align: right"] img {
         float: none !important;
         width: 100% !important;
         max-width: 100% !important;
@@ -244,7 +289,9 @@
     }
 
     .campaign-content ul.two-columns,
-    .ProseMirror ul.two-columns {
+    .ProseMirror ul.two-columns,
+    .campaign-content [data-type="columns"],
+    .ProseMirror [data-type="columns"] {
         grid-template-columns: 1fr;
     }
 }
@@ -295,6 +342,11 @@
 @source "../**/*.js";
 
 @layer base {
+
+    div.campaign-content li {
+        display: list-item !important;
+    }
+
     div.campaign-content h1 {
         font-size: 2.25rem !important;
         font-weight: 700 !important;
@@ -341,5 +393,25 @@
         padding-left: 1.5rem !important;
         margin-bottom: 1.25rem !important;
         display: block !important;
+    }
+
+    div.campaign-content p:has(img.align-left),
+    div.campaign-content p:has(img.align-right) {
+        display: contents;
+    }
+
+    div.campaign-content ul.two-columns {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.5rem 2rem;
+        list-style: none !important;
+        padding-left: 0 !important;
+        margin: 1.5rem 0 !important;
+    }
+
+    @media (max-width: 768px) {
+        div.campaign-content ul.two-columns {
+            grid-template-columns: 1fr !important;
+        }
     }
 }

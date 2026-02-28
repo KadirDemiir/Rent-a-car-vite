@@ -24,6 +24,7 @@
             "website.navigator.car_porte_car_rental" => "Brand name for the car rental service",
             "website.navigator.about_us" => "Text for the about us navigation menu item",
             "website.navigator.check_reservation" => "Text for the check reservation menu item",
+            "website.navigator.blog" => "Text for the blog menu item",
 
             "website.car_card.properties.properties_label" => "CarGroup Card Properties label",
             "website.car_card.properties.seat_count_{count}" => "CarGroup Card Properties seat count",
@@ -122,6 +123,8 @@
             "adminpanel.navigator.website_settings" => "Admin menu item for website settings",
             "adminpanel.navigator.page_settings" => "Admin menu item for page settings",
             "adminpanel.navigator.about_page" => "Admin menu item for about page settings",
+            "adminpanel.navigator.blog_page" => "Admin menu item for blog page settings",
+            "adminpanel.navigator.blog_page_add" => "Admin menu item for blog add page settings",
             // Email Templates
             "adminpanel.email.edit_email_template" => "Edit Email Template",
             "adminpanel.email.back" => "Back",
@@ -484,6 +487,7 @@
             "address.website_settings" => "settings for website url",
             "address.page_settings" => "page settings url",
             "address.about_page" => "about page settings url",
+            "address.blog_page" => "blog page settings url",
 
             "website.check_reservation.title" => "Check Reservation Title",
             "website.check_reservation.email_label" => "Email label for check reservation",
@@ -526,6 +530,7 @@
             "website.navigator.car_porte_car_rental" => "CarGroup Porte Kiralama",
             "website.navigator.about_us" => "Hakkımızda",
             "website.navigator.check_reservation" => "Rezervasyon Kontrolü",
+            "website.navigator.blog" => "Blog",
 
             "website.car_card.properties.properties_label" => "Özellikler",
             "website.car_card.properties.seat_count_{count}" => "{{count}} koltuk",
@@ -623,6 +628,8 @@
             "adminpanel.navigator.website_settings" => "Website Ayarları",
             "adminpanel.navigator.page_settings" => "Sayfa İşlemleri",
             "adminpanel.navigator.about_page" => "Hakkımızda Sayfası",
+            "adminpanel.navigator.blog_page" => "Blog Sayfası",
+            "adminpanel.navigator.blog_page_add" => "Blog Ekleme Sayfası",
             // Email Templates Turkish
             "adminpanel.email.edit_email_template" => "E-posta Şablonunu Düzenle",
             "adminpanel.email.back" => "Geri",
@@ -980,6 +987,7 @@
             "address.website_settings" => "webiste-ayarlari",
             "address.page_settings" => "sayfa-ayarlari",
             "address.about_page" => "hakkimizda-sayfasi",
+            "address.blog_page" => "blog-sayfasi",
 
             "website.check_reservation.title" => "Rezervasyon Kontrolü",
             "website.check_reservation.email_label" => "E-posta Adresi",

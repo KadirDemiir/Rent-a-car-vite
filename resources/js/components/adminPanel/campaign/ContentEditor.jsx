@@ -325,7 +325,7 @@ export default function CampaignTextEditor({ content, setContent, currLan, label
                 }}
             >
                 <EditorToolbar editor={editor} onImageUpload={handleImageUploadClick} />
-                <EditorContent editor={editor} className="flex-grow cursor-text" />
+                <EditorContent editor={editor} className="grow cursor-text" />
             </div>
 
             <div className="flex justify-between mt-1 text-sm text-gray-500">
