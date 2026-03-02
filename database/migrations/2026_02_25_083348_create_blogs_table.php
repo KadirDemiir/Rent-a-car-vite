@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('blogs', function (Blueprint $table) {
             $table->id();
-            $table->json('slug');
             $table->json('title');
+            $table->foreignId('slug_translation_key_id')->constrained('translation_keys')->cascadeOnDelete();
             $table->json('content');
             $table->string('cover_photo_path')->nullable();
             $table->json('meta_title');

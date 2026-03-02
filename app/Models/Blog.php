@@ -8,7 +8,7 @@ class Blog extends Model
 {
     protected $fillable = [
         'title',
-        'slug',
+        'slug_translation_key_id',
         'content',
         'cover_photo_path',
         'meta_title',
@@ -19,7 +19,6 @@ class Blog extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
-        'slug' => 'array',
         'title' => 'array',
         'content' => 'array',
         'meta_title' => 'array',
@@ -27,4 +26,9 @@ class Blog extends Model
         'meta_keywords' => 'array',
         'created_at' => 'datetime',
     ];
+
+    public function translationKey()
+    {
+        return $this->belongsTo(TranslationKey::class, 'slug_translation_key_id', 'id');
+    }
 }

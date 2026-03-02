@@ -8,7 +8,7 @@ export default function Blog({blogs = []}) {
     console.log(blogs);
     const {t, i18n} = useTranslation();
     const handleNavigation = (slug) => {
-        router.visit(`/${i18n.language}/${t('address.blog')}/${slug?.[i18n.language]}`);
+        router.visit(`/${i18n.language}/${t('address.blog')}/${t(slug)}`);
     };
     return (
         <>
@@ -22,10 +22,11 @@ export default function Blog({blogs = []}) {
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
                         {blogs.map((blog) => {
+                            console.log(t(blog.translation_key.key));
                             return (
                                 <div
                                     key={blog.id}
-                                    onClick={() => handleNavigation(blog.slug)}
+                                    onClick={() => handleNavigation(blog.translation_key.key)}
                                     className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden flex flex-col group"
                                 >
                                     <div className="relative w-full aspect-4/3 overflow-hidden bg-gray-100">

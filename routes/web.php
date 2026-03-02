@@ -38,7 +38,11 @@ use Inertia\Inertia;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-
+Route::get('/get-blog-titles', function () {
+   return response()->json([
+       'blog_titles' => \App\Models\Blog::where('is_active', true)->select('title')->get(),
+   ], 200);
+});
 Route::post('/make-url', function (Request $request) {
     $request->validate([
         'image' => 'required|image|max:5120',

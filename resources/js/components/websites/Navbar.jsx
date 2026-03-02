@@ -1,4 +1,4 @@
-import { Link, usePage, router } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { Menu, X, User, CarFront, ClipboardCheck, LogOut } from 'lucide-react';
 import { useState } from 'react';

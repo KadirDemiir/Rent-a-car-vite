@@ -28,17 +28,44 @@ class BlogController extends Controller
             'cover_image' => 'nullable|image|mimes:jpeg,jpg,png,gif,bmp,webp|max:10240',
         ]);
         $slugs = json_decode($validated['slug'], true);
-
+        $languages = \App\Models\Language::all();
         foreach ($slugs as $lang => $slug) {
-            $exists = \App\Models\Blog::where("slug->{$lang}", $slug)->exists();
-
-            if ($exists) throw \Illuminate\Validation\ValidationException::withMessages(['slug' => "{$lang} dili için girilen slug değeri zaten mevcut."]);
+            $language = $languages->where('code', $lang)->first();
+            $exists = \App\Models\Translation::join('translation_keys', 'translations.translation_key_id', '=', 'translation_keys.id')
+                ->where('translations.language_id', $language->id)
+                ->where('translations.value', $slug)
+                ->where('translation_keys.key', 'like', 'address.blog-%')
+                ->exists();
+            if ($exists) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'slug' => "{$lang} dili için girilen slug değeri zaten mevcut."
+                ]);
+            }
         }
         try {
+            \Illuminate\Support\Facades\DB::beginTransaction();
+
+            $keyString = 'address.blog-' . \Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(8));
+
+            $translationKey = \App\Models\TranslationKey::create([
+                'key' => $keyString
+            ]);
+
+            foreach ($slugs as $lang => $slug) {
+                $language = $languages->where('code', $lang)->first();
+
+                if ($language) {
+                    \App\Models\Translation::create([
+                        'translation_key_id' => $translationKey->id,
+                        'language_id' => $language->id,
+                        'value' => $slug
+                    ]);
+                }
+            }
             $path = $request->file('cover_image') ? $request->file('cover_image')->store('blog_images', 'public') : null;
 
             $newBlog = new \App\Models\Blog();
-            $newBlog->slug = json_decode($validated['slug'], true);
+            $newBlog->slug_translation_key_id = $translationKey->id;
             $newBlog->title = json_decode($validated['title'], true);
             $newBlog->content = json_decode($validated['content'], true);
             $newBlog->meta_title = json_decode($validated['meta_title'], true);
@@ -47,11 +74,15 @@ class BlogController extends Controller
             $newBlog->cover_photo_path = $path;
             $newBlog->is_active = true;
             $newBlog->save();
+            \Illuminate\Support\Facades\DB::commit();
+
             return response()->json([
                 'success' => true,
             ], 200);
 
         } catch (\Exception $exception) {
+            \Illuminate\Support\Facades\DB::rollBack();
+
             return response()->json([
                 'success' => false,
                 'message' => 'Kayıt işlemi sırasında sistemsel bir hata oluştu.',
@@ -67,15 +98,20 @@ class BlogController extends Controller
 
     public function showBlogs()
     {
-        return Inertia::render('Blog', ['blogs' => Blog::where('is_active', true)->get()]);
+        return Inertia::render('Blog', [
+            'blogs' => Blog::with('translationKey:id,key', 'translationKey.translations')
+                ->where('is_active', true)
+                ->get()
+        ]);
     }
 
     public function showIndexBlog($slug)
     {
-        \Illuminate\Support\Facades\Log::info($slug);
-        $locale = app()->getLocale();
-        $blog = Blog::where("slug->{$locale}", $slug)->firstOrFail();
-        \Illuminate\Support\Facades\Log::info($blog);
+        $blog = \App\Models\Blog::with('translationKey.translations')
+            ->whereHas('translationKey.translations', function ($query) use ($slug) {
+                $query->where('value', $slug);
+            })
+            ->first();
         return Inertia::render('IndexBlog', ['blog' => $blog]);
     }
 }
