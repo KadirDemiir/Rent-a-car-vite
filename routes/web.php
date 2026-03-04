@@ -38,10 +38,25 @@ use Inertia\Inertia;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-Route::get('/get-blog-titles', function () {
-   return response()->json([
-       'blog_titles' => \App\Models\Blog::where('is_active', true)->select('title')->get(),
-   ], 200);
+Route::post('/get-blog-titles', function (\Illuminate\Http\Request $request) {
+    $request->validate(['exclude_id' => 'required|integer|exists:blogs,id']);
+    try {
+        $query = \App\Models\Blog::with('translationKey:id,key')
+            ->where('is_active', true)
+            ->select(['id', 'title', 'slug_translation_key_id']);
+
+        if ($request->has('exclude_id')) {
+            $query->where('id', '!=', $request->exclude_id);
+        }
+
+        return response()->json([
+            'blog_titles' => $query->inRandomOrder()->take(5)->get(),
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'blog_titles' => null,
+        ], 500);
+    }
 });
 Route::post('/make-url', function (Request $request) {
     $request->validate([
@@ -500,5 +515,5 @@ Route::group([
 
 
 Route::get('{any?}', function () {
-    return Inertia::render('NotFound');
+    return Inertia::render('NotFound')->toResponse(request())->setStatusCode(404);
 })->where('any', '.*')->name('pageNotFound');

@@ -76,6 +76,7 @@ class BlogController extends Controller
             $newBlog->save();
             \Illuminate\Support\Facades\DB::commit();
 
+            clearTranslationCache();
             return response()->json([
                 'success' => true,
             ], 200);
@@ -112,6 +113,9 @@ class BlogController extends Controller
                 $query->where('value', $slug);
             })
             ->first();
-        return Inertia::render('IndexBlog', ['blog' => $blog]);
+        if($blog)
+            return Inertia::render('IndexBlog', ['blog' => $blog]);
+        else
+            return Inertia::render('NotFound')->toResponse(request())->setStatusCode(404);
     }
 }

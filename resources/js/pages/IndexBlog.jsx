@@ -2,7 +2,7 @@ import Navbar from "../components/websites/Navbar.jsx";
 import MetaData from "../components/websites/MetaData.jsx";
 import {useTranslation} from "react-i18next";
 import {Link} from '@inertiajs/react';
-import BlogTitlePreview from "../components/websites/blog/BlogTitlePreview.jsx";
+import SideTitlePreview from "../components/websites/SideTitlePreview.jsx";
 
 export default function IndexBlog({blog}) {
     const {t, i18n} = useTranslation();
@@ -11,7 +11,7 @@ export default function IndexBlog({blog}) {
         <>
             <MetaData/>
             <div className="min-h-screen bg-white">
-                <Navbar/>
+                    <Navbar/>
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
                     <div className="flex flex-col lg:flex-row gap-10 lg:gap-16">
@@ -42,7 +42,7 @@ export default function IndexBlog({blog}) {
                         </main>
 
                         <aside className="w-full lg:w-[30%]">
-                                <BlogTitlePreview />
+                                <SideTitlePreview currentId={blog.id} href={`/get-blog-titles`} />
                         </aside>
 
                     </div>

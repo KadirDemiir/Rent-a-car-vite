@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { Sparkles, ChevronRight } from "lucide-react";
+import { router } from "@inertiajs/react";
 
-export default function BlogTitlePreview() {
-    const { i18n } = useTranslation();
+export default function SideTitlePreview({ currentId , href}) {
+    const { t, i18n } = useTranslation();
     const [blogTitles, setBlogTitles] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -12,7 +13,9 @@ export default function BlogTitlePreview() {
         const fetchBlogTitles = async () => {
             setLoading(true);
             try {
-                const response = await axios.get('/get-blog-titles');
+                const response = await axios.post(href, {
+                    exclude_id: currentId
+                });
 
                 if (response.status === 200 && response.data?.blog_titles) {
                     setBlogTitles(response.data.blog_titles);
@@ -23,8 +26,14 @@ export default function BlogTitlePreview() {
             setLoading(false);
         };
 
-        fetchBlogTitles();
-    }, []);
+        if (currentId !== undefined) {
+            fetchBlogTitles();
+        }
+    }, [currentId]);
+
+    const handleCLick = (slug) => {
+        router.visit(`/${i18n.language}/${t("address.blog")}/${t(slug)}`);
+    }
 
     if (loading) {
         return (
@@ -49,18 +58,19 @@ export default function BlogTitlePreview() {
 
             <div className="flex flex-col w-full">
                 <ul className="flex flex-col w-full">
-                    {blogTitles.slice(0, 5).map((item, index) => {
+                    {blogTitles.map((item, index) => {
                         const rawTitle = item?.title !== undefined ? item.title : item;
-                        const t = typeof rawTitle === 'string' ? JSON.parse(rawTitle) : rawTitle;
+                        const tStr = typeof rawTitle === 'string' ? JSON.parse(rawTitle) : rawTitle;
 
                         return (
                             <li
                                 key={index}
+                                onClick={() => handleCLick(item?.translation_key.key)}
                                 className="group w-full px-5 py-4 hover:bg-blue-50/60 transition-all flex items-start gap-3 border-b border-solid border-gray-100 last:border-b-0 cursor-pointer"
                             >
                                 <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-300 group-hover:text-red-600 transition-colors shrink-0 mt-0.5" />
                                 <span className="text-gray-600 group-hover:text-red-600 font-medium text-sm sm:text-base line-clamp-2 transition-colors">
-                                    {t?.[i18n.language]}
+                                    {tStr?.[i18n.language]}
                                 </span>
                             </li>
                         );

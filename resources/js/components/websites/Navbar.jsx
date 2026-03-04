@@ -29,7 +29,7 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="sticky top-0 z-50 bg-white shadow-sm">
+        <nav className="top-0 z-50 bg-white shadow-sm">
             <div className="container mx-auto px-4">
                 <div className="hidden lg:flex items-center justify-between h-16">
                     <Link href="/" className="flex items-center gap-2 hover:text-blue-600 transition-colors">
