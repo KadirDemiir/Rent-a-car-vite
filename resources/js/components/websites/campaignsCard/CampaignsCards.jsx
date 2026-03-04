@@ -35,7 +35,7 @@ export default function CampaignsCards({ campaigns, isAdmin = false }) {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
                 {campaigns.map((campaign, index) => (
                     <Link
-                        href={isAdmin ? `/${i18n.language}/${t('address.adminpanel')}/${t('address.campaigns')}/${campaign.id}` : `/${i18n.language}/${t('address.campaigns')}/${campaign.id}`}
+                        href={isAdmin ? `/${i18n.language}/${t('address.adminpanel')}/${t('address.campaigns')}/${t(campaign.translation_key.key)}` : `/${i18n.language}/${t('address.campaigns')}/${t(campaign.translation_key.key)}`}
                         key={campaign.id}
                         className="group"
                         style={{

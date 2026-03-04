@@ -19,6 +19,10 @@ export default function CampaignForm({languages, mode = "add", campaign = null, 
         languages.reduce((acc, lang) => {
             acc[lang.code] = "";
             return acc;}, []));
+    const [slug, setSlug] = useState(() =>
+        languages.reduce((acc, lang) => {
+            acc[lang.code] = "";
+            return acc;}, []));
     const [content, setContent] = useState(() =>
         languages.reduce((acc, lang) => {
         acc[lang.code] = "";
@@ -44,6 +48,7 @@ export default function CampaignForm({languages, mode = "add", campaign = null, 
         if (campaign) {
             try {
                 setTitle(typeof campaign.title === "string" ? JSON.parse(campaign.title) : campaign.title);
+                setSlug(campaign.slug || languages.reduce((acc, lang) => { acc[lang.code] = ""; return acc; }, {}));
                 setContent(typeof campaign.content === "string" ? JSON.parse(campaign.content) : campaign.content);
                 setImagePreview(`/storage/${campaign.photo_path}`);
                 setStartDate(new Date(campaign.start_date));
@@ -78,6 +83,7 @@ export default function CampaignForm({languages, mode = "add", campaign = null, 
     }, [startDate]);
 
     const titleOnChange = (e) => setTitle((prev) => ({ ...prev, [currentLang]: e.target.value }));
+    const slugOnChange = (e) => setSlug((prev) => ({ ...prev, [currentLang]: e.target.value }));
     const contentOnChange = (val) => setContent((prev) => ({ ...prev, [currentLang]: val }));
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -91,6 +97,12 @@ export default function CampaignForm({languages, mode = "add", campaign = null, 
         setFormErrors(null);
         if (supportedLangs.some(sl => !title[sl.value])) {
             setFormErrors("Lütfen her dil için kampanya başlığı oluşturun.");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            return;
+        }
+
+        if (supportedLangs.some(sl => !slug[sl.value])) {
+            setFormErrors("Lütfen her dil için slug oluşturun.");
             window.scrollTo({ top: 0, behavior: "smooth" });
             return;
         }
@@ -138,6 +150,7 @@ export default function CampaignForm({languages, mode = "add", campaign = null, 
 
         const formData = new FormData();
         formData.append("title", JSON.stringify(title));
+        formData.append("slug", JSON.stringify(slug));
         formData.append("content", JSON.stringify(content));
         if (imageFile) formData.append("image", imageFile);
         formData.append("selectedDiscount", selectedDiscount);
@@ -177,7 +190,7 @@ export default function CampaignForm({languages, mode = "add", campaign = null, 
 
     const filledLanguageCount = languages?.reduce((count, language) => {
         const langCode = language.code;
-        const isFilled = title[langCode] && content[langCode];
+        const isFilled = title[langCode] && slug[langCode] && content[langCode];
         return count + (isFilled ? 1 : 0);
     }, 0);
 
@@ -190,9 +203,9 @@ export default function CampaignForm({languages, mode = "add", campaign = null, 
             )}
             {isConfirmOpen && <Confirm message={confirmMessage.message} confirm={handleConfirm} />}
             
-            <LanguageProgress langOpt={supportedLangs} calculateProgress={() => progressPercentage} isLanguageFilled={(langValue) => title[langValue]?.trim() && content[langValue]?.trim()} lang={currentLang} setLang={setCurrentLang} />
+            <LanguageProgress langOpt={supportedLangs} calculateProgress={() => progressPercentage} isLanguageFilled={(langValue) => title[langValue]?.trim() && slug[langValue]?.trim() && content[langValue]?.trim()} lang={currentLang} setLang={setCurrentLang} />
 
-            <AddCampaignInfo titleOnChange={titleOnChange} title={title[currentLang]} handleImageChange={handleImageChange} image={imagePreview} content={content[currentLang]} setOnChange={contentOnChange} currLan={currentLang}/>
+            <AddCampaignInfo titleOnChange={titleOnChange} title={title[currentLang]} slugOnChange={slugOnChange} slug={slug[currentLang]} handleImageChange={handleImageChange} image={imagePreview} content={content[currentLang]} setOnChange={contentOnChange} currLan={currentLang}/>
 
             <div className="mt-4">
                 <button onClick={() => setIsDiscountOpen(!isDiscountOpen)} className={`py-2 w-36 ${isDiscountOpen ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} flex items-center justify-center rounded-md text-white cursor-pointer`}>

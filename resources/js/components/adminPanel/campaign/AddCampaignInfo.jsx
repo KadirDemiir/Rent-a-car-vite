@@ -1,7 +1,6 @@
 import CampaignTextEditor from "./ContentEditor.jsx";
 import {useTranslation} from "react-i18next";
-export default function AddCampaignInfo({image, title, titleOnChange, handleImageChange, content, setOnChange, currLan}){
-    console.log(content);
+export default function AddCampaignInfo({image, title, titleOnChange, slug, slugOnChange, handleImageChange, content, setOnChange, currLan}){
     const {t} = useTranslation();
     return(
         <>
@@ -15,6 +14,18 @@ export default function AddCampaignInfo({image, title, titleOnChange, handleImag
                 required
                 className="w-full p-2 border border-gray-300 rounded-md mb-4"
                 placeholder={t("adminpanel.pricing.add_campaign.enter_a_campaign_title")}
+            />
+
+            <label className="block text-lg font-semibold mb-2 text-gray-700">
+                {t("adminpanel.pricing.add_campaign.campaign_slug")}
+            </label>
+            <input
+                type="text"
+                value={slug ?? ""}
+                onChange={slugOnChange}
+                required
+                className="w-full p-2 border border-gray-300 rounded-md mb-4"
+                placeholder={t("adminpanel.pricing.add_campaign.enter_a_campaign_slug")}
             />
 
             <label className="block text-lg font-semibold mb-2 text-gray-700">

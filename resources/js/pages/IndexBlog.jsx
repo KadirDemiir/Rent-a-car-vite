@@ -42,7 +42,7 @@ export default function IndexBlog({blog}) {
                         </main>
 
                         <aside className="w-full lg:w-[30%]">
-                                <SideTitlePreview currentId={blog.id} href={`/get-blog-titles`} />
+                                <SideTitlePreview currentId={blog.id} href={`/get-blog-titles`} addressName={`address.blog`} />
                         </aside>
 
                     </div>

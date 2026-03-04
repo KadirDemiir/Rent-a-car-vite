@@ -50,11 +50,30 @@ Route::post('/get-blog-titles', function (\Illuminate\Http\Request $request) {
         }
 
         return response()->json([
-            'blog_titles' => $query->inRandomOrder()->take(5)->get(),
+            'titles' => $query->inRandomOrder()->take(5)->get(),
         ], 200);
     } catch (\Exception $e) {
         return response()->json([
-            'blog_titles' => null,
+            'titles' => null,
+        ], 500);
+    }
+});
+Route::post('/get-campaign-titles', function (\Illuminate\Http\Request $request) {
+    $request->validate(['exclude_id' => 'required|integer|exists:campaigns,id']);
+    try {
+        $query = \App\Models\Campaigns::with('translationKey:id,key')
+            ->where('status', 'active')
+            ->select(['id', 'title', 'slug_translation_key_id']);
+        if ($request->has('exclude_id')) {
+            $query->where('id', '!=', $request->exclude_id);
+        }
+
+        return response()->json([
+            'titles' => $query->inRandomOrder()->take(5)->get(),
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'titles' => null,
         ], 500);
     }
 });
@@ -299,7 +318,7 @@ Route::group([
 
     Route::middleware('check.page.group:campaigns')->group(function () {
         Route::get(dbTransRoute('campaigns'), [CampaignsController::class, 'showAll'])->name('allCampaigns');
-        Route::get(dbTransRoute('campaigns') . '/{id}', [CampaignsController::class, 'showIndex'])->name('showCampaign');
+        Route::get(dbTransRoute('campaigns') . '/{slug}', [CampaignsController::class, 'showIndex'])->name('showCampaign');
     });
 
     Route::inertia(dbTransRoute('carporateRental'), 'CorporateRental')->middleware('check.page.group:corporate')->name('carporateRental');

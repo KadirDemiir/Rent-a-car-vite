@@ -1,5 +1,6 @@
 import Navbar from "../components/websites/Navbar.jsx";
 import {useTranslation} from "react-i18next";
+import SideTitlePreview from "../components/websites/SideTitlePreview.jsx";
 
 export default function CampaignsIndex({campaign}) {
     const {i18n} = useTranslation();
@@ -43,9 +44,7 @@ export default function CampaignsIndex({campaign}) {
                     </main>
 
                     <aside className="w-full lg:w-[25%]">
-                        <div className="sticky top-8 w-full min-h-[400px] bg-white rounded-2xl border border-gray-100 p-6 shadow-md flex flex-col items-center justify-center text-gray-400">
-                            Sağ Panel (Sonradan Eklenecek Alan)
-                        </div>
+                        <SideTitlePreview currentId={campaign.id} href={`/get-campaign-titles`} addressName={`address.campaigns`}/>
                     </aside>
 
                 </div>

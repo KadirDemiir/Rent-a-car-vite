@@ -4,9 +4,10 @@ import { useTranslation } from "react-i18next";
 import { Sparkles, ChevronRight } from "lucide-react";
 import { router } from "@inertiajs/react";
 
-export default function SideTitlePreview({ currentId , href}) {
+export default function SideTitlePreview({ currentId , href, addressName}) {
+    console.log("SideTitlePreview Props:", { currentId, href, addressName });  // Debugging line
     const { t, i18n } = useTranslation();
-    const [blogTitles, setBlogTitles] = useState([]);
+    const [titles, setTitles] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -17,8 +18,8 @@ export default function SideTitlePreview({ currentId , href}) {
                     exclude_id: currentId
                 });
 
-                if (response.status === 200 && response.data?.blog_titles) {
-                    setBlogTitles(response.data.blog_titles);
+                if (response.status === 200 && response.data?.titles) {
+                    setTitles(response.data.titles);
                 }
             } catch (error) {
                 console.error(error);
@@ -32,7 +33,7 @@ export default function SideTitlePreview({ currentId , href}) {
     }, [currentId]);
 
     const handleCLick = (slug) => {
-        router.visit(`/${i18n.language}/${t("address.blog")}/${t(slug)}`);
+        router.visit(`/${i18n.language}/${t(addressName)}/${t(slug)}`);
     }
 
     if (loading) {
@@ -43,7 +44,7 @@ export default function SideTitlePreview({ currentId , href}) {
         );
     }
 
-    if (!blogTitles || blogTitles.length === 0) {
+    if (!titles || titles.length === 0) {
         return null;
     }
 
@@ -58,7 +59,7 @@ export default function SideTitlePreview({ currentId , href}) {
 
             <div className="flex flex-col w-full">
                 <ul className="flex flex-col w-full">
-                    {blogTitles.map((item, index) => {
+                    {titles.map((item, index) => {
                         const rawTitle = item?.title !== undefined ? item.title : item;
                         const tStr = typeof rawTitle === 'string' ? JSON.parse(rawTitle) : rawTitle;
 

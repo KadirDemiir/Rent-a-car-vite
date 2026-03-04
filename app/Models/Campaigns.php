@@ -8,6 +8,7 @@ class Campaigns extends Model
 {
     protected $fillable = [
         'title',
+        'slug_translation_key_id',
         'photo_path',
         'content',
         'start_date',
@@ -23,6 +24,11 @@ class Campaigns extends Model
     public function discounts()
     {
         return $this->hasMany(Discount::class, 'campaign_id');
+    }
+
+    public function translationKey()
+    {
+        return $this->belongsTo(TranslationKey::class, 'slug_translation_key_id', 'id');
     }
 
 }

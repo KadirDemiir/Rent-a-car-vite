@@ -5,21 +5,26 @@ namespace App\Http\Controllers;
 use App\Models\Campaigns;
 use App\Models\Discount;
 use App\Models\Currency;
+use App\Models\Language;
+use App\Models\Translation;
+use App\Models\TranslationKey;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use DOMDocument;
 
 class CampaignsController extends Controller
 {
     public function showAll()
     {
-        $campaigns = Campaigns::select('id', 'title', 'content', 'photo_path', 'start_date', 'end_date')
-            ->where('status', 'active')
-            ->get();
+    $campaigns = Campaigns::with('translationKey:id,key')
+    ->select('id', 'title', 'content', 'photo_path', 'start_date', 'end_date', 'slug_translation_key_id')
+    ->where('status', 'active')
+    ->get();
 
         return Inertia::render('Campaigns', [
             'campaigns' => $campaigns,
@@ -28,7 +33,7 @@ class CampaignsController extends Controller
 
     public function showAllAdminPanel()
     {
-        $campaigns = Campaigns::all();
+        $campaigns = Campaigns::with('translationKey:id,key')->get();
 
         return Inertia::render('adminPanel/campaigns/Campaigns', [
             'campaigns' => $campaigns,
@@ -36,18 +41,36 @@ class CampaignsController extends Controller
         ]);
     }
 
-    public function showIndex($id)
+    public function showIndex($slug)
     {
-        $campaign = Campaigns::findOrFail($id);
-        return Inertia::render('CampaignsIndex', [
-            'campaign' => $campaign,
-        ]);
+        $locale = app()->getLocale();
+        $campaign = Campaigns::whereHas('translationKey.translations', function ($query) use ($slug, $locale) {
+            $query->where('value', $slug)
+                ->where('language_id', Language::where('code', $locale)->first()->id);
+        })->firstOrFail();
+        if($campaign)
+            return Inertia::render('CampaignsIndex', ['campaign' => $campaign,]);
+        else
+            return Inertia::render('NotFound');
     }
 
-    public function showIndexAdminPanel($id)
+    public function showIndexAdminPanel($slug)
     {
-        $campaign = Campaigns::with('discounts')->findOrFail($id);
+        $locale = app()->getLocale();
+        $campaign = Campaigns::whereHas('translationKey.translations', function ($query) use ($slug, $locale) {
+            $query->where('value', $slug)
+                ->where('language_id', Language::where('code', $locale)->first()->id);
+        })->with(['discounts', 'translationKey.translations.language'])->firstOrFail();
         $languages = getActiveLanguages();
+
+        // Transform slug translations to key-value pairs by language code
+        $slug = [];
+        if ($campaign->translationKey) {
+            foreach ($campaign->translationKey->translations as $translation) {
+                $slug[$translation->language->code] = $translation->value;
+            }
+        }
+        $campaign->slug = $slug;
 
         return Inertia::render('adminPanel/campaigns/Campaign', [
             'languages' => $languages,
@@ -60,6 +83,7 @@ class CampaignsController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|json',
+            'slug' => 'required|json',
             'content' => 'required|json',
             'image' => 'required|file|image|mimes:jpeg,png,jpg|max:2048',
             'start_date' => 'required|date',
@@ -70,8 +94,43 @@ class CampaignsController extends Controller
             'discountTarget' => 'nullable|string',
         ]);
 
+        // Validate slug uniqueness
+        $slugs = json_decode($validated['slug'], true);
+        $languages = Language::all();
+        foreach ($slugs as $lang => $slugValue) {
+            $language = $languages->where('code', $lang)->first();
+            if (!$language) continue;
+            
+            $exists = Translation::join('translation_keys', 'translations.translation_key_id', '=', 'translation_keys.id')
+                ->where('translations.language_id', $language->id)
+                ->where('translations.value', $slugValue)
+                ->where('translation_keys.key', 'like', 'address.campaign-%')
+                ->exists();
+            if ($exists) {
+                throw ValidationException::withMessages([
+                    'slug' => "{$lang} dili icin girilen slug degeri zaten mevcut."
+                ]);
+            }
+        }
+
         try {
             DB::beginTransaction();
+
+            // Create translation key for slug
+            $keyString = 'address.campaign-' . Str::lower(Str::random(8));
+            $translationKey = TranslationKey::create(['key' => $keyString]);
+
+            // Create translations for each language
+            foreach ($slugs as $lang => $slugValue) {
+                $language = $languages->where('code', $lang)->first();
+                if ($language) {
+                    Translation::create([
+                        'translation_key_id' => $translationKey->id,
+                        'language_id' => $language->id,
+                        'value' => $slugValue
+                    ]);
+                }
+            }
 
             $startDate = Carbon::parse($validated['start_date']);
             $endDate = Carbon::parse($validated['end_date']);
@@ -86,6 +145,7 @@ class CampaignsController extends Controller
 
             $campaign = new Campaigns();
             $campaign->title = json_decode($validated['title'], true);
+            $campaign->slug_translation_key_id = $translationKey->id;
             $campaign->content = $processedContent;
             $campaign->start_date = $startDate;
             $campaign->end_date = $endDate;
@@ -113,6 +173,8 @@ class CampaignsController extends Controller
             }
 
             DB::commit();
+
+            clearTranslationCache();
 
             return Inertia::render('adminPanel/campaigns/AddCampaign', [
                 'languages' => getActiveLanguages(),
@@ -233,6 +295,7 @@ class CampaignsController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|json',
+            'slug' => 'required|json',
             'content' => 'required|json',
             'image' => 'nullable|file|image|mimes:jpeg,png,jpg|max:2048',
             'start_date' => 'required|date',
@@ -243,8 +306,65 @@ class CampaignsController extends Controller
             'discountTarget' => 'nullable|string',
         ]);
 
+        // Validate slug uniqueness (exclude current campaign's translation key)
+        $slugs = json_decode($validated['slug'], true);
+        $languages = Language::all();
+        foreach ($slugs as $lang => $slugValue) {
+            $language = $languages->where('code', $lang)->first();
+            if (!$language) continue;
+            
+            $query = Translation::join('translation_keys', 'translations.translation_key_id', '=', 'translation_keys.id')
+                ->where('translations.language_id', $language->id)
+                ->where('translations.value', $slugValue)
+                ->where('translation_keys.key', 'like', 'address.campaign-%');
+            
+            if ($campaign->slug_translation_key_id) {
+                $query->where('translations.translation_key_id', '!=', $campaign->slug_translation_key_id);
+            }
+            
+            if ($query->exists()) {
+                throw ValidationException::withMessages([
+                    'slug' => "{$lang} dili icin girilen slug degeri zaten mevcut."
+                ]);
+            }
+        }
+
         try {
             DB::beginTransaction();
+
+            // Handle translation key for slug
+            if ($campaign->slug_translation_key_id) {
+                // Update existing translations
+                foreach ($slugs as $lang => $slugValue) {
+                    $language = $languages->where('code', $lang)->first();
+                    if ($language) {
+                        Translation::updateOrCreate(
+                            [
+                                'translation_key_id' => $campaign->slug_translation_key_id,
+                                'language_id' => $language->id,
+                            ],
+                            ['value' => $slugValue]
+                        );
+                    }
+                }
+            } else {
+                // Create new translation key
+                $keyString = 'address.campaign-' . Str::lower(Str::random(8));
+                $translationKey = TranslationKey::create(['key' => $keyString]);
+                
+                foreach ($slugs as $lang => $slugValue) {
+                    $language = $languages->where('code', $lang)->first();
+                    if ($language) {
+                        Translation::create([
+                            'translation_key_id' => $translationKey->id,
+                            'language_id' => $language->id,
+                            'value' => $slugValue
+                        ]);
+                    }
+                }
+                
+                $campaign->slug_translation_key_id = $translationKey->id;
+            }
 
             $startDate = Carbon::parse($validated['start_date']);
             $endDate = Carbon::parse($validated['end_date']);
@@ -289,6 +409,8 @@ class CampaignsController extends Controller
             }
 
             DB::commit();
+
+            clearTranslationCache();
 
             return redirect()->route('showIndexAdminPanel', $campaign->id)->with('success', 'Kampanya güncellendi!');
         } catch (\Exception $e) {
