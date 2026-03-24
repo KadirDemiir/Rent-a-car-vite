@@ -12,6 +12,7 @@ class Page extends Model
         'meta_title',
         'meta_description',
         'meta_keywords',
+        'sort_order',
         'is_system',
         'is_active',
     ];

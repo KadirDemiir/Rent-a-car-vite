@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('pages', function (Blueprint $table) {
             $table->id();
             $table->json('title');
-            $table->string('route_group_name');
+            $table->string('route_group_name'); 
             $table->json('meta_title')->nullable();
             $table->json('meta_description')->nullable();
             $table->json('meta_keywords')->nullable();

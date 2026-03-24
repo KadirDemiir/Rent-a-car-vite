@@ -125,6 +125,7 @@
             "adminpanel.navigator.about_page" => "Admin menu item for about page settings",
             "adminpanel.navigator.blog_page" => "Admin menu item for blog page settings",
             "adminpanel.navigator.blog_page_add" => "Admin menu item for blog add page settings",
+            "adminpanel.navigator.navigation_bar_settings" => "Admin menu item for navigation bar settings",
             // Email Templates
             "adminpanel.email.edit_email_template" => "Edit Email Template",
             "adminpanel.email.back" => "Back",
@@ -488,6 +489,7 @@
             "address.page_settings" => "page settings url",
             "address.about_page" => "about page settings url",
             "address.blog_page" => "blog page settings url",
+            "address.navigation_bar_settings" => "navigation bar settings url",
 
             "website.check_reservation.title" => "Check Reservation Title",
             "website.check_reservation.email_label" => "Email label for check reservation",
@@ -630,6 +632,7 @@
             "adminpanel.navigator.about_page" => "Hakkımızda Sayfası",
             "adminpanel.navigator.blog_page" => "Blog Sayfası",
             "adminpanel.navigator.blog_page_add" => "Blog Ekleme Sayfası",
+            "adminpanel.navigator.navigation_bar_settings" => "Menü Ayarları",
             // Email Templates Turkish
             "adminpanel.email.edit_email_template" => "E-posta Şablonunu Düzenle",
             "adminpanel.email.back" => "Geri",
@@ -988,6 +991,7 @@
             "address.page_settings" => "sayfa-ayarlari",
             "address.about_page" => "hakkimizda-sayfasi",
             "address.blog_page" => "blog-sayfasi",
+            "address.navigation_bar_settings" => "menu-ayarları",
 
             "website.check_reservation.title" => "Rezervasyon Kontrolü",
             "website.check_reservation.email_label" => "E-posta Adresi",

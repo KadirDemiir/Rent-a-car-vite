@@ -68,7 +68,7 @@ export default function CarCard({ car }) {
                     </div>
                 </div>
 
-                <div className="flex justify-stretch gap-2 mb-6">
+                <div className="flex justify-between gap-2 mb-6">
                     <FeatureItem icon={Settings2} label={t(`transmission.${car.transmission_id}`)} />
                     <FeatureItem icon={Fuel} label={t(`fuel.${car.fuel_id}`)} />
                     <FeatureItem icon={Users} label={`${car.seat_count}`} />
@@ -79,10 +79,10 @@ export default function CarCard({ car }) {
                 <div className="w-full h-px bg-gray-100 mb-4 mt-auto"></div>
 
 
-                <div className="flex items-end justify-between gap-2">
+                <div className="flex items-end justify-end gap-2">
 
 
-                    <div className="flex flex-col">
+{/*                    <div className="flex flex-col">
 
 
                         <div className="flex items-center gap-2 mb-0.5">
@@ -104,7 +104,7 @@ export default function CarCard({ car }) {
                         <span className="text-[10px] text-gray-400 font-medium mt-1">
                             {t('website.car.daily_price') || 'Günlük Kiralama'}
                         </span>
-                    </div>
+                    </div>*/}
 
 
                     <button className="flex items-center justify-center gap-2 bg-gray-900 text-white px-5 py-3 rounded-xl text-sm font-bold transition-all hover:bg-emerald-600 shadow-lg hover:shadow-emerald-600/20 active:scale-95 whitespace-nowrap">

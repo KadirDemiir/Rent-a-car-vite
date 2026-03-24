@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import Categories from "./Categories.jsx";
 import { useTranslation } from 'react-i18next';
+import { href } from "react-router-dom";
 
 
 export default function LeftSide({ isOpen, onClose }) {
@@ -89,6 +90,7 @@ export default function LeftSide({ isOpen, onClose }) {
                 {name: t("adminpanel.navigator.about_page"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.about_page")}`},
                 {name: t("adminpanel.navigator.blog_page"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.blog_page")}`},
                 {name: t("adminpanel.navigator.blog_page_add"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.blog_page")}/${t("address.add")}`},
+                {name: t("adminpanel.navigator.navigation_bar_settings"), href: `/${i18n.language}/${t("address.adminpanel")}/${t("address.navigation_bar_settings")}`},
             ]
         }
     ];

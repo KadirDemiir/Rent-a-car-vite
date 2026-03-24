@@ -7,12 +7,11 @@ import CurrencyDropDown from '../CurrencyDropDown.jsx';
 import axios from "axios";
 
 const Navbar = () => {
-    const { auth, activePages } = usePage().props;
+    const { auth, activePages, pageName } = usePage().props;
     const [user, setUser] = useState(auth?.user);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { i18n, t } = useTranslation();
     const lang = i18n.language.split('-')[0];
-
     const upperFirstLetter = (str) => {
         return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     }
@@ -36,37 +35,16 @@ const Navbar = () => {
                         <CarFront size={28} strokeWidth={2} />
                     </Link>
 
-                    <div className="flex items-center gap-1">
-                        {activePages?.includes('cars') && (
-                            <Link href={`/${lang}/${t('address.cars')}`} className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-white hover:bg-blue-500 rounded-lg transition-colors">
-                                {upperFirstLetter(t('website.navigator.cars'))}
+                    <div className="flex flex-wrap items-center gap-1 sm:gap-2 md:gap-4">
+                        {pageName?.map((page) => (
+                            <Link
+                                key={page}
+                                href={`/${lang}/${t(`address.${page}`)}`}
+                                className="px-2 py-1 sm:px-3 sm:py-2 md:px-4 md:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:text-white hover:bg-blue-500 rounded-lg transition-colors w-full sm:w-auto text-center"
+                            >
+                                {upperFirstLetter(t(`website.navigator.${page}`))}
                             </Link>
-                        )}
-                        {activePages?.includes('locations') && (
-                            <Link href={`/${lang}/${t('address.locations')}`} className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-white hover:bg-blue-500 rounded-lg transition-colors">
-                                {upperFirstLetter(t('website.navigator.locations'))}
-                            </Link>
-                        )}
-                        {activePages?.includes('campaigns') && (
-                            <Link href={`/${lang}/${t('address.campaigns')}`} className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-white hover:bg-blue-500 rounded-lg transition-colors">
-                                {upperFirstLetter(t('website.navigator.campaigns'))}
-                            </Link>
-                        )}
-                        {activePages?.includes('corporate') && (
-                            <Link href={`/${lang}/${t('address.carporateRental')}`} className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-white hover:bg-blue-500 rounded-lg transition-colors">
-                                {upperFirstLetter(t('website.navigator.car_porte_car_rental'))}
-                            </Link>
-                        )}
-                        {activePages?.includes('about') && (
-                            <Link href={`/${lang}/${t('address.about')}`} className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-white hover:bg-blue-500 rounded-lg transition-colors">
-                                {upperFirstLetter(t('website.navigator.about_us'))}
-                            </Link>
-                        )}
-                        {activePages?.includes('blog') && (
-                            <Link href={`/${lang}/${t('address.blog')}`} className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-white hover:bg-blue-500 rounded-lg transition-colors">
-                                {upperFirstLetter(t('website.navigator.blog'))}
-                            </Link>
-                        )}
+                        ))}
                     </div>
 
                     <div className="flex items-center gap-2">

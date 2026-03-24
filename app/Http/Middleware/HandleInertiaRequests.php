@@ -30,6 +30,7 @@ class HandleInertiaRequests extends Middleware
             'locale' => app()->getLocale(),
             'languages' => fn () => $this->getLanguages(),
             // Pass translations inline to avoid extra HTTP request from i18next
+            'pageName' => getPagesNameCache(),
             'translations' => fn () => $this->getTranslations(),
             'activePages' => getPagesCache()->where('is_active', true)->pluck('route_group_name')->toArray(),
         ]);

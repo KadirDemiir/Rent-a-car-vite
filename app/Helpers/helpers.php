@@ -22,6 +22,19 @@ if(!function_exists('getPagesCache')){
     }
 }
 
+if(!function_exists('getPagesNameCache')){
+    function getPagesNameCache()
+    {
+        return \Illuminate\Support\Facades\Cache::rememberForever('pages_name_cache', function () {
+            return \App\Models\Page::query()
+                ->where('is_system', false)
+                ->orderBy('sort_order')
+                ->pluck('route_group_name')
+                ->toArray();
+        });
+    }
+}
+
 if(!function_exists('getSectionsCache')){
     function getSectionsCache()
     {
@@ -158,3 +171,18 @@ if (!function_exists('clearTranslationCache')) {
         }
     }
 }
+
+if (!function_exists('clearPageCache')) {
+    function clearPageCache() {
+        $store = getCacheStore();
+        $store->forget('getPagesCache');
+    }
+}
+
+if (!function_exists('clearPageNameCache')) {
+    function clearPageNameCache() {
+        $store = getCacheStore();
+        $store->forget('pages_name_cache');
+    }
+}
+

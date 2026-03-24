@@ -137,7 +137,7 @@ class PageSeeder extends Seeder
                 'is_system' => false,
             ],
             [
-                'route_group_name' => 'about',
+                'route_group_name' => 'about_us',
                 'title' => [
                     'tr' => 'Hakkımızda',
                     'en' => 'About Us'
@@ -200,7 +200,7 @@ class PageSeeder extends Seeder
                 'is_system' => false,
             ],
             [
-                'route_group_name' => 'corporate',
+                'route_group_name' => 'car_porte_car_rental',
                 'title' => [
                     'tr' => 'Kurumsal Kiralama',
                     'en' => 'Corporate Rental'

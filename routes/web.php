@@ -100,6 +100,7 @@ Route::post('/make-url', function (Request $request) {
 Route::get('/locales/{locale}/translation.json', [TranslationController::class, 'fetch'])
     ->name('translations.fetch');
 Route::middleware('admin')->group(function () {
+    Route::get('/get-pages', [\App\Http\Controllers\PageController::class, 'getPages'])->name('adminGetPages');
     Route::post('/adminpanel/cars/update-sort', [AdminCarController::class, 'updateSortOrder'])->name('adminUpdateCarSort');
     Route::post('/adminpanel/car/add', [CarController::class, 'addCar'])->name('adminAddCar');
     Route::post('/adminpanel/car-groups', [AdminCarController::class, 'storeCarGroup'])->name('adminStoreCarGroup');
@@ -528,6 +529,9 @@ Route::group([
     Route::get(dbTransRoute('adminpanel') . '/'. dbTransRoute('blog_page'), [\App\Http\Controllers\BlogController::class, 'showAdminPage'] )->name('showAdminBlogPage');
     Route::get(dbTransRoute('adminpanel') . '/'. dbTransRoute('blog_page') . '/' . dbTransRoute('add') , [\App\Http\Controllers\BlogController::class, 'showAdminAddPage'] )->name('showAdminAddBlogPage');
     Route::post('/adminpanel/blogs', [\App\Http\Controllers\BlogController::class, 'add'])->name('admin.pages.add');
+
+    Route::get(dbTransRoute('adminpanel') . '/'. dbTransRoute('navigation_bar_settings'), [\App\Http\Controllers\PageController::class, 'showSortPage'] )->name('adminNavigationBarSettings');
+    Route::post('/update-pages-sort', [\App\Http\Controllers\PageController::class, 'updateSort'])->name('admin.update.page.sort');
 
     });
 });
