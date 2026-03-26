@@ -322,9 +322,9 @@ Route::group([
         Route::get(dbTransRoute('campaigns') . '/{slug}', [CampaignsController::class, 'showIndex'])->name('showCampaign');
     });
 
-    Route::inertia(dbTransRoute('carporateRental'), 'CorporateRental')->middleware('check.page.group:corporate')->name('carporateRental');
+    Route::inertia(dbTransRoute('car_porte_car_rental'), 'CorporateRental')->middleware('check.page.group:car_porte_car_rental')->name('carporateRental');
 
-    Route::get(dbTransRoute('about'), [\App\Http\Controllers\AboutController::class, 'show'])->middleware('check.page.group:about')->name('about');
+    Route::get(dbTransRoute('about_us'), [\App\Http\Controllers\AboutController::class, 'show'])->middleware('check.page.group:about_us')->name('about');
 
     Route::get(dbTransRoute('blog'), [\App\Http\Controllers\BlogController::class, 'showBlogs'])->middleware('check.page.group:blog')->name('showBlogs');
     Route::get(dbTransRoute('blog') .'/{slug}', [\App\Http\Controllers\BlogController::class, 'showIndexBlog'])->middleware('check.page.group:blog')->name('showIndexBlog');
