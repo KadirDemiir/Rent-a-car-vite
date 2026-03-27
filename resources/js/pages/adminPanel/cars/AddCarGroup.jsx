@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { useState, useRef } from "react";
 import {router} from "@inertiajs/react";
+import SuccessMessage from "../../../components/SuccessMessage.jsx";
 export default function AddCarGroup({ locations = [] }) {
     const { t, i18n } = useTranslation();
     const [success, setSuccess] = useState("");
@@ -65,11 +66,7 @@ export default function AddCarGroup({ locations = [] }) {
                     {t("adminpanel.car_group.add_car_group") || "Add CarGroup Group"}
                 </h3>
                 <hr className="my-4" />
-                {success && (
-                    <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded">
-                        {success}
-                    </div>
-                )}
+                <SuccessMessage message={success} />
                 {error && (
                     <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded">
                         <p>{error}</p>

@@ -3,6 +3,7 @@ import {useState} from "react";
 import axios from "axios";
 import {useTranslation} from "react-i18next";
 import i18next from "i18next";
+import SuccessMessage from "../../SuccessMessage.jsx";
 
 export default function SegmentFormModal({segment = null, lngs, translations = null, mode="create"}){
     const {t} = useTranslation();
@@ -72,7 +73,7 @@ export default function SegmentFormModal({segment = null, lngs, translations = n
 
     return(
         <div className={`shadow-lg p-8 bg-white`}>
-            {success && <p className={`w-full border-l-12 border-green-700 bg-green-300 text-green-700 font-semibold p-2`}>{success}</p>}
+            <SuccessMessage message={success} />
             <SegmentForm formData={formData} currentLang={currentLang} langOptions={langOptions} setCurrentLang={setCurrentLang} setFormData={setFormData}/>
             <div className={`w-full flex justify-end p-8`}>
                 <button onClick={handleSubmit} className={`bg-gray-700 rounded-lg py-1 px-4 text-white`}>

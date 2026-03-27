@@ -4,6 +4,7 @@ import axios from 'axios';
 import Input from '../../components/websites/formElement/Input.jsx';
 import Navbar from '../../components/websites/Navbar.jsx';
 import { useTranslation } from 'react-i18next';
+import SuccessMessage from '../../components/SuccessMessage.jsx';
 
 export default function ResetPassword() {
     const { t } = useTranslation();
@@ -77,8 +78,9 @@ export default function ResetPassword() {
                     <div className="px-8 py-8 space-y-6">
                         <h1 className="text-xl font-semibold text-gray-800">{t("website.auth.login.forgot_password", "Reset password")}</h1>
 
-                        {message && (
-                            <div className={`${message.type === 'success' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'} border px-4 py-3 rounded-lg flex items-start gap-2`}>
+                        {message?.type === 'success' && <SuccessMessage message={message.text} />}
+                        {message?.type === 'error' && (
+                            <div className="bg-red-50 border-red-200 text-red-700 border px-4 py-3 rounded-lg flex items-start gap-2">
                                 <span className="text-sm">{message.text}</span>
                             </div>
                         )}

@@ -129,7 +129,16 @@ Route::middleware('admin')->group(function () {
     });
     Route::get('/adminpanel/get-info/locations/{id}', [LocationsController::class, 'getIndexLocationInfo']);
     Route::get('/get-reservations-informations', function () {
-        $data = Reservation::with(['extras.extra', 'carGroup', 'assignedVehicle', 'pickupLocation', 'returnLocation', 'currency'])->get();
+        $data = Reservation::with([
+    'extras.extra', 
+    'carGroup', 
+    'assignedVehicle', 
+    'pickupLocation', 
+    'returnLocation', 
+    'currency'
+])
+->orderByDesc('pickup_datetime')
+->get();
         if ($data->isEmpty()) {
             return response()->json(['message' => 'Veritabanında rezervasyon bulunamadı.'], 404);
         }
@@ -303,6 +312,8 @@ Route::group([
     ]
 ], function () {
 
+    Route::middleware('website')->group(function () {
+
     Route::get('', function () {
         $carGroups = CarGroup::with(['photos'])->get();
         return Inertia::render('Home', [
@@ -349,6 +360,8 @@ Route::group([
     Route::get(dbTransRoute ('checkReservation'), [ReservationController::class, 'checkReservationPage'])->name('checkReservationPage');
     Route::post(dbTransRoute('checkReservation'), [ReservationController::class, 'checkReservation'])->name('checkReservation');
     Route::post('/guest-reservation/{id}/cancel', [ReservationController::class, 'guestCancelReservation'])->name('guestCancelReservation');
+
+    });
 
     // Admin Login Routes
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('auth'), [AuthController::class, 'showAdminLogin'])->name('admin.login');

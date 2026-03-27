@@ -4,25 +4,25 @@ export default function ChevronNavigation({handlePrev, handleNext, startIndex, p
 {
     return(
         <>
-            <div className="w-full flex justify-between items-center px-6 pt-4">
+            <div className="w-full flex justify-between items-center px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-lg mt-2">
                     <button
                       onClick={handlePrev}
                       disabled={startIndex === 0}
-                      className="text-2xl rounded-full p-2 bg-gray-200 hover:bg-gray-300 shadow transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                      className="flex items-center justify-center w-10 h-10 rounded-lg bg-white border border-gray-300 hover:bg-gray-100 hover:border-gray-400 shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:shadow-md"
                     >
-                      <ChevronLeft className="w-6 h-6" />
+                      <ChevronLeft className="w-5 h-5 text-gray-600" />
                     </button>
             
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm font-medium text-gray-600">
                       Sayfa {currentPage} / {totalPages}
                     </span>
             
                     <button
                       onClick={handleNext}
                       disabled={startIndex + perPage >= length}
-                      className="text-2xl rounded-full p-2 bg-gray-200 hover:bg-gray-300 shadow transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                      className="flex items-center justify-center w-10 h-10 rounded-lg bg-white border border-gray-300 hover:bg-gray-100 hover:border-gray-400 shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:shadow-md"
                     >
-                      <ChevronRight className="w-6 h-6" />
+                      <ChevronRight className="w-5 h-5 text-gray-600" />
                     </button>
                   </div>
         </>

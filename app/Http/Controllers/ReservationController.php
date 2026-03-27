@@ -479,84 +479,140 @@ class ReservationController extends Controller
                 'finish_date_time' => 'required|date|after:start_date_time',
                 'pick_up_location_id' => 'required|exists:locations,id',
                 'return_location_id' => 'required|exists:locations,id',
-                'total_days' => 'required|numeric|min:1',
-                'daily_price' => 'required|numeric|min:1',
-                'drop_price' => 'required|numeric|min:0',
                 'currency_id' => 'required|exists:currencies,id',
                 'user_info.name' => 'required|string',
                 'user_info.surname' => 'required|string',
                 'user_info.email' => 'required|email',
-                'user_info.phone' => 'required|string',
+                'user_info.phone' => 'required|string|max:50',
                 'user_info.address' => 'required|string',
                 'user_info.notes' => 'nullable|string',
-                'user_info.id' => 'required',
+                'user_info.id' => 'required|string|max:32',
                 'user_info.birthday' => 'required|date|before:' . Carbon::now()->subYears(18)->format('Y-m-d'),
                 'user_info.arrival_flight_no' => 'nullable|string',
                 'user_info.return_flight_no' => 'nullable|string',
                 'extras' => 'nullable|json',
                 'lang' => 'required|string',
                 'pay_online' => 'nullable|boolean',
-                'online_discount_amount' => 'nullable|numeric|min:0|max:1',
             ]);
 
             DB::beginTransaction();
 
-            if (!$this->isCarGroupAvailable((int) $validated['car_group_id'], $validated['start_date_time'], $validated['finish_date_time'])) {
+            $start = Carbon::parse($validated['start_date_time'], 'Europe/Istanbul');
+            $finish = Carbon::parse($validated['finish_date_time'], 'Europe/Istanbul');
+            if ($start->isPast() || $finish->lessThanOrEqualTo($start)) {
+                return response()->json(['error' => 'Invalid reservation dates'], 422);
+            }
+
+            $dayCount = $start->diffInDays($finish);
+            $diffHours = $start->diffInHours($finish) % 24;
+            if ($diffHours > 3) {
+                $dayCount += 1;
+            }
+            if ($dayCount === 0) {
+                $dayCount = 1;
+            }
+
+            if (!$this->isCarGroupAvailable((int) $validated['car_group_id'], $start->toDateTimeString(), $finish->toDateTimeString())) {
                 return response()->json(['error' => 'CarGroup is not available'], 409);
             }
 
-            $extrasArray = json_decode($validated['extras'] ?? '[]', true);
-            $extras_total_price = collect($extrasArray)->sum(function ($extra) {
-                return $extra['price'] * $extra['count'];
+            $carGroup = CarGroup::query()
+                ->select(['id', 'segment_id', 'online_discount'])
+                ->with(['price' => function ($query) use ($start) {
+                    $query->select('car_group_id', 'base_price', 'price', 'currency_id', 'min_days', 'max_days')
+                        ->where('month', $start->month)
+                        ->where('is_active', 1);
+                }])
+                ->findOrFail((int) $validated['car_group_id']);
+
+            $matchingPrice = $carGroup->price?->first(function ($p) use ($dayCount) {
+                return $dayCount >= (int) $p->min_days && $dayCount <= (int) $p->max_days;
             });
 
-            $baseDailyPrice = $validated['daily_price'];
-            $drop_cost = $validated['drop_price'];
+            $baseDailyPrice = (float) ($matchingPrice->base_price ?? 0);
+            if ($baseDailyPrice <= 0) {
+                return response()->json(['error' => 'Pricing not available for selected dates'], 422);
+            }
+
+            $drop = DropPrice::select('price')
+                ->where('from_location_id', (int) $validated['pick_up_location_id'])
+                ->where('to_location_id', (int) $validated['return_location_id'])
+                ->first();
+            $drop_cost = (float) ($drop->price ?? 0);
 
             $discountData = $this->calculateDiscount(
                 (int) $validated['car_group_id'],
-                $validated['start_date_time'],
-                $validated['finish_date_time'],
+                $start->toDateTimeString(),
+                $finish->toDateTimeString(),
                 $baseDailyPrice
             );
 
-            $dailyDiscountAmount = $discountData['amount'];
+            $dailyDiscountAmount = (float) ($discountData['amount'] ?? 0);
             $discountRule = $discountData['meta'] ?? null;
 
-            $totalDiscountAmount = $dailyDiscountAmount * $validated['total_days'];
+            $totalDiscountAmount = $dailyDiscountAmount * $dayCount;
             $discountedDailyPrice = max(0, $baseDailyPrice - $dailyDiscountAmount);
 
-            $rental_cost = $validated['total_days'] * $discountedDailyPrice;
+            $rental_cost = $dayCount * $discountedDailyPrice;
 
             $total_price = $rental_cost + $drop_cost;
             $total_price = max(0, $total_price);
 
             // Apply online discount if paying online
             $payOnline = $validated['pay_online'] ?? false;
-            $onlineDiscountRate = $validated['online_discount_amount'] ?? 0;
+            $onlineDiscountRate = (float) ($carGroup->online_discount ?? 0);
             if ($payOnline && $onlineDiscountRate > 0) {
                 $total_price = $total_price * (1 - $onlineDiscountRate);
             }
 
             $exchange_rate = \App\Models\Currency::findOrFail($validated['currency_id'])->exchange_rate;
 
+            $extras_total_price = 0.0;
+            $extrasPayload = json_decode($validated['extras'] ?? '[]', true);
+            if (!is_array($extrasPayload)) {
+                $extrasPayload = [];
+            }
+            $extrasToPersist = [];
+            foreach ($extrasPayload as $key => $value) {
+                $extraId = is_numeric($key) ? (int) $key : (int) ($value['id'] ?? 0);
+                $qty = (int) ($value['count'] ?? $value['quantity'] ?? 0);
+                if ($extraId <= 0 || $qty <= 0) {
+                    continue;
+                }
+
+                $priceTier = \App\Models\ExtraServicePrice::query()
+                    ->where('extra_service_id', $extraId)
+                    ->where('min_days', '<=', $dayCount)
+                    ->where('max_days', '>=', $dayCount)
+                    ->orderBy('min_days', 'asc')
+                    ->first();
+
+                $unitBasePrice = (float) ($priceTier->base_price ?? 0);
+                if ($unitBasePrice <= 0) {
+                    continue;
+                }
+
+                $extras_total_price += $unitBasePrice * $qty;
+                $extrasToPersist[] = ['id' => $extraId, 'qty' => $qty, 'unit_price' => $unitBasePrice];
+            }
+
             $reservation = Reservation::create([
                 'car_group_id' => $validated['car_group_id'],
-                'pickup_datetime' => Carbon::parse($validated['start_date_time'], 'Europe/Istanbul')->setTimezone('UTC'),
-                'return_datetime' => Carbon::parse($validated['finish_date_time'], 'Europe/Istanbul')->setTimezone('UTC'),
+                'pickup_datetime' => $start->copy()->setTimezone('UTC'),
+                'return_datetime' => $finish->copy()->setTimezone('UTC'),
                 'currency_id' => $validated['currency_id'],
                 'exchange_rate' => $exchange_rate,
                 'pickup_location_id' => $validated['pick_up_location_id'],
                 'return_location_id' => $validated['return_location_id'],
-                'rental_days' => $validated['total_days'],
+                'rental_days' => $dayCount,
                 'daily_price' => $baseDailyPrice,
-                'drop_price' => $validated['drop_price'] ?? null,
+                'drop_price' => $drop_cost,
                 'extras_total' => $extras_total_price,
                 'discount_amount' => $totalDiscountAmount,
                 'discount_type' => $discountRule ? $discountRule->discount_type : null,
                 'discount_target' => $discountRule ? $discountRule->target_type : null,
-                'online_discount_amount' => $validated['online_discount_amount'] ?? 0,
-                'total_price' => $total_price + ($extras_total_price * $validated['total_days']),
+                'online_discount_amount' => $onlineDiscountRate,
+                'total_price' => $total_price + ($extras_total_price * $dayCount),
                 'name' => $validated['user_info']['name'],
                 'surname' => $validated['user_info']['surname'],
                 'email' => $validated['user_info']['email'],
@@ -571,12 +627,12 @@ class ReservationController extends Controller
                 'identity_number' => $validated['user_info']['id'],
             ]);
 
-            foreach($extrasArray as $extraId => $e){
+            foreach ($extrasToPersist as $e) {
                 ReservationExtra::create([
                     'reservation_id' => $reservation->id,
-                    'extra_service_id' => $extraId,
-                    'price' => $e['price'],
-                    'quantity' => $e['count'],
+                    'extra_service_id' => $e['id'],
+                    'price' => $e['unit_price'],
+                    'quantity' => $e['qty'],
                 ]);
             }
 
@@ -588,7 +644,7 @@ class ReservationController extends Controller
             $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_created', [
                 'user_name' => $reservation->name,
                 'reference_code' => $reservation->reference_code,
-                'car_name' => $names[$validated['lang']],
+                'car_name' => $names[$validated['lang']] ?? ($names['en'] ?? reset($names)),
                 'tracking_url'   => $reservation->tracking_url,
                 'pickup_location' => $reservation->pickupLocation->name,
                 'return_location' => $reservation->returnLocation->name,
@@ -601,7 +657,8 @@ class ReservationController extends Controller
             return response()->json([
                 'success' => true,
                 'token' => $reservation->token,
-                'payment_type' => $reservation->payment_type
+                'payment_type' => $reservation->payment_type,
+                'reference_code' => $reservation->reference_code,
             ], 201);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -706,7 +763,7 @@ class ReservationController extends Controller
     {
         $user = auth()->user();
         $reservations = Reservation::where('email', $user->email)
-            ->with(['carGroup.photos', 'pickupLocation', 'returnLocation', 'carGroup.brandKey', 'carGroup.modelKey', 'currency'])
+            ->with(['carGroup.photos', 'pickupLocation', 'returnLocation', 'carGroup.translationKey', 'currency'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -715,13 +772,13 @@ class ReservationController extends Controller
         ]);
     }
 
-    public function cancelReservation(Request $request)
+        public function cancelReservation(Request $request, $referenceCode)
     {
         $user = auth()->user();
-        $langCode = $request->input('lang');
+        $langCode = $request->input('lang', 'en');
 
         $reservation = Reservation::where('email', $user->email)
-            ->where('reference_code', $request->input('reference_code'))
+            ->where('reference_code', $referenceCode)
             ->firstOrFail();
 
         if ($reservation->status !== 'pending') {
@@ -739,7 +796,7 @@ class ReservationController extends Controller
         $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_rejected', [
             'user_name' => $reservation->name,
             'reference_code' => $reservation->reference_code,
-            'car_name' => $names[$langCode],
+            'car_name' => $names[$langCode] ?? ($names['en'] ?? reset($names)),
             'pickup_location' => $reservation->pickupLocation->name,
             'return_location' => $reservation->returnLocation->name,
             'pickup_date' => $reservation->pickup_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
@@ -752,7 +809,7 @@ class ReservationController extends Controller
             ->with(['carGroup.photos', 'pickupLocation', 'returnLocation', 'carGroup.brandKey', 'carGroup.modelKey', 'currency'])
             ->orderBy('created_at', 'desc')
             ->get();
-
+ 
         return response()->json([
             'success' => 'Rezervasyon başarıyla iptal edildi.',
             'reservations' => $reservations,
@@ -868,13 +925,13 @@ class ReservationController extends Controller
         $reservation->notify(new \App\Notifications\CustomEmailNotification('reservation_rejected', [
             'user_name' => $reservation->name,
             'reference_code' => $reservation->reference_code,
-            'car_name' => $names[$validated['langCode']],
+            'car_name' => $names[$validated['lang'] ?? 'en'] ?? ($names['en'] ?? reset($names)),
             'pickup_location' => $reservation->pickupLocation->name,
             'return_location' => $reservation->returnLocation->name,
             'pickup_date' => $reservation->pickup_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
             'return_date' => $reservation->return_datetime->setTimezone('Europe/Istanbul')->format('d.m.Y H:i'),
             'total_price' => number_format($reservation->total_price * $reservation->exchange_rate, 2, ',', '.') . ' ' . $reservation->currency->symbol,
-            'lang' => $reservation->locale ?? $validated['langCode']
+            'lang' => $reservation->locale ?? ($validated['lang'] ?? 'en')
         ]));
 
         if ($request->wantsJson()) {

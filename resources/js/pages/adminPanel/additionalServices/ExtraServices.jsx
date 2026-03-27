@@ -4,6 +4,7 @@ import ExternalServiceModal from "../../../components/adminPanel/price/ExternalS
 import {useTranslation} from "react-i18next";
 import {useCurrency} from "../../../providers/CurrencyContext.jsx";
 import { Plus, Package, Edit2 } from "lucide-react";
+import SuccessMessage from "../../../components/SuccessMessage.jsx";
 
 export default function ExtraServices({ extraServices, success, error }) {
     const {t, i18n} = useTranslation();
@@ -62,11 +63,7 @@ export default function ExtraServices({ extraServices, success, error }) {
                             <span className="text-sm font-medium">{error}</span>
                         </div>
                     )}
-                    {success && (
-                        <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 text-green-700 rounded-xl">
-                            <span className="text-sm font-medium">{success}</span>
-                        </div>
-                    )}
+                    <SuccessMessage message={success} />
 
                     {/* Desktop Table View */}
                     <div className="hidden lg:block bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">

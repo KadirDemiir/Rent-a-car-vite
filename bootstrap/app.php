@@ -37,6 +37,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'localeViewPath'          => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class,
             'detectBrowserLocale'     => DetectBrowserLocale::class,
             'admin'                   => \App\Http\Middleware\AdminMiddleware::class,
+            'website'                 => \App\Http\Middleware\WebsiteMiddleware::class,
             'check.page.group'        => CheckPageGroupIsActive::class,
         ]);
     })

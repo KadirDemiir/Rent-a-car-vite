@@ -4,6 +4,7 @@ import LanguageInformationForm from "./LanguageInformationForm.jsx";
 import CampaignLanguage from "./CampaignLanguage.jsx";
 import {useTranslation} from "react-i18next";
 import { Globe, Code, Megaphone, Car } from "lucide-react";
+import SuccessMessage from "../../SuccessMessage.jsx";
 
 export default function LanguageForm({ language, keys, campaigns}) {
     const {t} = useTranslation();
@@ -86,12 +87,7 @@ export default function LanguageForm({ language, keys, campaigns}) {
             {/* Alert Messages */}
             {(success || error) && (
                 <div className="space-y-3">
-                    {success && (
-                        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-800">
-                            <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                            <span className="text-sm sm:text-base font-medium">{success}</span>
-                        </div>
-                    )}
+                    <SuccessMessage message={success} className="mb-0" />
                     {error && (
                         <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-800">
                             <div className="w-2 h-2 rounded-full bg-red-500"></div>

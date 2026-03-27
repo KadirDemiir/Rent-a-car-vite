@@ -3,6 +3,7 @@ import DropLocations from "../../../components/adminPanel/price/DropPrice/DropLo
 import DropCoefficient from "../../../components/adminPanel/price/DropPrice/DropCoefficient.jsx";
 import {useTranslation} from "react-i18next";
 import {useState} from "react";
+import SuccessMessage from "../../../components/SuccessMessage.jsx";
 
 export default function DropPrice({locations, dropPrice, segments, success, general, currencies}) {
     const {t} = useTranslation();
@@ -37,9 +38,7 @@ export default function DropPrice({locations, dropPrice, segments, success, gene
                     </header>
 
                     {successMessage && (
-                        <div className="rounded-2xl border border-green-200 bg-green-50 p-4 text-green-800">
-                            {successMessage}
-                        </div>
+                        <SuccessMessage message={successMessage} className="rounded-2xl" />
                     )}
                     {generalMessage && (
                         <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-red-700">

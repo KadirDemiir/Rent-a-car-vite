@@ -3,6 +3,7 @@ import Navbar from "../../../components/adminPanel/navbar/Navbar.jsx";
 import CampaignTextEditor from "../../../components/adminPanel/campaign/ContentEditor.jsx";
 import LanguageProgress from "../../../components/adminPanel/LanguageProgress.jsx";
 import axios from "axios";
+import SuccessMessage from "../../../components/SuccessMessage.jsx";
 
 export default function AboutPage({ languages = [], about_info }) {
     const [currentLang, setCurrentLang] = useState(languages.length > 0 ? languages[0].code : "");
@@ -147,11 +148,7 @@ export default function AboutPage({ languages = [], about_info }) {
                         </h1>
                     </div>
 
-                    {success && (
-                        <div className="w-full bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6 flex items-center transition-all">
-                            <span className="font-semibold">{success}</span>
-                        </div>
-                    )}
+                    <SuccessMessage message={success} className="w-full mb-6" />
 
                     {serverError && (
                         <div className="w-full bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center transition-all">

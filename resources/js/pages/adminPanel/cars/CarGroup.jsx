@@ -6,6 +6,7 @@ import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import {VehicleTable} from "../../../components/adminPanel/car/CarTable.jsx";
+import SuccessMessage from "../../../components/SuccessMessage.jsx";
 
 export default function CarGroup({ id, locations = [] }) {
     const [car, setCar] = useState(null);
@@ -50,11 +51,7 @@ export default function CarGroup({ id, locations = [] }) {
                         </div>
                         <hr className="my-4" />
 
-                        {success && (
-                            <div className="mb-4 p-3 rounded bg-green-100 text-green-800 border border-green-300">
-                                {success}
-                            </div>
-                        )}
+                        <SuccessMessage message={success} />
 
                         <div className="w-full flex flex-col gap-16">
                             <ModifyCar car={car} setCar={setCar} setSuccess={setSuccess} />

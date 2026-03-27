@@ -75,7 +75,7 @@ export default function ClockSelector({ selectedClock, onClockChange }) {
                     ref={refs.setFloating}
                     style={floatingStyles}
                     {...getFloatingProps()}
-                    className="z-50 w-32 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+                    className="z-50 w-44 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150"
                 >
                     <div className="max-h-60 overflow-y-auto py-1 scrollbar-hide" ref={listRef}>
                         {times.map((time) => (

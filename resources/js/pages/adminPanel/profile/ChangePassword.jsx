@@ -1,6 +1,7 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import Navbar from '../../../components/adminPanel/navbar/Navbar.jsx';
+import SuccessMessage from '../../../components/SuccessMessage.jsx';
 
 export default function ChangePassword() {
     const { t, i18n } = useTranslation();
@@ -29,11 +30,7 @@ export default function ChangePassword() {
                     <h1 className="text-2xl font-bold text-gray-800 mb-2">Change Password</h1>
                     <p className="text-gray-500 mb-6">Update your admin account password.</p>
 
-                    {success && (
-                        <div className="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
-                            {success}
-                        </div>
-                    )}
+                    <SuccessMessage message={success} className="mb-6" />
                     {(pageErrors.current_password || pageErrors.password || pageErrors.password_confirmation) && (
                         <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
                             {pageErrors.current_password || pageErrors.password || pageErrors.password_confirmation}

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import LocationAdd from "../../../components/adminPanel/locations/LocationAdd.jsx";
 import LocationsList from "../../../components/adminPanel/locations/LocationsList.jsx";
 import axios from "axios";
+import SuccessMessage from "../../../components/SuccessMessage.jsx";
 
 export default function Locations() {
     const [locations, setLocations] = useState([]);
@@ -99,12 +100,7 @@ export default function Locations() {
                                 ))}
                             </div>
                         )}
-                        {success && (
-                            <div className="flex items-center text-xs font-medium text-emerald-600 bg-emerald-50/30 px-3 py-2 rounded-lg border border-emerald-100/50 animate-in fade-in duration-300">
-                                <span className="mr-2">✓</span>
-                                {success}
-                            </div>
-                        )}
+                        <SuccessMessage message={success} />
                     </div>
                     <br/>
                     {isModalOpen && (

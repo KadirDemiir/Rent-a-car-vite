@@ -2,6 +2,7 @@ import CarForm from "./form/CarForm.jsx";
 import { usePage } from "@inertiajs/react";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import SuccessMessage from "../../SuccessMessage.jsx";
 
 export default function CarModify({ closeModal = null, car = null, setCar, setSuccess }) {
     const { t, i18n } = useTranslation();
@@ -34,11 +35,7 @@ export default function CarModify({ closeModal = null, car = null, setCar, setSu
             </button>
 
             <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6 pr-8">{t("adminpanel.car.car_modify.edit_car_information.edit_car_information")}</h2>
-            {success && (
-                <div className="mb-4 p-3 rounded bg-green-100 text-green-800 border border-green-300">
-                    {success}
-                </div>
-            )}
+            <SuccessMessage message={success} />
             {error && (
                 <div className="mb-4 p-3 rounded bg-red-100 text-red-800 border border-red-300">
                     {error}

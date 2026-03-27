@@ -65,37 +65,42 @@ export default function CarReservations({ allReservations, updateData, current =
 
     return (
         <div className="relative">
-            <table className="table-auto w-full border border-gray-500 border-collapse mt-2">
-                <thead className="bg-gray-100">
-                    <tr>
-                        <Td cls={TDclass} contents={headers} as="th" />
-                    </tr>
-                </thead>
-                <tbody>
-                    {currentReservations.map((r, index) => (
-                        <tr
-                            key={r.id || startIndex + index}
-                            onClick={() => setSelectedReservation(r)}
-                            className="cursor-pointer hover:bg-gray-100"
-                        >
-                            <Td
-                                cls={TDclass}
-                                contents={[
-                                    `${r.name} ${r.surname}`,
-                                    new Date(r.pickup_datetime).toLocaleString("tr-TR", { timeZone: "Europe/Istanbul", dateStyle: "short", timeStyle: "short" }),
-                                    new Date(r.return_datetime).toLocaleString("tr-TR", { timeZone: "Europe/Istanbul", dateStyle: "short", timeStyle: "short" }),
-                                    <span className={`${getPaymentStatusColor(r.payment_status)} font-semibold`} key="payment">
-                                        {r.payment_status}
-                                    </span>,
-                                    <span className={`${getStatusColor(r.status)} font-semibold`} key="status">
-                                        {r.status}
-                                    </span>,
-                                ]}
-                            />
+            <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
+                <table className="w-full border-collapse">
+                    <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+                        <tr>
+                            <th className="px-6 py-3 font-semibold text-gray-700 text-sm text-left w-1/4">{headers[0]}</th>
+                            <th className="px-6 py-3 font-semibold text-gray-700 text-sm text-left w-1/5">{headers[1]}</th>
+                            <th className="px-6 py-3 font-semibold text-gray-700 text-sm text-left w-1/5">{headers[2]}</th>
+                            <th className="px-6 py-3 font-semibold text-gray-700 text-sm text-left w-1/6">{headers[3]}</th>
+                            <th className="px-6 py-3 font-semibold text-gray-700 text-sm text-left w-1/6">{headers[4]}</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                        {currentReservations.map((r, index) => (
+                            <tr
+                                key={r.id || startIndex + index}
+                                onClick={() => setSelectedReservation(r)}
+                                className="cursor-pointer bg-white hover:bg-blue-50 transition-colors duration-150 border-0"
+                            >
+                                <td className="px-6 py-4 text-sm text-gray-900 w-1/4">{`${r.name} ${r.surname}`}</td>
+                                <td className="px-6 py-4 text-sm text-gray-900 w-1/5">{new Date(r.pickup_datetime).toLocaleString("tr-TR", { timeZone: "Europe/Istanbul", dateStyle: "short", timeStyle: "short" })}</td>
+                                <td className="px-6 py-4 text-sm text-gray-900 w-1/5">{new Date(r.return_datetime).toLocaleString("tr-TR", { timeZone: "Europe/Istanbul", dateStyle: "short", timeStyle: "short" })}</td>
+                                <td className="px-6 py-4 text-sm w-1/6">
+                                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getPaymentStatusColor(r.payment_status)} ${getPaymentStatusColor(r.payment_status).includes('green') ? 'bg-green-50 border border-green-300' : getPaymentStatusColor(r.payment_status).includes('red') ? 'bg-red-50 border border-red-300' : 'bg-yellow-50 border border-yellow-300'}`}>
+                                        {r.payment_status}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4 text-sm w-1/6">
+                                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(r.status)} ${getStatusColor(r.status).includes('green') ? 'bg-green-50 border border-green-300' : getStatusColor(r.status).includes('red') ? 'bg-red-50 border border-red-300' : 'bg-yellow-50 border border-yellow-300'}`}>
+                                        {r.status}
+                                    </span>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
             <ChevronNavigation
                 handlePrev={handlePrev}

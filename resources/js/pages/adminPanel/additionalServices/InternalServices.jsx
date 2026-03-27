@@ -4,6 +4,7 @@ import { useState } from "react";
 import {useTranslation} from "react-i18next";
 import axios from "axios";
 import LanguageProgress from "../../../components/adminPanel/LanguageProgress.jsx";
+import SuccessMessage from "../../../components/SuccessMessage.jsx";
 
 export default function InternalServices({services, languages}) {
     const [langOpt, setLangOpt] = useState(() => languages.map(l => ({label: l.name, value: l.code})));
@@ -87,7 +88,7 @@ export default function InternalServices({services, languages}) {
                     
                     {error && <div className="mb-4 border-l-4 border-red-500 bg-red-50 text-red-700 p-4 rounded">{error}</div>}
                     {formError && <div className="mb-4 border-l-4 border-red-500 bg-red-50 text-red-700 p-4 rounded">{formError}</div>}
-                    {success && <div className="mb-4 border-l-4 border-green-500 bg-green-50 text-green-700 p-4 rounded">{success}</div>}
+                    <SuccessMessage message={success} />
                     
                     {/* Services Table Section */}
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">

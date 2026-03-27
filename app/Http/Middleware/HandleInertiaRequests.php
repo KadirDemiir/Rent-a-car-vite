@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 use App\Services\TranslationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -13,7 +14,7 @@ class HandleInertiaRequests extends Middleware
     // Request-level caching to avoid repeated lookups within same request
     private static ?array $cachedCurrencies = null;
     private static ?array $cachedLanguages = null;
-    private static ?array $cachedTranslations = null;
+    private static array $cachedTranslations = [];
 
     public function version(Request $request): ?string
     {
@@ -31,7 +32,7 @@ class HandleInertiaRequests extends Middleware
             'languages' => fn () => $this->getLanguages(),
             // Pass translations inline to avoid extra HTTP request from i18next
             'pageName' => getPagesNameCache(),
-            'translations' => fn () => $this->getTranslations(),
+            'translations' => fn () => $this->getTranslations($request),
             'activePages' => getPagesCache()->where('is_active', true)->pluck('route_group_name')->toArray(),
         ]);
     }
@@ -76,11 +77,43 @@ class HandleInertiaRequests extends Middleware
      * Get translations with request-level caching
      * Passed inline via props to avoid extra HTTP request
      */
-    private function getTranslations(): array
+    private function getTranslations(Request $request): array
     {
-        if (self::$cachedTranslations === null) {
-            self::$cachedTranslations = TranslationService::getTranslationsByLanguage(app()->getLocale());
+        $scope = $this->resolveTranslationScope($request);
+        $cacheKey = app()->getLocale() . '|' . $scope;
+
+        if (!array_key_exists($cacheKey, self::$cachedTranslations)) {
+            $translations = TranslationService::getTranslationsByLanguage(app()->getLocale());
+            
+            if ($scope === 'admin') {
+                // For admin, exclude anything starting with website.
+                self::$cachedTranslations[$cacheKey] = collect($translations)
+                    ->filter(fn ($value, $key) => !Str::startsWith($key, 'website.'))
+                    ->toArray();
+            } else {
+                // For website, exclude anything starting with adminpanel.
+                self::$cachedTranslations[$cacheKey] = collect($translations)
+                    ->filter(fn ($value, $key) => !Str::startsWith($key, 'adminpanel.'))
+                    ->toArray();
+            }
         }
-        return self::$cachedTranslations;
+
+        return self::$cachedTranslations[$cacheKey];
+    }
+
+    /**
+     * Determine whether request is in website or admin area.
+     */
+    private function resolveTranslationScope(Request $request): string
+    {
+        $route = $request->route();
+        $routeMiddlewares = $route?->gatherMiddleware() ?? [];
+        $routeName = $route?->getName() ?? '';
+
+        if (in_array('admin', $routeMiddlewares, true) || Str::startsWith($routeName, 'admin')) {
+            return 'admin';
+        }
+
+        return 'website';
     }
 }

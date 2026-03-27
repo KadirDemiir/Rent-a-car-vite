@@ -2,6 +2,7 @@ import CarPropertiesGenericInfo from "./CarPropertiesGenericInfo.jsx";
 import {useState} from "react";
 import axios from "axios";
 import {useTranslation} from "react-i18next";
+import SuccessMessage from "../../SuccessMessage.jsx";
 
 export default function BodyTypeForm({mode="create", lngs, bt=null}){
     const {t} = useTranslation();
@@ -74,7 +75,7 @@ export default function BodyTypeForm({mode="create", lngs, bt=null}){
 
     return(
         <div className={`p-8 shadow-lg`}>
-            {success && <p className={`w-full border-l-12 border-green-700 bg-green-300 text-green-700 font-semibold p-2`}>{success}</p>}
+            <SuccessMessage message={success} />
             {error && <p className={`w-full border-l-12 border-red-700 bg-red-300 text-red-700 font-semibold p-2`}>{error}</p>}
 
             <CarPropertiesGenericInfo title={t("adminpanel.add_body_type.select_language")} name={t("adminpanel.add_body_type.body_type_name")} formData={formData} currentLang={currentLang} langOptions={langOptions } setCurrentLang={setCurrentLang} setFormData={setFormData}

@@ -5,6 +5,7 @@ import DiscountForm from "../../../components/adminPanel/price/DiscountForm.jsx"
 import axios from "axios";
 import {useTranslation} from "react-i18next";
 import {createEmptyDiscount} from "../../../components/adminPanel/price/discountHelpers.js";
+import SuccessMessage from "../../../components/SuccessMessage.jsx";
 
 export default function AddDiscounts({success, errors, segments, currencies}) {
     const {t} = useTranslation();
@@ -123,18 +124,6 @@ export default function AddDiscounts({success, errors, segments, currencies}) {
 
     };
 
-    const FeedbackMessage = ({ type, children }) => (
-        <div
-            className={`mb-4 border-l-4 p-4 ${
-                type === "success"
-                    ? "border-green-500 bg-green-100 text-green-700"
-                    : "border-red-500 bg-red-100 text-red-700"
-            }`}
-        >
-            {children}
-        </div>
-    );
-
     return (
         <div className="w-full min-h-[600px]">
             <Navbar>
@@ -144,9 +133,9 @@ export default function AddDiscounts({success, errors, segments, currencies}) {
                     </h3>
                     <hr className="my-6" />
 
-                    {serverSuccess && <FeedbackMessage type="success">{serverSuccess}</FeedbackMessage>}
-                    {serverError && <FeedbackMessage type="error">{serverError}</FeedbackMessage>}
-                    {error && <FeedbackMessage type="error">{error}</FeedbackMessage>}
+                    <SuccessMessage message={serverSuccess} />
+                    {serverError && <div className="mb-4 border-l-4 border-red-500 bg-red-100 p-4 text-red-700">{serverError}</div>}
+                    {error && <div className="mb-4 border-l-4 border-red-500 bg-red-100 p-4 text-red-700">{error}</div>}
 
                     <DiscountForm currencies={currencies} selectedDiscount={selectedDiscount} setSelectedDiscount={setSelectedDiscount} dayDiscount={dayDiscount} setDayDiscount={setDayDiscount} segmentId={segmentId} setSegmentId={setSegmentId} segments={segments} defaultCurrencyId={defaultCurrencyId} startDate={startDate} setStartDate={setStartDate} endDate={endDate} setEndDate={setEndDate}/>
 

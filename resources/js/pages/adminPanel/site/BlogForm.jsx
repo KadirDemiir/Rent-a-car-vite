@@ -3,6 +3,7 @@ import axios from 'axios';
 import LanguageProgress from "../../../components/adminPanel/LanguageProgress.jsx";
 import CampaignTextEditor from "../../../components/adminPanel/campaign/ContentEditor.jsx"
 import Navbar from "../../../components/adminPanel/navbar/Navbar.jsx";
+import SuccessMessage from "../../../components/SuccessMessage.jsx";
 
 export default function BlogForm({languages = [], blog = null}) {
     const langOpt = languages.map(l => ({label: l.name, value: l.code}));
@@ -145,9 +146,7 @@ export default function BlogForm({languages = [], blog = null}) {
                 </h2>
 
                 {successMessage && (
-                    <div className="w-full bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6 flex items-center shadow-sm">
-                        <span className="block sm:inline font-medium">{successMessage}</span>
-                    </div>
+                    <SuccessMessage message={successMessage} className="mb-6 w-full shadow-sm" />
                 )}
 
                 {errorMessage && (

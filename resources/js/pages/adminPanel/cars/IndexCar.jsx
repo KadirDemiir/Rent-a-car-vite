@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { router } from "@inertiajs/react";
+import SuccessMessage from "../../../components/SuccessMessage.jsx";
 
 const safeJsonParse = (str) => {
     try {
@@ -173,11 +174,7 @@ export default function IndexCar({ id, locations = [], carGroups = [], languages
                             </div>
                         </div>
 
-                        {success && (
-                            <div className="p-4 bg-green-100 border border-green-200 text-green-800 rounded-lg">
-                                {success}
-                            </div>
-                        )}
+                        <SuccessMessage message={success} />
 
                         {/* Car Details Card */}
                         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

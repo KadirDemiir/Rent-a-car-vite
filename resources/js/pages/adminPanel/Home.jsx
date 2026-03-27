@@ -142,7 +142,7 @@ export default function Home({ upcomingReservations, activeReservations, lateRes
                     <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
                         <h3 className="text-lg font-bold text-gray-800 mb-4">Kiralamayı Tamamla</h3>
                         <p className="text-sm text-gray-600 mb-4">
-                            <span>{completeModal.reservation.assigned_vehicle.plate_number } </span>
+                            <span>{completeModal.reservation.assigned_vehicle.licence_plate } </span>
                             <span>Plakalı aracı teslim almak için güncel kilometre bilgisini girin.</span>
                         </p>
                         <p>

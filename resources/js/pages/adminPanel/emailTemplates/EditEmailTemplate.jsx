@@ -5,6 +5,7 @@ import Navbar from '../../../components/adminPanel/navbar/Navbar.jsx';
 import axios from 'axios';
 import CampaignTextEditor from '../../../components/adminPanel/campaign/ContentEditor.jsx';
 import LanguageProgress from '../../../components/adminPanel/LanguageProgress.jsx';
+import SuccessMessage from '../../../components/SuccessMessage.jsx';
 
 export default function EditEmailTemplate({ template, languages }) {
     const { t, i18n } = useTranslation();
@@ -76,8 +77,9 @@ export default function EditEmailTemplate({ template, languages }) {
                     </button>
                 </div>
 
-                {message && (
-                    <div className={`mb-4 p-4 rounded-lg ${message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                {message?.type === 'success' && <SuccessMessage message={message.text} />}
+                {message?.type === 'error' && (
+                    <div className="mb-4 p-4 rounded-lg bg-red-100 text-red-800">
                         {message.text}
                     </div>
                 )}

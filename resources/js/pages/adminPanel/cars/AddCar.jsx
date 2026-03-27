@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import axios from "axios";
 import React, { useState, useRef } from "react";
 import CarVehicleForm from "../../../components/adminPanel/car/form/CarVehicleForm.jsx";
+import SuccessMessage from "../../../components/SuccessMessage.jsx";
 
 const safeJsonParse = (str) => {
     try {
@@ -138,7 +139,7 @@ export default function AddCar({ carGroups = [], locations = [], languages = [] 
                     </p>
                     <hr className="my-4" />
 
-                    {success && <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded">{success}</div>}
+                    <SuccessMessage message={success} />
                     {error && <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded">{error}</div>}
 
                     <div className="w-full shadow-lg p-6 rounded-xl bg-white border border-gray-200">

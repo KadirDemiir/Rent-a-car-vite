@@ -3,6 +3,7 @@ import SiteVariable from "./SiteVariable.jsx";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { Save, CheckCircle, AlertCircle } from "lucide-react";
+import SuccessMessage from "../../SuccessMessage.jsx";
 
 export default function SiteVariableForm({keys, language}){
     const [success, setSuccess] = useState();
@@ -55,12 +56,7 @@ export default function SiteVariableForm({keys, language}){
             {/* Alert Messages */}
             {(success || error) && (
                 <div className="space-y-3">
-                    {success && (
-                        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-800">
-                            <CheckCircle size={18} />
-                            <span className="text-sm sm:text-base font-medium">{success}</span>
-                        </div>
-                    )}
+                    <SuccessMessage message={success} className="mb-0" />
                     {error && (
                         <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-800">
                             <AlertCircle size={18} />

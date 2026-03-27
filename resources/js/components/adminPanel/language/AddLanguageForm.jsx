@@ -4,6 +4,7 @@ import LanguageInformation from "./LanguageInformation.jsx";
 import axios from "axios";
 import {router} from "@inertiajs/react";
 import {useTranslation} from "react-i18next";
+import SuccessMessage from "../../SuccessMessage.jsx";
 
 export default function AddLanguageForm({ keys}) {
     const {t, i18n} = useTranslation();
@@ -77,7 +78,7 @@ export default function AddLanguageForm({ keys}) {
             <div className="flex justify-end pr-16">
                 <LanguageInformation data={formLanguageData} setData={setFormLanguageData} />
             </div>
-            {success && <div className={`w-full border-l-12 border-green-600 bg-green-500 text-white p-2`}>{success}</div>}
+            <SuccessMessage message={success} />
             {error && <div className={`w-full border-l-12 border-red-600 bg-red-500 text-white p-2`}>{error}</div>}
             <button onClick={handleSubmit} className="mt-4 px-6 py-2 rounded-lg text-white bg-gray-700 hover:bg-gray-800 transition-colors">{t("adminpanel.add_languages.button.save")}</button>
             <SiteVariable keys={keys} formData={formData} setFormData={setFormData}/>

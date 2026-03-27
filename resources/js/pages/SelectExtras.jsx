@@ -119,6 +119,10 @@ export default function SelectExtras({car, auth_user, params}){
         };
         axios.post('/create-reservation', submissionData, )
             .then(res => {
+                if (auth_user) {
+                    router.visit(`/${i18n.language}/my-reservations`);
+                    return;
+                }
                 router.visit(`/r/track/${res.data.token}`);
             })
             .catch(error => {

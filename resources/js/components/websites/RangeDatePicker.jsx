@@ -104,7 +104,7 @@ export default function RangeDatePicker({
                         disabled={{ before: minDateClean }}
                         locale={activeLocale}
                         showOutsideDays
-                        numberOfMonths={1}
+                        numberOfMonths={2}
                         defaultMonth={selectedForCalendar?.from || new Date()}
                         modifiersClassNames={{
                             selected: 'bg-gray-800 text-white hover:bg-gray-700',

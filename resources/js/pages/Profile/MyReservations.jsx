@@ -5,14 +5,14 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 
 export default function MyReservations({ reservations }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { processing } = useForm();
     const [filter, setFilter] = useState('active'); // 'active' or 'past'
     const [updatedReservations, setUpdatedReservations] = useState(reservations);
 
-    const handleCancel = (id) => {
+    const handleCancel = (referenceCode) => {
         if (confirm(t('Are you sure you want to cancel this reservation?'))) {
-            axios.post(`/my-reservations/${id}/cancel`, {
+            axios.patch(`/my-reservations/${encodeURIComponent(referenceCode)}/cancel`, {
                 lang: i18n.language
             })
                 .then(response => {
@@ -117,7 +117,7 @@ export default function MyReservations({ reservations }) {
                                         {reservation.status === 'pending' && (
                                             <div className="mt-6 pt-4 border-t border-gray-100 text-right">
                                                 <button
-                                                    onClick={() => handleCancel(reservation.id)}
+                                                    onClick={() => handleCancel(reservation.reference_code)}
                                                     disabled={processing}
                                                     className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50"
                                                 >
