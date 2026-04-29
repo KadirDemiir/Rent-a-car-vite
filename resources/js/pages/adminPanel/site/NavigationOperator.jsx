@@ -79,6 +79,16 @@ export default function NavigationOperator() {
     const [loading, setLoading] = useState(false);
     const [pages, setPages] = useState([]);
     const [isSaving, setIsSaving] = useState(false);
+    const [success, setSuccess] = useState("");
+
+    useEffect(() => {
+        if (success) {
+            const timer = setTimeout(() => {
+                setSuccess("");
+            }, 20000);
+            return () => clearTimeout(timer);
+        }
+    }, [success]);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -124,7 +134,12 @@ export default function NavigationOperator() {
         }));
 
         try {
-            await axios.post("/update-pages-sort", { pages: payload });
+            await axios.post("/update-pages-sort", { pages: payload })
+                .then(res => {
+                    if(res.data.success)
+                        setSuccess("Update Successfully.");
+
+                })
         } catch (error) {
             console.error(error);
         } finally {
@@ -145,6 +160,19 @@ export default function NavigationOperator() {
                         {isSaving ? "Kaydediliyor..." : "Sıralamayı Kaydet"}
                     </button>
                 </div>
+
+                {success && (
+                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative mb-4">
+
+                        <span className="block sm:inline">{success}</span>
+                        <button
+                            className="absolute top-0 bottom-0 right-0 px-4 py-3"
+                            onClick={() => setSuccess("")}
+                        >
+                            <span className="text-xl">&times;</span>
+                        </button>
+                    </div>
+                )}
 
                 {loading ? (
                     <div className="flex justify-center p-8 text-gray-500">Yükleniyor...</div>

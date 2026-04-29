@@ -1,10 +1,12 @@
 import Navbar from "../../../components/adminPanel/navbar/Navbar.jsx";
 import { router } from '@inertiajs/react';
+import {useTranslation} from "react-i18next";
 
 export default function BlogPage({ blogs }) {
+    const {t} = useTranslation();
 
     const handleRowClick = (id) => {
-        router.get(`/admin/blogs/${id}`);
+        router.get(`/${t('address.adminpanel')}/${t('address.blog_page')}/${id}`);
     };
 
     const formatDate = (dateString) => {

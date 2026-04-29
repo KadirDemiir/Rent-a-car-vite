@@ -27,6 +27,7 @@ if(!function_exists('getPagesNameCache')){
     {
         return \Illuminate\Support\Facades\Cache::rememberForever('pages_name_cache', function () {
             return \App\Models\Page::query()
+                ->where('is_active', true)
                 ->where('is_system', false)
                 ->orderBy('sort_order')
                 ->pluck('route_group_name')
@@ -175,7 +176,7 @@ if (!function_exists('clearTranslationCache')) {
 if (!function_exists('clearPageCache')) {
     function clearPageCache() {
         $store = getCacheStore();
-        $store->forget('getPagesCache');
+        $store->forget('pages_cache');
     }
 }
 

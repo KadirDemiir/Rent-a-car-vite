@@ -78,7 +78,7 @@ class PageController extends Controller
         return response()->json(['success' => true, 'is_active' => $page->is_active]);
     }
 
-    public function update(Request $request, Page $page)
+    public function update(Request $request, $id)
     {
         $validated = $request->validate([
             'title' => 'required|array',
@@ -87,8 +87,13 @@ class PageController extends Controller
             'meta_keywords' => 'nullable|array',
             'is_active' => 'boolean',
         ]);
+
+        $page = Page::findOrFail($id);
         $page->update($validated);
-        \Cache::forget('pages_cache');
+
+        clearPageCache();
+        clearPageNameCache();
+
         return response()->json(['success' => true, 'page' => $page]);
     }
 

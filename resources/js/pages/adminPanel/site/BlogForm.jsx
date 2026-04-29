@@ -23,7 +23,7 @@ export default function BlogForm({languages = [], blog = null}) {
 
     const [formData, setFormData] = useState({
         title: blog?.title || { ...defaultLangState },
-        slug: blog?.slug || { ...defaultLangState },
+        slug: blog?.slugs || { ...defaultLangState },
         content: blog?.content || { ...defaultLangState },
         meta_title: blog?.meta_title || { ...defaultLangState },
         meta_description: blog?.meta_description || { ...defaultLangState },
@@ -96,7 +96,7 @@ export default function BlogForm({languages = [], blog = null}) {
         }
 
         try {
-            const url = blog?.id ? `/api/blogs/${blog.id}` : '/adminpanel/blogs';
+            const url = blog?.id ? `/blogs/${blog.id}` : '/adminpanel/blogs';
             const response = await axios.post(url, data, {
                 headers: {
                     'Content-Type': 'multipart/form-data',

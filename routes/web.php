@@ -38,6 +38,7 @@ use Inertia\Inertia;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+
 Route::post('/get-blog-titles', function (\Illuminate\Http\Request $request) {
     $request->validate(['exclude_id' => 'required|integer|exists:blogs,id']);
     try {
@@ -130,11 +131,11 @@ Route::middleware('admin')->group(function () {
     Route::get('/adminpanel/get-info/locations/{id}', [LocationsController::class, 'getIndexLocationInfo']);
     Route::get('/get-reservations-informations', function () {
         $data = Reservation::with([
-    'extras.extra', 
-    'carGroup', 
-    'assignedVehicle', 
-    'pickupLocation', 
-    'returnLocation', 
+    'extras.extra',
+    'carGroup',
+    'assignedVehicle',
+    'pickupLocation',
+    'returnLocation',
     'currency'
 ])
 ->orderByDesc('pickup_datetime')
@@ -534,14 +535,16 @@ Route::group([
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('page_settings'), [\App\Http\Controllers\PageController::class, 'showPage'])->name('adminShowSiteSettings');
     Route::get('/adminpanel/pages', [\App\Http\Controllers\PageController::class, 'index'])->name('adminGetPages');
     Route::post('/adminpanel/pages/{id}/toggle-status', [\App\Http\Controllers\PageController::class, 'toggleStatus'])->name('adminTogglePageStatus');
-    Route::put('/pages/{page}', [\App\Http\Controllers\PageController::class, 'update'])->name('admin.pages.update');
+    Route::put('/adminpanel/pages/{id}', [\App\Http\Controllers\PageController::class, 'update'])->name('admin.pages.update');
 
     Route::get(dbTransRoute('adminpanel') . '/' . dbTransRoute('about_page'), [\App\Http\Controllers\AboutController::class, 'showPage'] )->name('adminAboutPage');
     Route::post('/adminpanel/about_page', [\App\Http\Controllers\AboutController::class, 'add'])->name('admin.pages.update');
 
     Route::get(dbTransRoute('adminpanel') . '/'. dbTransRoute('blog_page'), [\App\Http\Controllers\BlogController::class, 'showAdminPage'] )->name('showAdminBlogPage');
     Route::get(dbTransRoute('adminpanel') . '/'. dbTransRoute('blog_page') . '/' . dbTransRoute('add') , [\App\Http\Controllers\BlogController::class, 'showAdminAddPage'] )->name('showAdminAddBlogPage');
+    Route::get(dbTransRoute('adminpanel' . '/' . dbTransRoute('blog_page') . '/{id}'), [\App\Http\Controllers\BlogController::class, 'showAdminIndexBlog'])->name('adminShowIndexBlog');
     Route::post('/adminpanel/blogs', [\App\Http\Controllers\BlogController::class, 'add'])->name('admin.pages.add');
+    Route::put('/blogs/{id}', [\App\Http\Controllers\BlogController::class, 'update'])->name('admin.blogs.update');
 
     Route::get(dbTransRoute('adminpanel') . '/'. dbTransRoute('navigation_bar_settings'), [\App\Http\Controllers\PageController::class, 'showSortPage'] )->name('adminNavigationBarSettings');
     Route::post('/update-pages-sort', [\App\Http\Controllers\PageController::class, 'updateSort'])->name('admin.update.page.sort');
