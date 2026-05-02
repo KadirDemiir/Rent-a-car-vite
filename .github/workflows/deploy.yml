@@ -17,7 +17,7 @@ jobs:
           script_stop: true
           script: |
             set -e
-            cd /var/www/Rent-a-car-vite
+            cd /www/wwwroot/Rent-a-car-vite
 
             git fetch --all
             git reset --hard origin/main
