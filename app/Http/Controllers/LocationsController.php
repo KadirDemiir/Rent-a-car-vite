@@ -38,7 +38,7 @@ class LocationsController extends Controller
             'address'   => 'required|string',
             'latitude'  => 'required|numeric',
             'longitude' => 'required|numeric',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'parentId'  => 'nullable|exists:locations,id',
         ]);
 

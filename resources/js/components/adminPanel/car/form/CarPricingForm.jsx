@@ -123,12 +123,12 @@ const CarPricingForm = forwardRef(({ car = {}, onSubmit, ddopen = false }, ref) 
                     type="number"
                     min="0"
                     max="100"
-                    value={formData.online_discount.toFixed(2)}
+                    value={formData?.online_discount !== undefined ? Number(formData.online_discount).toFixed(2) : ""}
                     onChange={e => {
                         let val = parseFloat(e.target.value) || 0;
                         if (val < 0) val = 0;
                         if (val > 100) val = 100;
-                        setFormData(p => ({ ...p, online_discount: val.toFixed(2) }));
+                        setFormData(p => ({ ...p, online_discount: val }));
                     }}
                     error={error.online_discount}
                 />
